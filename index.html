@@ -150,7 +150,7 @@ details.tol-det[open] > summary::before { content: '▾'; }
 .tol-card.tol-mok { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
 .tol-sum-txt .ok { color: oklch(85% .12 160); font-weight: 700; } .tol-sum-txt .ko { color: oklch(80% .15 25); font-weight: 700; }
 .tol-summary { flex-wrap: wrap; } .tol-sum-txt { flex: 1 1 220px; } .tol-summary .tol-chip { flex: none; }
-@media (max-width: 899px) { body.tol-has-summary { padding-bottom: 118px; } .tol-sum-txt { font-size: 12px; } }
+@media (max-width: 899px) { body.tol-has-summary { padding-bottom: 150px; } .tol-sum-txt { font-size: 12px; } }
 @media (max-width: 899px) { .tol-fitrow { grid-template-columns: 98px 1fr; } .tol-fitrow span { grid-column: 1 / -1; } .tol-mbox .tol-inp { width: 150px; } }
 @media print { .tol-recent, details.tol-det { display: none !important; } }   /* «µm» in maiuscolo diventerebbe «MM» */
 .tol-grid > div { min-width: 0; }   /* le pillole scorrevoli non devono allargare la colonna della griglia */
@@ -183,6 +183,18 @@ details.tol-det[open] > summary::before { content: '▾'; }
 .tol-summary[hidden] { display: none; }
 .tol-sum-txt { flex: 1; min-width: 0; font: 12.5px/1.35 var(--mono, monospace); overflow: hidden; }
 .tol-sum-txt b { font-size: 14px; }
+.tol-sum-txt .l1 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.tol-sum-txt .cls { font-size: 17px; font-weight: 700; }
+.tol-sum-txt .dev { font-size: 12.5px; color: oklch(85% .01 78); }
+.tol-sum-txt .l2 { margin-top: 2px; }
+.tol-sum-txt .lim { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+.tol-sum-txt .u { font-size: 11px; color: oklch(75% .01 78); margin-left: 5px; }
+.tol-sum-txt .m { margin-top: 4px; font-size: 13px; }
+.tol-sum-txt .m .ok, .tol-sum-txt .m .ko { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12.5px; margin-right: 6px; }
+.tol-sum-txt .m .ok { background: var(--green); color: #fff; } .tol-sum-txt .m .ko { background: var(--red); color: #fff; }
+.tol-summary { border-top: 4px solid var(--blue); }
+.tol-summary.shaft { border-top-color: var(--amber); }
+@media (max-width: 899px) { .tol-sum-txt { flex: 1 1 100%; } .tol-sum-txt .lim { font-size: 21px; } .tol-sum-txt .cls { font-size: 16px; } .tol-summary { padding-top: 8px; gap: 6px 8px; } }
 .tol-sum-copy { border-color: oklch(70% .01 78); color: var(--surface); background: transparent; white-space: nowrap; }
 .tol-sum-copy.on { background: var(--surface); color: var(--text); }
 .tol-scrollx { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 3px; }
@@ -1098,13 +1110,14 @@ var TolISO = (function () {
     var o = limits(side, cur.letter, cur.grade, st.D);
     if (!o.ok) return { html: '<b>' + esc(cur.letter + cur.grade) + '</b> · ' + esc(t('err')[o.err] || tu('na')), copy: '' };
     var f = formats(o, lang === 'it' ? ',' : '.'), isH = side === 'hole';
-    var html = '<b>' + esc(f.cls) + '</b> · ' + (isH ? 'ES' : 'es') + ' ' + um(o.up) + ' · ' + (isH ? 'EI' : 'ei') + ' ' + um(o.lo) + ' → <b>' + esc(f.lim) + '</b>';
+    var html = '<div class="l1"><span class="cls">' + esc(f.cls) + '</span><span class="dev">' + (isH ? 'ES' : 'es') + ' ' + um(o.up) + ' · ' + (isH ? 'EI' : 'ei') + ' ' + um(o.lo) + ' µm</span></div>' +
+               '<div class="l2"><span class="lim">' + esc(f.lim) + '</span><span class="u">mm</span></div>';
     var text = f.cls + ' · ' + um(o.up) + '/' + um(o.lo) + ' → ' + f.lim, m = measured();
     if (m !== null) {
       var c = checkMeasure(o, m), ms = num(m, 3), line;
       if (c.ok) line = '<span class="ok">' + tu('mIn') + '</span> ' + ms + ' · ' + umAbs(c.toMax) + ' µm ' + tu('mFromMax') + ' · ' + umAbs(c.toMin) + ' µm ' + tu('mFromMin');
       else line = '<span class="ko">' + tu('mOut') + '</span> ' + ms + ' · ' + umAbs(c.toMax < 0 ? -c.toMax : -c.toMin) + ' µm ' + (c.toMax < 0 ? tu('mOver') : tu('mUnder'));
-      html += '<br>' + line; text += ' · ' + (c.ok ? tu('mIn') : tu('mOut')) + ' ' + ms;
+      html += '<div class="m">' + line + '</div>'; text += ' · ' + (c.ok ? tu('mIn') : tu('mOut')) + ' ' + ms;
     }
     return { html: html, copy: f.both, text: text };
   }
@@ -1114,6 +1127,7 @@ var TolISO = (function () {
     $('tol-sum-txt').innerHTML = s.html;
     var b = $('tol-sum-copy'); b.setAttribute('data-copy', s.copy); b.style.display = s.copy ? '' : 'none';
     var sh = $('tol-sum-share'); sh.setAttribute('data-share', s.text || ''); sh.style.display = s.text ? '' : 'none';
+    box.classList.toggle('shaft', side === 'shaft');
     box.hidden = false; document.body.classList.add('tol-has-summary');
   }
   function renderBand(st) {
@@ -1668,7 +1682,18 @@ var TolISO = (function () {
   var accOpenBefore = [];
   window.addEventListener('beforeprint', function () { preparePrint(); accOpenBefore = []; Array.prototype.forEach.call(document.querySelectorAll('details.tol-acc'), function (d) { accOpenBefore.push(d.open); d.open = true; }); });
   window.addEventListener('afterprint', function () { Array.prototype.forEach.call(document.querySelectorAll('details.tol-acc'), function (d, i) { d.open = !!accOpenBefore[i]; }); });
-  document.getElementById('tol-print-btn').addEventListener('click', function () { preparePrint(); setTimeout(function () { window.print(); }, 30); });
+  var isIOSDev = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  document.getElementById('tol-print-btn').addEventListener('click', function () {
+    preparePrint();
+    if (isIOSDev) {
+      /* su iPhone il tasto Stampa del browser non esiste dentro l'app: si passa dal foglio Condividi, dove iOS offre «Stampa» e «Salva in PDF» */
+      var msg = document.documentElement.lang === 'en' ? 'On iPhone: in the sheet that opens, scroll the list and tap "Print" or "Save to Files" (PDF).' : 'Su iPhone: nel foglio che si apre scorri la lista e tocca «Stampa» oppure «Salva su File» (PDF).';
+      if (navigator.share) { navigator.share({ title: document.title, url: location.href.split('?')[0] }).catch(function () {}); TolISO.showAlert(msg); setTimeout(function () { document.getElementById('tol-alert').classList.remove('on'); }, 9000); }
+      else TolISO.showAlert(msg + (document.documentElement.lang === 'en' ? ' Use the browser Share button.' : ' Usa il tasto Condividi del browser.'));
+      return;
+    }
+    setTimeout(function () { window.print(); }, 30);
+  });
 
   /* App installabile: service worker solo via http(s); con il doppio clic sul file resta una pagina normale */
   var noSw = /[?&]nosw/.test(location.search);   /* ?nosw = sviluppo: niente cache, e cancella quella esistente */
