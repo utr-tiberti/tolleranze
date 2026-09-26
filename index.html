@@ -286,7 +286,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 
   <header class="hd">
     <div>
-      <div class="hd-by">UTR Tiberti &middot; 1952</div>
+      <div class="hd-by">UTR Tiberti &middot; 1952 &middot; <span id="tol-ver-top"></span></div>
       <h1 class="hd-title" data-tx-it="Tolleranze <strong>ISO 286</strong>" data-tx-en="<strong>ISO 286</strong> Tolerances">Tolleranze <strong>ISO 286</strong></h1>
       <div class="hd-sub" data-tx-it="Fori e alberi &middot; accoppiamenti &middot; 0&ndash;500 mm &middot; app installabile, funziona senza rete" data-tx-en="Holes and shafts &middot; fits &middot; 0&ndash;500 mm &middot; installable app, works offline">Fori e alberi &middot; accoppiamenti &middot; 0&ndash;500 mm &middot; app installabile, funziona senza rete</div>
     </div>
@@ -1736,6 +1736,7 @@ var TolISO = (function () {
   function fail(msg) { var a = document.getElementById('tol-alert'); if (a) { a.textContent = 'Errore: ' + msg + ' — ricarica la pagina; se resta, fotografa questo messaggio e mandalo a UTR.'; a.classList.add('on'); } }
   window.addEventListener('error', function (e) { fail((e && e.message) || 'sconosciuto'); });
   try { TolISO.mount(); } catch (e) { fail(e && e.message ? e.message : String(e)); }
+  var vt = document.getElementById('tol-ver-top'); if (vt) vt.textContent = 'v' + TolISO.version;   /* versione visibile in alto, non solo a piè di pagina */
   var l0 = 'it'; try { l0 = localStorage.getItem('tolIso.lang') || 'it'; } catch (e) {}
   if (l0 !== 'it') applyLang(l0);
 
