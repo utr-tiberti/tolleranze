@@ -151,7 +151,7 @@ details.tol-det[open] > summary::before { content: '▾'; }
 .tol-sum-txt .ok { color: oklch(85% .12 160); font-weight: 700; } .tol-sum-txt .ko { color: oklch(80% .15 25); font-weight: 700; }
 .tol-summary { flex-wrap: wrap; } .tol-sum-txt { flex: 1 1 220px; } .tol-summary .tol-chip { flex: none; }
 @media (max-width: 899px) { body.tol-has-summary { padding-bottom: 150px; } .tol-sum-txt { font-size: 12px; } }
-@media (max-width: 899px) { .tol-fitrow { grid-template-columns: 98px 1fr; } .tol-fitrow span { grid-column: 1 / -1; } .tol-mbox .tol-inp { width: 150px; } }
+@media (max-width: 899px) { .tol-mbox .tol-inp { width: 150px; } }
 @media print { .tol-recent, details.tol-det { display: none !important; } }   /* «µm» in maiuscolo diventerebbe «MM» */
 .tol-grid > div { min-width: 0; }   /* le pillole scorrevoli non devono allargare la colonna della griglia */
 .tol-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -225,6 +225,13 @@ details.tol-acc[open] > summary .chev { transform: rotate(180deg); }
 details.tol-acc > summary .sub { font: 10.5px var(--mono, monospace); color: var(--text-faint); text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px; }
 details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 @keyframes tolAccIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.tol-fitimg { width: 64px; height: 52px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); background: #faf9f7; flex: none; }
+.tol-fitrow .tol-fitimg { width: 52px; height: 44px; grid-row: 1 / 3; align-self: center; }
+.tol-fitrow { grid-template-columns: 52px 104px 84px 1fr; }
+.tol-fitrow span { grid-column: 2 / -1; }
+.tol-res-h.tol-fit { align-items: center; }
+.tol-res-h.tol-fit .tol-fitimg { width: 110px; height: 90px; margin-left: auto; }
+@media (max-width: 899px) { .tol-fitrow { grid-template-columns: 52px 98px 1fr; } .tol-fitrow span { grid-column: 2 / -1; } .tol-res-h.tol-fit .tol-fitimg { width: 72px; height: 50px; } }
 .tol-press { margin: 4px 0 14px; }
 .tol-press .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 10px; margin: 8px 0 10px; }
 .tol-press .tol-lbl { margin-bottom: 3px; }
@@ -897,7 +904,7 @@ var TolISO = (function () {
   }
   function fitBlock(f) {
     var col = f.type === 'clearance' ? 'tol-c-green' : (f.type === 'interference' ? 'tol-c-red' : 'tol-c-amber');
-    var h = '<div class="tol-res-h tol-fit"><b class="' + col + '">' + f.hole.letter + f.hole.grade + '/' + f.shaft.letter + f.shaft.grade + ' — ' + t(f.type) + '</b><small>' + (f.type === 'transition' ? t('fitTr') : t('fitL')) + '</small></div><div class="tol-tiles">';
+    var h = '<div class="tol-res-h tol-fit"><b class="' + col + '">' + f.hole.letter + f.hole.grade + '/' + f.shaft.letter + f.shaft.grade + ' — ' + t(f.type) + '</b><small>' + (f.type === 'transition' ? t('fitTr') : t('fitL')) + '</small>' + fitImg(f.type) + '</div><div class="tol-tiles">';
     if (f.type === 'clearance') { h += tile('G<sub>max</sub>', umAbs(f.clrMax), 'µm', t('gmax'), col) + tile('G<sub>min</sub>', umAbs(f.clrMin), 'µm', t('gmin'), col); }
     else if (f.type === 'interference') { h += tile('I<sub>max</sub>', umAbs(f.intMax), 'µm', t('imax'), col) + tile('I<sub>min</sub>', umAbs(f.intMin), 'µm', t('imin'), col); }
     else { h += tile('G<sub>max</sub>', umAbs(f.clrMax), 'µm', t('gmax'), 'tol-c-green') + tile('I<sub>max</sub>', umAbs(f.intMax), 'µm', t('imax'), 'tol-c-red'); }
@@ -1005,6 +1012,8 @@ var TolISO = (function () {
     o += '<text x="30" y="' + (HH - 8) + '" font-size="9.5" fill="var(--text-faint)">' + (lang === 'it' ? 'sezione assiale · scostamenti ingranditi ×' : 'axial section · deviations magnified ×') + Math.round(g.k) + ' · ' + (lang === 'it' ? 'tratteggio = materiale certo · fascia chiara = zona di tolleranza · linea 0 = Ø nominale' : 'hatch = certain material · light band = tolerance zone · line 0 = nominal Ø') + '</text>';
     return o + '</svg>';
   }
+  var FITIMG = { clearance: 'img/fit-gioco.webp', transition: 'img/fit-incerto.webp', interference: 'img/fit-forzato.webp' };
+  function fitImg(type, cls) { return '<img class="tol-fitimg ' + (cls || '') + '" src="' + FITIMG[type] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">'; }
   var PICT = { clearance: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="6" width="24" height="6" fill="var(--amber-dark)"/></svg>',
                transition: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="4.5" width="24" height="9" fill="var(--amber-dark)"/></svg>',
                interference: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="2.5" width="24" height="13" fill="var(--amber-dark)"/><rect x="1" y="2.5" width="24" height="1.5" fill="var(--red)"/><rect x="1" y="14" width="24" height="1.5" fill="var(--red)"/></svg>' };
@@ -1072,8 +1081,8 @@ var TolISO = (function () {
     FITS.forEach(function (f) {
       var pair = f[0] + '/' + f[1], typ = '', col = '', na = false;
       if (dOk) { var ph = parseClass(f[0]), ps = parseClass(f[1]), r = fit(st.D, ph, ps); if (r && r.type) { typ = r.type === 'clearance' ? tu('clr') : (r.type === 'transition' ? tu('trn') : tu('itf')); col = r.type === 'clearance' ? 'tol-c-green' : (r.type === 'transition' ? 'tol-c-amber' : 'tol-c-red'); } else na = true; }
-      var pict = (dOk && !na && r && r.type) ? PICT[r.type] : '';
-      h += '<button type="button" class="tol-fitrow' + (pair === cur ? ' on' : '') + (na ? ' na' : '') + '" data-fit="' + pair + '"' + (na ? ' disabled' : '') + '><b>' + pict + pair + '</b><i class="' + col + '">' + typ + '</i><span>' + esc(lang === 'it' ? f[2] : f[3]) + '</span></button>';
+      var pict = (dOk && !na && r && r.type) ? fitImg(r.type) : '<span class="tol-fitimg"></span>';
+      h += '<button type="button" class="tol-fitrow' + (pair === cur ? ' on' : '') + (na ? ' na' : '') + '" data-fit="' + pair + '"' + (na ? ' disabled' : '') + '>' + pict + '<b>' + pair + '</b><i class="' + col + '">' + typ + '</i><span>' + esc(lang === 'it' ? f[2] : f[3]) + '</span></button>';
     });
     box.innerHTML = h;
   }
