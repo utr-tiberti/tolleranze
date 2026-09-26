@@ -225,6 +225,17 @@ details.tol-acc[open] > summary .chev { transform: rotate(180deg); }
 details.tol-acc > summary .sub { font: 10.5px var(--mono, monospace); color: var(--text-faint); text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px; }
 details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 @keyframes tolAccIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.tol-press { margin: 4px 0 14px; }
+.tol-press .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 10px; margin: 8px 0 10px; }
+.tol-press .tol-lbl { margin-bottom: 3px; }
+.tol-press .tol-inp input, .tol-press .tol-inp select { font-size: 13.5px; padding: 7px 9px; }
+.tol-press table { border-collapse: collapse; width: 100%; font: 12.5px var(--mono, monospace); margin-top: 6px; }
+.tol-press th, .tol-press td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: right; }
+.tol-press th { font-size: 10.5px; letter-spacing: .4px; text-transform: uppercase; color: var(--text-faint); font-weight: 700; }
+.tol-press td:first-child, .tol-press th:first-child { text-align: left; font-family: var(--sans); }
+.tol-press td b { font-size: 14px; }
+.tol-press .warn { background: var(--red-dim); border: 1px solid var(--red-border); color: var(--red-dark); border-radius: var(--r, 6px); padding: 7px 10px; font-size: 12.5px; margin-top: 8px; }
+.tol-press .note { font: 11px/1.45 var(--mono, monospace); color: var(--text-faint); margin-top: 8px; }
 .tol-install { display: none; background: var(--blue-dim); border: 1px solid var(--blue); border-radius: var(--r-lg, 10px); padding: 12px 14px; margin-bottom: 12px; font-size: 13px; line-height: 1.45; }
 .tol-install.on { display: block; }
 .tol-install b { color: var(--blue-dark); }
@@ -416,7 +427,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
     <span data-tx-it="Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate." data-tx-en="Reference: ISO 286-1:2010 system (IT grades, fundamental deviations, &Delta; rule for holes K&hellip;ZC) and ISO 286-2:2010 tables. Range 0&ndash;500 mm. js/JS = exact &plusmn;IT/2 (old slide charts round js7&hellip;js11 to the whole micron). Values checked against independent external sources: see the <em>verifica/</em> folder. Table 4 of ISO 286-1:2010 and its Cor.1:2013 read and applied on 2026-09-24 (cd, ef, fg up to 50 mm; ef 18&ndash;30 = &minus;28). The ISO 286-2 tables and their Cor.1 have not been compared.">Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate.</span><br>
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span><br>
-    Tolleranze ISO UTR v3.6 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v3.7 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -838,6 +849,52 @@ var TolISO = (function () {
     h += '</div>';
     return h;
   }
+  /* ── FORZATO: pressione di contatto e forza di montaggio (cilindri spessi, Lamé, elastico).
+     δ (interferenza diametrale, mm) = p · d · [ (1/E_m)·((De²+d²)/(De²−d²) + ν_m) + (1/E_a)·((d²+di²)/(d²−di²) − ν_a) ]
+     F assiale = p · π · d · L · μ · M trasmissibile = F · d/2 · σ tangenziale mozzo (bordo foro) = p · (De²+d²)/(De²−d²)
+     Formule standard (Niemann/Roloff-Matek); verificate contro un'app indipendente (TolerangeLab): Ø25 H7/u6, De 50, L 25, E 205000, ν 0,29 → p 83,02/187,57 MPa. ── */
+  var MAT = { steel: { E: 210000, nu: 0.30, Re: 355, it: 'Acciaio', en: 'Steel' }, cast: { E: 110000, nu: 0.26, Re: 200, it: 'Ghisa', en: 'Cast iron' },
+              alu: { E: 70000, nu: 0.33, Re: 240, it: 'Alluminio', en: 'Aluminium' }, bronze: { E: 110000, nu: 0.34, Re: 200, it: 'Bronzo', en: 'Bronze' } };
+  var press = { De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null };
+  function pressCalc(d, deltaUm, q) {
+    /* d, De, di, L in mm · delta in µm · E in MPa → p in MPa, F in N, M in N·mm, sigma in MPa */
+    var De = q.De, di = q.di || 0, delta = deltaUm / 1000;
+    if (!(d > 0) || !(De > d) || !(di >= 0) || !(di < d) || !(q.L > 0) || !(q.Eh > 0) || !(q.Es > 0)) return null;
+    var kh = (De * De + d * d) / (De * De - d * d), ks = (d * d + di * di) / (d * d - di * di);
+    var c = (kh + q.nuh) / q.Eh + (ks - q.nus) / q.Es;
+    var p = delta / (d * c);
+    var F = p * Math.PI * d * q.L * q.mu, M = F * d / 2, sig = p * kh;
+    return { p: p, F: F, M: M, sig: sig, kh: kh };
+  }
+  function pressBlock(f, D) {
+    if (!(f.intMax > 0)) return '';
+    var q = { De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: press.mu,
+              Eh: press.Eh || MAT[press.mh].E, nuh: (press.nuh !== null ? press.nuh : MAT[press.mh].nu), Es: press.Es || MAT[press.ms].E, nus: (press.nus !== null ? press.nus : MAT[press.ms].nu), Re: press.Re || MAT[press.mh].Re };
+    var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
+                             col: ['', 'interf. min', 'interf. max'], rows: ['Interferenza', 'Pressione di contatto', 'Forza di montaggio (pressa)', 'Coppia trasmissibile', 'Sollecitazione mozzo (bordo foro)'], dT: 'Calettamento a caldo: scaldare il mozzo di circa', warn: 'La sollecitazione nel mozzo supera lo snervamento: il mozzo si deforma in modo permanente. Ridurre l\'interferenza o aumentare lo spessore del mozzo.',
+                             note: 'Modello elastico dei cilindri spessi (Lamé), pressione uniforme, senza rugosità né effetti termici; l\'interferenza effettiva è un po\' minore di quella nominale per lo schiacciamento delle creste (≈ 0,8·(Rz mozzo + Rz albero)). Valori indicativi per dimensionare la pressa: per un forzato importante fa fede il calcolo del progettista.' }
+                          : { title: 'Interference fit: pressure and assembly force', De: 'Hub outside Ø', di: 'Shaft bore Ø (0 = solid)', L: 'Joint length', mu: 'Friction μ', mh: 'Hub material', ms: 'Shaft material', Re: 'Hub yield strength Re',
+                             col: ['', 'min interf.', 'max interf.'], rows: ['Interference', 'Contact pressure', 'Assembly force (press)', 'Transmissible torque', 'Hub stress (bore edge)'], dT: 'Shrink fit: heat the hub by about', warn: 'Hub stress exceeds the yield strength: the hub deforms permanently. Reduce the interference or increase the hub thickness.',
+                             note: 'Elastic thick-cylinder model (Lamé), uniform pressure, no roughness or thermal effects; the effective interference is slightly below nominal due to asperity flattening (≈ 0.8·(Rz hub + Rz shaft)). Indicative values to size the press: for an important fit the designer\'s calculation prevails.' };
+    var imin = Math.max(0, f.intMin || 0), imax = f.intMax, a = pressCalc(D, imin, q), b = pressCalc(D, imax, q);
+    function inp(id, val, step, lbl) { return '<div><div class="tol-lbl">' + lbl + '</div><div class="tol-inp"><input type="text" inputmode="decimal" data-press="' + id + '" value="' + val + '"></div></div>'; }
+    function sel(id, val, lbl) { var h = '<div><div class="tol-lbl">' + lbl + '</div><div class="tol-inp"><select data-press="' + id + '">'; Object.keys(MAT).forEach(function (k) { h += '<option value="' + k + '"' + (k === val ? ' selected' : '') + '>' + MAT[k][lang] + ' (E ' + (MAT[k].E / 1000) + ' GPa)</option>'; }); return h + '</select></div></div>'; }
+    var h = '<details class="tol-acc tol-press" id="tol-press-det"' + (press.open ? ' open' : '') + '><summary><span>' + L2.title + '</span><span class="chev"></span></summary><div class="body">';
+    h += '<div class="grid">' + inp('De', q.De, 0.1, L2.De + ' <span>mm</span>') + inp('di', q.di, 0.1, L2.di + ' <span>mm</span>') + inp('L', q.L, 0.1, L2.L + ' <span>mm</span>') + inp('mu', q.mu, 0.01, L2.mu) + sel('mh', press.mh, L2.mh) + sel('ms', press.ms, L2.ms) + inp('Re', q.Re, 5, L2.Re + ' <span>MPa</span>') + '</div>';
+    if (!a || !b) return h + '<div class="warn">' + (lang === 'it' ? 'Dati non validi: Ø esterno mozzo > Ø nominale, Ø interno albero < Ø nominale, lunghezza > 0.' : 'Invalid data: hub OD > nominal Ø, shaft bore < nominal Ø, length > 0.') + '</div></div></details>';
+    function n1(v) { return num(v, 1); } function n2(v) { return num(v, 2); }
+    h += '<table><tr><th>' + L2.col[0] + '</th><th>' + L2.col[1] + '</th><th>' + L2.col[2] + '</th></tr>';
+    h += '<tr><td>' + L2.rows[0] + '</td><td>' + umAbs(imin) + ' µm</td><td>' + umAbs(imax) + ' µm</td></tr>';
+    h += '<tr><td>' + L2.rows[1] + '</td><td><b>' + n1(a.p) + '</b> MPa</td><td><b>' + n1(b.p) + '</b> MPa</td></tr>';
+    h += '<tr><td>' + L2.rows[2] + '</td><td><b>' + n2(a.F / 1000) + '</b> kN</td><td><b>' + n2(b.F / 1000) + '</b> kN</td></tr>';
+    h += '<tr><td>' + L2.rows[3] + '</td><td>' + n1(a.M / 1000) + ' N·m</td><td>' + n1(b.M / 1000) + ' N·m</td></tr>';
+    h += '<tr><td>' + L2.rows[4] + '</td><td>' + n1(a.sig) + ' MPa</td><td>' + n1(b.sig) + ' MPa</td></tr></table>';
+    var alpha = 11.5e-6, dT = (imax / 1000 + 0.001 * D) / (alpha * D);
+    h += '<div class="note">' + L2.dT + ' <b>' + Math.round(dT) + ' °C</b> (α = 11,5·10⁻⁶/K, con 1 µm/mm di gioco di infilaggio).</div>';
+    if (b.sig > q.Re) h += '<div class="warn">' + L2.warn + ' (' + n1(b.sig) + ' MPa > Re ' + q.Re + ' MPa)</div>';
+    h += '<div class="note">' + L2.note + '</div>';
+    return h + '</div></details>';
+  }
   function fitBlock(f) {
     var col = f.type === 'clearance' ? 'tol-c-green' : (f.type === 'interference' ? 'tol-c-red' : 'tol-c-amber');
     var h = '<div class="tol-res-h tol-fit"><b class="' + col + '">' + f.hole.letter + f.hole.grade + '/' + f.shaft.letter + f.shaft.grade + ' — ' + t(f.type) + '</b><small>' + (f.type === 'transition' ? t('fitTr') : t('fitL')) + '</small></div><div class="tol-tiles">';
@@ -1166,7 +1223,7 @@ var TolISO = (function () {
       if (S && !S.ok) msgs.push(t('shaft') + ' ' + st.shaft.letter + st.shaft.grade + ': ' + t('err')[S.err]);
       if (H && H.ok) { out += resBlock(H); zones.push(H); }
       if (S && S.ok) { out += resBlock(S); zones.push(S); }
-      if (H && H.ok && S && S.ok) out += fitBlock(fit(st.D, st.hole, st.shaft));
+      if (H && H.ok && S && S.ok) { var ff = fit(st.D, st.hole, st.shaft); out += fitBlock(ff) + pressBlock(ff, st.D); }
     }
     if (!out && !msgs.length) out = '<div class="tol-empty">' + t('empty') + '</div>';
     $('tol-out').innerHTML = out;
@@ -1264,6 +1321,14 @@ var TolISO = (function () {
     ['input', 'change'].forEach(function (ev) { $('tol-m').addEventListener(ev, render); });
     $('tol-quick').addEventListener('keydown', function (e) { if (e.key === 'Enter') applyQuick(); });
     $('tol-quick').addEventListener('change', applyQuick);
+    root.addEventListener('change', function (e) {
+      var el = e.target; if (!el || !el.hasAttribute || !el.hasAttribute('data-press')) return;
+      var k = el.getAttribute('data-press'), v = String(el.value).replace(',', '.');
+      if (k === 'mh' || k === 'ms') { press[k] = v; press[k === 'mh' ? 'Eh' : 'Es'] = null; press[k === 'mh' ? 'nuh' : 'nus'] = null; if (k === 'mh') press.Re = null; }
+      else { var n = parseFloat(v); press[k] = isFinite(n) ? n : null; }
+      press.open = true; render();
+    });
+    root.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'tol-press-det') press.open = e.target.open; }, true);
     root.addEventListener('click', function (e) {
       var el = e.target.closest ? e.target.closest('[data-cls],[data-tab],[data-filter],[data-band],[data-copy],[data-share],[data-quick],[data-fit]') : null;
       if (!el || !root.contains(el)) return;
@@ -1297,6 +1362,7 @@ var TolISO = (function () {
   }
   function printLabel() { return side === 'hole' ? tu('printHole') : tu('printShaft'); }
   function getUI() { return { tab: tab, side: side, filter: filter, viewFi: viewFi, cols: colsFor(side) }; }
+  function pressPreset(o) { Object.keys(o).forEach(function (k) { press[k] = o[k]; }); }
   function showAlert(msg) { var a = document.getElementById('tol-alert'); if (!a) return; a.textContent = msg; a.classList.add('on'); }
 
   /* ════════ AUTOTEST DELLA UI (solo nel browser, dopo mount) — la parete e le schede devono dire esattamente quello che dice limits() ════════ */
@@ -1439,6 +1505,16 @@ var TolISO = (function () {
     ck('campo unico: «25 H7/g6» → ACCOPPIAMENTO', tab === 'fit' && $('tol-d').value === '25' && $('tol-h-gr').value === '7');
     $('tol-d').value = '25 XYZ'; $('tol-d').dispatchEvent(new Event('change'));
     ck('campo unico: testo non valido → campo segnato in rosso, niente cambia', $('tol-d-wrap').classList.contains('tol-bad') && tab === 'fit');
+    /* 17. forzato in ACCOPPIAMENTO: compare solo con interferenza, i campi aggiornano i numeri */
+    setTab('fit'); $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; render();
+    ck('forzato: assente con H7/g6', !$('tol-press-det'));
+    $('tol-s-let').value = 'u'; render();
+    ck('forzato: presente con H7/u6', !!$('tol-press-det') && /MPa/.test($('tol-press-det').textContent));
+    pressPreset({ De: 50, di: 0, L: 25, mu: 0.10, mh: 'steel', ms: 'steel', Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29, Re: null }); render();
+    ck('forzato: con i dati TolerangeLab mostra 83,0 MPa e 16,30 kN', /83,0/.test($('tol-press-det').textContent) && /16,30/.test($('tol-press-det').textContent));
+    var deIn = $('tol-press-det').querySelector('[data-press="De"]'); deIn.value = '100'; deIn.dispatchEvent(new Event('change', { bubbles: true }));
+    ck('forzato: cambio Ø esterno mozzo → pressione più alta e scheda aperta', press.De === 100 && $('tol-press-det').open && !/83,0/.test($('tol-press-det').textContent));
+    pressPreset({ De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null, open: false });
     /* 16. schede a scomparsa: chiuse all'avvio, contenuto presente */
     ck('schede: provenienza e IT chiuse all\'avvio', !$('tol-acc-prov').open && !$('tol-acc-it').open);
     ck('schede: contenuti generati', !!$('tol-prov').querySelector('table') && !!$('tol-ittable').querySelector('tbody'));
@@ -1625,13 +1701,24 @@ var TolISO = (function () {
       ck('diagramma zone dentro gli assi Ø' + q[0], g.amin <= Math.min(H.lo, S.lo, 0) && g.amax >= Math.max(H.up, S.up, 0));
       ck('diagramma tacche intere Ø' + q[0], Math.abs((g.amax - g.amin) / g.step - Math.round((g.amax - g.amin) / g.step)) < 1e-9 && Math.abs(g.amin / g.step - Math.round(g.amin / g.step)) < 1e-9);
     });
+    /* 9b. FORZATO: riferimenti esterni (TolerangeLab, screenshot App Store 26/09/2026) — Ø25 H7/u6, mozzo De 50 pieno, L 25, acciaio E 205000 ν 0,29 */
+    (function () {
+      var q = { De: 50, di: 0, L: 25, mu: 0.10, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }, fu = fit(25, 'H7', 'u6');
+      ck('forzato: H7/u6 Ø25 interferenza 27…61 µm', fu.type === 'interference' && fu.intMin === 27 && fu.intMax === 61);
+      var a = pressCalc(25, 27, q), b = pressCalc(25, 61, { De: 50, di: 0, L: 25, mu: 0.20, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 });
+      ck('forzato: pressione 83,02 / 187,57 MPa', Math.abs(a.p - 83.02) < 0.05 && Math.abs(b.p - 187.57) < 0.05);
+      ck('forzato: forza assiale 16,3 / 73,66 kN', Math.abs(a.F / 1000 - 16.3) < 0.05 && Math.abs(b.F / 1000 - 73.66) < 0.05);
+      ck('forzato: sollecitazione mozzo 138,37 / 312,62 MPa', Math.abs(a.sig - 138.37) < 0.05 && Math.abs(b.sig - 312.62) < 0.05);
+      ck('forzato: albero cavo riduce la pressione, mozzo più grosso la aumenta', pressCalc(25, 27, { De: 50, di: 15, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }).p < a.p && pressCalc(25, 27, { De: 100, di: 0, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }).p > a.p);
+      ck('forzato: dati impossibili → null', pressCalc(25, 27, { De: 20, di: 0, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }) === null && pressCalc(25, 27, { De: 50, di: 30, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }) === null);
+    })();
     /* 10. tutte le colonne del regolo calcolabili in almeno una fascia */
     ['hole', 'shaft'].forEach(function (k) { COLS[k].forEach(function (c) { var pc = parseClass(c); ck('colonna ' + c, pc && pc.kind === k && limits(k, pc.letter, pc.grade, 5).ok); }); });
     return { pass: pass, fail: fail, total: pass + fail, failures: failures };
   }
 
-  return { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom,
-           _diagramGeom: diagramGeom, version: '3.6' };
+  return { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _pressCalc: pressCalc, _pressPreset: pressPreset,
+           _diagramGeom: diagramGeom, version: '3.7' };
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
 
