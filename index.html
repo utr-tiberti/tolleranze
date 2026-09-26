@@ -201,6 +201,7 @@ details.tol-det[open] > summary::before { content: '▾'; }
 .tol-scrollx .tol-chip { white-space: nowrap; }
 body.tol-has-summary { padding-bottom: 78px; }
 .tol-fitdraw { width: 100%; max-width: 660px; height: auto; display: block; margin: 4px 0 10px; }
+.tol-fitdraw-photo { max-width: 760px; border-radius: 8px; overflow: hidden; }
 .tol-fitdraw text { font-family: var(--mono, monospace); }
 .tol-dbox .tol-inp { width: 250px; }
 .tol-dbox .tol-inp input { font-size: 15px; }
@@ -1014,6 +1015,73 @@ var TolISO = (function () {
   }
   var FITIMG = { clearance: 'img/fit-gioco.webp', transition: 'img/fit-incerto.webp', interference: 'img/fit-forzato.webp' };
   function fitImg(type, cls) { return '<img class="tol-fitimg ' + (cls || '') + '" src="' + FITIMG[type] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">'; }
+  /* ── DISEGNO FOTOGRAFICO dell'accoppiamento (v3.7): la foto generata dall'utente (img/sezione.webp, 1802×873) è tagliata in tre strisce
+     orizzontali — blocco superiore (righe 0–164), albero (righe 288–576 dentro il blocco, 235–632 alle estremità), blocco inferiore (697–872) —
+     e ogni striscia viene spostata/scalata secondo le stesse quote di fitDrawGeom: il bordo del blocco sta sulla linea del foro MASSIMO,
+     l'albero è alto quanto il suo diametro MINIMO. Le fasce colorate in mezzo sono dipinte dall'app, non prese dalla foto: così i colori
+     e le distanze sono quelli calcolati. Ø nominale = 288 px (l'albero della foto), scostamento più grande = 72 px, ingrandimento dichiarato. ── */
+  var PH = { W: 1802, H: 873, CY: 432, DPX: 288, A: [0, 165], B: [288, 576], Bend: [235, 632], C: [697, 873], X0: 320, X1: 1405, MAXPX: 72 };
+  var photoReady = false, photoImg = null;
+  function photoLayout(H, S, D) {
+    var m = 1; [H, S].forEach(function (z) { if (z) m = Math.max(m, Math.abs(z.up), Math.abs(z.lo)); });
+    var s = PH.MAXPX / m, truePx = PH.DPX / (D * 1000), k = s / truePx;
+    function yTop(dev) { return PH.CY - (PH.DPX / 2 + dev * s / 2); }
+    var yHmax = H ? yTop(H.up) : yTop(0), yHmin = H ? yTop(H.lo) : yTop(0), ySmax = S ? yTop(S.up) : yTop(0), ySmin = S ? yTop(S.lo) : yTop(0);
+    return { s: s, k: k, yTop: yTop, yHmax: yHmax, yHmin: yHmin, ySmax: ySmax, ySmin: ySmin,
+             dyA: yHmax - PH.A[1], dyC: (2 * PH.CY - yHmax) - PH.C[0], shaftScale: (PH.CY - ySmin) / (PH.DPX / 2) };
+  }
+  function fitDrawingPhoto(H, S, D) {
+    var g = photoLayout(H, S, D), W = PH.W, HH = PH.H, CY = PH.CY, X0 = PH.X0, X1 = PH.X1, o = '', f2 = function (v) { return v.toFixed(2); };
+    var mirror = function (y) { return 2 * CY - y; }, href = 'img/sezione.webp';
+    var HALO = ' paint-order="stroke" stroke="#fff" stroke-width="9" stroke-linejoin="round"', FS = 34;
+    function lbl(x, y, anchor, size, color, txt, bold) { return '<text x="' + f2(x) + '" y="' + f2(y) + '" text-anchor="' + anchor + '" font-size="' + size + '"' + (bold ? ' font-weight="700"' : '') + ' fill="' + color + '"' + HALO + '>' + txt + '</text>'; }
+    function twoLabels(x, anchor, yA, yB, color, tA, tB) { var ya = yA + 12, yb = Math.max(yB + 12, ya + 40); return lbl(x, ya, anchor, FS, color, tA, true) + lbl(x, yb, anchor, FS, color, tB, true); }
+    o += '<svg class="tol-fitdraw tol-fitdraw-photo" viewBox="0 0 ' + W + ' ' + HH + '" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="' + (lang === 'it' ? 'Sezione albero e foro' : 'Shaft and hole section') + '">';
+    o += '<defs><linearGradient id="phBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f9093"/><stop offset="1" stop-color="#b9babd"/></linearGradient>' +
+         '<linearGradient id="phBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fd6"/><stop offset=".5" stop-color="#7fb2ff"/><stop offset="1" stop-color="#2f6fd6"/></linearGradient>' +
+         '<linearGradient id="phAmber" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8790f"/><stop offset=".5" stop-color="#f2c04a"/><stop offset="1" stop-color="#b8790f"/></linearGradient>' +
+         '<linearGradient id="phGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e8b3e"/><stop offset=".5" stop-color="#8fe08a"/><stop offset="1" stop-color="#2e8b3e"/></linearGradient>' +
+         '<linearGradient id="phRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3261e"/><stop offset=".5" stop-color="#ff7a70"/><stop offset="1" stop-color="#b3261e"/></linearGradient>' +
+         '<clipPath id="phA"><rect x="0" y="' + PH.A[0] + '" width="' + W + '" height="' + (PH.A[1] - PH.A[0]) + '"/></clipPath>' +
+         '<clipPath id="phC"><rect x="0" y="' + PH.C[0] + '" width="' + W + '" height="' + (PH.C[1] - PH.C[0]) + '"/></clipPath>' +
+         '<clipPath id="phB"><rect x="' + X0 + '" y="' + PH.B[0] + '" width="' + (X1 - X0) + '" height="' + (PH.B[1] - PH.B[0]) + '"/><rect x="0" y="' + PH.Bend[0] + '" width="' + X0 + '" height="' + (PH.Bend[1] - PH.Bend[0]) + '"/><rect x="' + X1 + '" y="' + PH.Bend[0] + '" width="' + (W - X1) + '" height="' + (PH.Bend[1] - PH.Bend[0]) + '"/></clipPath></defs>';
+    o += '<rect x="0" y="0" width="' + W + '" height="' + HH + '" fill="url(#phBg)"/>';
+    var img = '<image href="' + href + '" xlink:href="' + href + '" x="0" y="0" width="' + W + '" height="' + HH + '" preserveAspectRatio="none"/>';
+    /* blocco sotto e blocco sopra: traslati perché il bordo del foro stia sulla linea del foro massimo */
+    o += '<g transform="translate(0 ' + f2(g.dyC) + ')" clip-path="url(#phC)">' + img + '</g>';
+    o += '<g transform="translate(0 ' + f2(g.dyA) + ')" clip-path="url(#phA)">' + img + '</g>';
+    /* fasce dipinte: zona foro (blu), gioco (verde) o interferenza (rosso), zona albero (ambra) — sopra e specchiate sotto */
+    function band(y1, y2, fill, op) { var a = Math.min(y1, y2), h = Math.abs(y2 - y1); if (h < 0.5) return ''; var ex = op ? ' opacity="' + op + '"' : ''; return '<rect x="' + X0 + '" y="' + f2(a) + '" width="' + (X1 - X0) + '" height="' + f2(h) + '" fill="' + fill + '"' + ex + '/><rect x="' + X0 + '" y="' + f2(mirror(a) - h) + '" width="' + (X1 - X0) + '" height="' + f2(h) + '" fill="' + fill + '"' + ex + '/>'; }
+    if (H) o += band(g.yHmax, g.yHmin, 'url(#phBlue)');
+    if (S) o += band(g.ySmax, g.ySmin, 'url(#phAmber)');
+    var inter = false, f = null;
+    /* gioco: verde pieno nello spazio libero · interferenza: rosso trasparente SOPRA le fasce, così zona foro e zona albero restano leggibili */
+    if (H && S) { f = fit(D, H, S); inter = g.ySmax < g.yHmin; o += inter ? band(g.yHmin, g.ySmax, 'url(#phRed)', '.6') : band(g.yHmin, g.ySmax, 'url(#phGreen)'); }
+    /* albero: scalato verticalmente attorno all'asse perché sia alto quanto il diametro MINIMO */
+    o += '<g transform="translate(0 ' + CY + ') scale(1 ' + f2(g.shaftScale) + ') translate(0 ' + (-CY) + ')" clip-path="url(#phB)">' + img + '</g>';
+    /* asse e linea dello zero */
+    o += '<line x1="20" x2="' + (W - 20) + '" y1="' + CY + '" y2="' + CY + '" stroke="#222" stroke-width="2" stroke-dasharray="26 8 4 8" opacity=".7"/>';
+    var y0 = g.yTop(0);
+    o += '<line x1="' + X0 + '" x2="' + X1 + '" y1="' + f2(y0) + '" y2="' + f2(y0) + '" stroke="#111" stroke-width="2.5"/>';
+    o += lbl(X0 + 60, y0 - 10, 'start', FS, '#111', 'Ø' + esc(num(D, 3).replace(/[.,]?0+$/, '')) + ' = 0', true);
+    if (H) o += twoLabels(X0 - 14, 'end', g.yHmax, g.yHmin, '#1a4b9c', (H.letter + H.grade) + ' max ' + um(H.up), 'min ' + um(H.lo));
+    if (S) o += twoLabels(W - 14, 'end', g.ySmax, g.ySmin, '#8a5a06', (S.letter + S.grade) + ' max ' + um(S.up), 'min ' + um(S.lo));
+    if (H && S) {
+      var top = Math.min(g.yHmin, g.ySmax), h = Math.abs(g.yHmin - g.ySmax), col = inter ? '#8f1d16' : '#1f6b2b';
+      var t1 = inter ? ((lang === 'it' ? 'interferenza max ' : 'max interference ') + umAbs(f.intMax) + ' µm') : ((lang === 'it' ? 'gioco min ' : 'min clearance ') + umAbs(f.clrMin) + ' µm');
+      var t2 = f.type === 'clearance' ? (lang === 'it' ? 'gioco max ' : 'max clearance ') + umAbs(f.clrMax) + ' µm' : (f.type === 'interference' ? (lang === 'it' ? 'interferenza min ' : 'min interference ') + umAbs(f.intMin) + ' µm' : (lang === 'it' ? 'gioco max ' : 'max clearance ') + umAbs(f.clrMax) + ' µm');
+      o += lbl((X0 + X1) / 2, h >= 44 ? top + h / 2 + 12 : top + h + 38, 'middle', FS, col, t1, true);
+      o += lbl((X0 + X1) / 2, mirror(top) - (h >= 44 ? h / 2 - 12 : -38), 'middle', FS, '#222', t2, true);
+    }
+    o += lbl(20, HH - 16, 'start', 24, '#333', (lang === 'it' ? 'scostamenti ingranditi ×' : 'deviations magnified ×') + Math.round(g.k) + ' · ' + (lang === 'it' ? 'blu foro · ambra albero · verde gioco · rosso interferenza · linea 0 = Ø nominale' : 'blue hole · amber shaft · green clearance · red interference · line 0 = nominal Ø'), false);
+    return o + '</svg>';
+  }
+  function preloadPhoto() {
+    if (photoImg) return; photoImg = new Image();
+    photoImg.onload = function () { photoReady = true; if (root) render(); };
+    photoImg.onerror = function () { photoReady = false; };
+    photoImg.src = 'img/sezione.webp';
+  }
   var PICT = { clearance: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="6" width="24" height="6" fill="var(--amber-dark)"/></svg>',
                transition: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="4.5" width="24" height="9" fill="var(--amber-dark)"/></svg>',
                interference: '<svg class="pict" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" fill="none" stroke="var(--blue-dark)"/><rect x="1" y="2.5" width="24" height="13" fill="var(--amber-dark)"/><rect x="1" y="2.5" width="24" height="1.5" fill="var(--red)"/><rect x="1" y="14" width="24" height="1.5" fill="var(--red)"/></svg>' };
@@ -1237,7 +1305,8 @@ var TolISO = (function () {
     if (!out && !msgs.length) out = '<div class="tol-empty">' + t('empty') + '</div>';
     $('tol-out').innerHTML = out;
     $('tol-diagram-box').innerHTML = diagram(zones);
-    $('tol-fitdraw-box').innerHTML = (dOk && zones.length) ? fitDrawing(zones.filter(function (z) { return z.kind === 'hole'; })[0] || null, zones.filter(function (z) { return z.kind === 'shaft'; })[0] || null, st.D) : '';
+    var zh = zones.filter(function (z) { return z.kind === 'hole'; })[0] || null, zs = zones.filter(function (z) { return z.kind === 'shaft'; })[0] || null;
+    $('tol-fitdraw-box').innerHTML = (dOk && zones.length) ? (photoReady ? fitDrawingPhoto(zh, zs, st.D) : fitDrawing(zh, zs, st.D)) : '';
     var m = $('tol-msg'); m.innerHTML = msgs.map(esc).join('<br>'); m.classList.toggle('on', msgs.length > 0);
     ['hole', 'shaft'].forEach(function (k) {
       var cur = st[k] ? st[k].letter + st[k].grade : '';
@@ -1314,7 +1383,7 @@ var TolISO = (function () {
       else { $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     } catch (e) { $('tol-h-let').value = 'H'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     Array.prototype.forEach.call($('tol-filter').children, function (b) { b.classList.toggle('on', b.getAttribute('data-filter') === filter); });
-    loadRecent(); renderRecent();
+    loadRecent(); renderRecent(); preloadPhoto();
     try { if (window.matchMedia && window.matchMedia('(min-width: 900px)').matches) $('tol-fits-det').open = true; } catch (e) {}
     setTab(tab); buildItTable(); renderProv();
     if (tab === 'fit') rebuildTables();
@@ -1721,12 +1790,23 @@ var TolISO = (function () {
       ck('forzato: albero cavo riduce la pressione, mozzo più grosso la aumenta', pressCalc(25, 27, { De: 50, di: 15, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }).p < a.p && pressCalc(25, 27, { De: 100, di: 0, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }).p > a.p);
       ck('forzato: dati impossibili → null', pressCalc(25, 27, { De: 20, di: 0, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }) === null && pressCalc(25, 27, { De: 50, di: 30, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }) === null);
     })();
+    /* 9c. disegno fotografico: le strisce della foto seguono le quote calcolate */
+    (function () {
+      var H = limits('hole', 'H', 7, 25), S = limits('shaft', 'g', 6, 25), g = photoLayout(H, S, 25);
+      ck('foto: bordo del blocco sulla linea del foro massimo', Math.abs((PH.A[1] + g.dyA) - g.yHmax) < 1e-9 && Math.abs((PH.C[0] + g.dyC) - (2 * PH.CY - g.yHmax)) < 1e-9);
+      ck('foto: albero alto quanto il diametro minimo', Math.abs(g.shaftScale * PH.DPX - 2 * (PH.CY - g.ySmin)) < 1e-9);
+      ck('foto: zona foro alta IT7·s/2', Math.abs((g.yHmin - g.yHmax) - H.it * g.s / 2) < 1e-9);
+      ck('foto: scostamento più grande = 72 px', Math.abs(Math.max(Math.abs(H.up), Math.abs(H.lo), Math.abs(S.up), Math.abs(S.lo)) * g.s - PH.MAXPX) < 1e-9);
+      var P = limits('shaft', 'p', 6, 25), gp = photoLayout(H, P, 25);
+      ck('foto: H7/p6 albero max sopra foro min → interferenza', gp.ySmax < gp.yHmin && g.ySmax > g.yHmin);
+      ck('foto: senza albero, albero a scala 1', Math.abs(photoLayout(H, null, 25).shaftScale - 1) < 1e-9);
+    })();
     /* 10. tutte le colonne del regolo calcolabili in almeno una fascia */
     ['hole', 'shaft'].forEach(function (k) { COLS[k].forEach(function (c) { var pc = parseClass(c); ck('colonna ' + c, pc && pc.kind === k && limits(k, pc.letter, pc.grade, 5).ok); }); });
     return { pass: pass, fail: fail, total: pass + fail, failures: failures };
   }
 
-  return { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _pressCalc: pressCalc, _pressPreset: pressPreset,
+  return { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _pressCalc: pressCalc, _pressPreset: pressPreset,
            _diagramGeom: diagramGeom, version: '3.7' };
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
