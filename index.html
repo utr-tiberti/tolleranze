@@ -203,6 +203,16 @@ body.tol-has-summary { padding-bottom: 78px; }
 .tol-net { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); vertical-align: 0; margin-right: 4px; } .tol-net.off { background: var(--amber); }
 .tol-fitrow .pict { width: 26px; height: 18px; vertical-align: -4px; margin-right: 2px; }
 @media (max-width: 899px) { .tol-dbox .tol-inp { width: 100%; } .tol-dbox { width: 100%; } }
+/* v3.6: schede a scomparsa (Provenienza, Gradi IT, Cuscinetti): chiuse, un tocco le apre */
+details.tol-acc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg, 10px); box-shadow: var(--sh); padding: 0; margin-bottom: 12px; }
+details.tol-acc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--text-faint); font-weight: 700; -webkit-tap-highlight-color: transparent; user-select: none; }
+details.tol-acc > summary::-webkit-details-marker { display: none; }
+details.tol-acc > summary .chev { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--surface-2); display: inline-flex; align-items: center; justify-content: center; transition: transform .25s ease; }
+details.tol-acc > summary .chev::before { content: ''; width: 6px; height: 6px; border-right: 1.6px solid var(--text-muted); border-bottom: 1.6px solid var(--text-muted); transform: translateY(-1.5px) rotate(45deg); }
+details.tol-acc[open] > summary .chev { transform: rotate(180deg); }
+details.tol-acc > summary .sub { font: 10.5px var(--mono, monospace); color: var(--text-faint); text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px; }
+details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
+@keyframes tolAccIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .tol-install { display: none; background: var(--blue-dim); border: 1px solid var(--blue); border-radius: var(--r-lg, 10px); padding: 12px 14px; margin-bottom: 12px; font-size: 13px; line-height: 1.45; }
 .tol-install.on { display: block; }
 .tol-install b { color: var(--blue-dark); }
@@ -222,7 +232,7 @@ body.tol-has-summary { padding-bottom: 78px; }
   .tol-dbox .tol-inp { width: 150px; }
   .tol-filter { overflow-x: auto; max-width: 100%; }
   .tol-filter button { padding: 6px 9px; font-size: 10.5px; white-space: nowrap; }
-  .tol-more { display: none; }
+  .tol-more details.tol-acc { }
   .tol-cards { grid-template-columns: repeat(3, 1fr); }
   .tol-tiles { grid-template-columns: repeat(2, 1fr); }
 }
@@ -237,7 +247,7 @@ body.tol-has-summary { padding-bottom: 78px; }
   .tol-table thead th { position: static; background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .tol-table th.tol-rng { position: static; }
   .tol-table tr.tol-cur td, .tol-table tr.tol-cur th.tol-rng { background: #fff3c4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .tol-more { display: block; page-break-before: always; }
+  .tol-more { display: block; page-break-before: always; } details.tol-acc > summary .chev { display: none; }
   body.tol-print-table .tol-more { display: none; }
   body.tol-print-table .tol-panel { display: block; }
 }
@@ -370,14 +380,15 @@ body.tol-has-summary { padding-bottom: 78px; }
       </div>
     </section>
 
-    <div class="block tol-more">
-      <div class="section-lbl" data-tx-it="Provenienza dei dati" data-tx-en="Where the data comes from">Provenienza dei dati</div>
-      <div id="tol-prov" class="tol-prov"></div>
-    </div>
-
-    <div class="block tol-more">
-      <div class="section-lbl" data-tx-it="Gradi di tolleranza normalizzati IT &mdash; ampiezza in micron" data-tx-en="Standard tolerance grades IT &mdash; width in microns">Gradi di tolleranza normalizzati IT &mdash; ampiezza in micron</div>
-      <div class="tol-tablewrap" style="margin-top:12px;"><table class="tol-table" id="tol-ittable"></table></div>
+    <div class="tol-more">
+      <details class="tol-acc" id="tol-acc-prov">
+        <summary><span data-tx-it="Provenienza dei dati" data-tx-en="Where the data comes from">Provenienza dei dati</span><span class="chev"></span></summary>
+        <div class="body"><div id="tol-prov" class="tol-prov"></div></div>
+      </details>
+      <details class="tol-acc" id="tol-acc-it">
+        <summary><span data-tx-it="Gradi di tolleranza normalizzati IT <span class=&quot;sub&quot;>ampiezza in micron</span>" data-tx-en="Standard tolerance grades IT <span class=&quot;sub&quot;>width in microns</span>">Gradi di tolleranza normalizzati IT <span class="sub">ampiezza in micron</span></span><span class="chev"></span></summary>
+        <div class="body"><div class="tol-tablewrap"><table class="tol-table" id="tol-ittable"></table></div></div>
+      </details>
     </div>
 
     <div class="tol-summary tol-noprint" id="tol-summary" hidden>
@@ -393,7 +404,7 @@ body.tol-has-summary { padding-bottom: 78px; }
     <span data-tx-it="Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate." data-tx-en="Reference: ISO 286-1:2010 system (IT grades, fundamental deviations, &Delta; rule for holes K&hellip;ZC) and ISO 286-2:2010 tables. Range 0&ndash;500 mm. js/JS = exact &plusmn;IT/2 (old slide charts round js7&hellip;js11 to the whole micron). Values checked against independent external sources: see the <em>verifica/</em> folder. Table 4 of ISO 286-1:2010 and its Cor.1:2013 read and applied on 2026-09-24 (cd, ef, fg up to 50 mm; ef 18&ndash;30 = &minus;28). The ISO 286-2 tables and their Cor.1 have not been compared.">Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate.</span><br>
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span><br>
-    Tolleranze ISO UTR v3.5 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v3.6 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -1414,6 +1425,10 @@ var TolISO = (function () {
     ck('campo unico: «25 H7/g6» → ACCOPPIAMENTO', tab === 'fit' && $('tol-d').value === '25' && $('tol-h-gr').value === '7');
     $('tol-d').value = '25 XYZ'; $('tol-d').dispatchEvent(new Event('change'));
     ck('campo unico: testo non valido → campo segnato in rosso, niente cambia', $('tol-d-wrap').classList.contains('tol-bad') && tab === 'fit');
+    /* 16. schede a scomparsa: chiuse all'avvio, contenuto presente */
+    ck('schede: provenienza e IT chiuse all\'avvio', !$('tol-acc-prov').open && !$('tol-acc-it').open);
+    ck('schede: contenuti generati', !!$('tol-prov').querySelector('table') && !!$('tol-ittable').querySelector('tbody'));
+    $('tol-acc-prov').open = true; ck('schede: si apre', $('tol-acc-prov').open); $('tol-acc-prov').open = false;
     /* 13. virgola dal tastierino del telefono: «25,5» e «25.5» valgono uguale, nel Ø e nel misurato */
     setTab('hole'); $('tol-d').value = '25,5'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-m').value = '25,51'; rebuildTables(); render();
     ck('virgola: Ø 25,5 accettato (fascia 24…30) e misura 25,51 DENTRO', /> 24 … 30/.test($('tol-band').textContent) && /DENTRO/.test($('tol-sum-txt').textContent) && /Ø25,5 H7/.test($('tol-sum-txt').textContent));
@@ -1602,7 +1617,7 @@ var TolISO = (function () {
   }
 
   return { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom,
-           _diagramGeom: diagramGeom, version: '3.5' };
+           _diagramGeom: diagramGeom, version: '3.6' };
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
 
@@ -1650,7 +1665,9 @@ var TolISO = (function () {
     var d = new Date(), ds = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
     t.textContent = isTable ? 'UTR Tiberti · Tolleranze ISO 286 · ' + TolISO.printLabel() + ' · µm · v' + TolISO.version + ' · ' + ds : 'UTR Tiberti · Tolleranze ISO 286 · v' + TolISO.version + ' · ' + ds;
   }
-  window.addEventListener('beforeprint', preparePrint);
+  var accOpenBefore = [];
+  window.addEventListener('beforeprint', function () { preparePrint(); accOpenBefore = []; Array.prototype.forEach.call(document.querySelectorAll('details.tol-acc'), function (d) { accOpenBefore.push(d.open); d.open = true; }); });
+  window.addEventListener('afterprint', function () { Array.prototype.forEach.call(document.querySelectorAll('details.tol-acc'), function (d, i) { d.open = !!accOpenBefore[i]; }); });
   document.getElementById('tol-print-btn').addEventListener('click', function () { preparePrint(); setTimeout(function () { window.print(); }, 30); });
 
   /* App installabile: service worker solo via http(s); con il doppio clic sul file resta una pagina normale */
