@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifica esterna — Tolleranze ISO UTR</title>
+<style>
+body{font:14px/1.5 'Segoe UI',system-ui,sans-serif;background:#f6f4f1;color:#222;margin:0;padding:20px 16px 40px}
+.w{max-width:980px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px} .sub{font:12px Consolas,Menlo,monospace;color:#777;margin-bottom:16px}
+.tot{font:700 15px Consolas,Menlo,monospace;padding:12px 14px;border-radius:8px;margin-bottom:16px}
+.tot.ok{background:#e3f4ea;color:#14532d;border:1px solid #9ad0b0}.tot.ko{background:#fde8e6;color:#7f1d1d;border:1px solid #f0a8a0}
+.ds{background:#fff;border:1px solid #ddd8d0;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.ds b{font:700 13px Consolas,Menlo,monospace}.ds .f{font-size:12px;color:#666;margin:2px 0 4px}
+.ds pre{font:11.5px/1.5 Consolas,Menlo,monospace;margin:6px 0 0;white-space:pre-wrap;color:#555}
+.badge{font:700 11px Consolas,Menlo,monospace;padding:2px 8px;border-radius:10px;margin-left:8px}
+.badge.ok{background:#e3f4ea;color:#14532d}.badge.ko{background:#fde8e6;color:#7f1d1d}.badge.n{background:#fdf1d8;color:#7a4b00}
+</style></head><body><div class="w">
+<h1>Verifica esterna — Tolleranze ISO 286 UTR Tiberti</h1>
+<div class="sub"><a href="../" style="color:inherit">&larr; torna all'app</a> &middot; Ogni casella qui sotto è stata trascritta da una fonte indipendente (regolo Talide, compendio Walter, tabella a parete EVO) e confrontata con quello che calcola l'app in tre punti della fascia. Le «differenze note» sono arrotondamenti dei vecchi regoli su js/JS, non errori.</div>
+<div class="sub" id="sub"></div>
+<div id="tot" class="tot"></div>
+<div id="out"></div>
+</div>
+<script src="../tol-iso-core.js"></script>
+<script src="dataset_talide_alberi.js"></script>
+<script src="dataset_talide_alberi_rs.js"></script>
+<script src="dataset_talide_fori.js"></script>
+<script src="dataset_talide_fori_fini.js"></script>
+<script src="dataset_talide_fori_c9.js"></script>
+<script src="dataset_walter_f33_alberi.js"></script>
+<script src="dataset_walter_f33_fori.js"></script>
+<script src="dataset_evo_fori.js"></script>
+<script src="dataset_evo_alberi.js"></script>
+<script src="verifica_runner.js"></script>
+<script>
+(function(){
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  var st=TolISO.selfTest(), rep=tolVerify(TolISO,TOL_DATASETS);
+  document.getElementById('sub').textContent='TolISO v'+TolISO.version+' · autotest interno '+st.pass+'/'+st.total+(st.fail?' — FALLITI: '+st.failures.join(' | '):' OK')+' · i dataset sono trascritti dalle fonti, mai calcolati dal modulo';
+  var t=document.getElementById('tot'); t.className='tot '+(rep.errori||st.fail?'ko':'ok');
+  t.textContent=rep.caselle+' caselle da fonti esterne · '+rep.confronti+' confronti → '+rep.ok+' ok · '+rep.noti+' differenze note · '+rep.errori+' ERRORI';
+  var h='';
+  rep.datasets.forEach(function(r){
+    h+='<div class="ds"><b>'+esc(r.id)+'</b><span class="badge '+(r.errori?'ko':'ok')+'">'+r.ok+'/'+r.confronti+' ok</span>'+(r.noti?'<span class="badge n">'+r.noti+' noti</span>':'')+(r.errori?'<span class="badge ko">'+r.errori+' ERRORI</span>':'')+
+       '<div class="f">'+esc(r.fonte)+' — '+r.caselle+' caselle'+(r.note?'<br>'+esc(r.note):'')+'</div>'+(r.dettagli.length?'<pre>'+esc(r.dettagli.join('\n'))+'</pre>':'')+'</div>';
+  });
+  document.getElementById('out').innerHTML=h;
+  window.__rep=rep;
+})();
+</script></body></html>
