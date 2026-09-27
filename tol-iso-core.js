@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.2.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.3.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -1735,7 +1735,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.2' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.3' };
   return API;
 })();
 /* TOL-ISO:JS END */
