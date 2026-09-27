@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.1.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.2.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -1429,6 +1429,14 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 22. v4.2: le righe «consigliati» e «trova» sono tasti riconoscibili; il tasto guida ha un testo, non solo «?» */
+    (function () {
+      var sm = $('tol-find-det').querySelector('summary'), cs = getComputedStyle(sm);
+      ck('v4.2: «Trova accoppiamento» ha bordo, sfondo e grassetto (sembra un tasto)', cs.borderTopWidth === '1px' && cs.borderTopStyle === 'solid' && parseInt(cs.fontWeight, 10) >= 700 && parseFloat(cs.paddingTop) >= 8);
+      ck('v4.2: sottotitolo su riga propria', getComputedStyle($('tol-fits-det').querySelector('summary > span > span')).display === 'block');
+      var hb = document.getElementById('tol-help-btn');
+      ck('v4.2: tasto guida «? Come si usa» con testo visibile', !!hb && /Come si usa/.test(hb.textContent) && hb.offsetWidth > 60);
+    })();
     /* 21. trova accoppiamento (v4.1) */
     (function () {
       var keepF = { type: finder.type, basis: finder.basis, a: finder.a, b: finder.b, all: finder.all, open: $('tol-find-det').open };
@@ -1727,7 +1735,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.1' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.2' };
   return API;
 })();
 /* TOL-ISO:JS END */

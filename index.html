@@ -144,10 +144,16 @@ body { background: var(--bg); color: var(--text); font: 14px/1.45 var(--sans); p
 .tol-fitrow span { font-size: 11.5px; line-height: 1.3; color: var(--text-muted); }
 .tol-fitrow.on { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); }
 .tol-fitrow.na { opacity: .45; cursor: default; }
-details.tol-det > summary { cursor: pointer; font-size: 11.5px; color: var(--text-muted); list-style: none; display: flex; align-items: center; gap: 6px; }
+/* v4.2: le righe a scomparsa sono TASTI riconoscibili (bordo, sfondo, titolo in grassetto, freccia a destra), non testo grigio */
+details.tol-det > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--border-mid); border-radius: var(--r, 6px); background: var(--surface); padding: 10px 12px; font: 700 13px var(--mono, monospace); color: var(--text); -webkit-tap-highlight-color: transparent; user-select: none; }
+details.tol-det > summary:hover { border-color: var(--blue); background: var(--blue-dim); }
+details.tol-det[open] > summary { border-color: var(--blue); background: var(--blue-dim); color: var(--blue-dark); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 details.tol-det > summary::-webkit-details-marker { display: none; }
-details.tol-det > summary::before { content: '▸'; font-size: 10px; color: var(--text-faint); }
-details.tol-det[open] > summary::before { content: '▾'; }
+details.tol-det > summary > span { flex: 1; }
+details.tol-det > summary > span > span { display: block; font: 10.5px var(--mono, monospace); color: var(--text-faint); margin-top: 2px; }
+details.tol-det > summary::after { content: ''; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg) translate(-2px, -2px); transition: transform .2s ease; margin-right: 4px; }
+details.tol-det[open] > summary::after { transform: rotate(-135deg) translate(-2px, -2px); border-color: var(--blue-dark); }
+details.tol-det > .tol-fits, details.tol-det > .tol-find { border: 1px solid var(--blue); border-top: 0; border-radius: 0 0 var(--r, 6px) var(--r, 6px); padding: 8px 10px 10px; margin-top: 0; }
 .tol-table td.tol-mok { box-shadow: inset 0 0 0 2px var(--green); }
 .tol-card.tol-mok { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
 .tol-sum-txt .ok { color: oklch(85% .12 160); font-weight: 700; } .tol-sum-txt .ko { color: oklch(80% .15 25); font-weight: 700; }
@@ -208,7 +214,9 @@ body.tol-has-summary { padding-bottom: 78px; }
 .tol-dbox .tol-inp { width: 250px; }
 .tol-dbox .tol-inp input { font-size: 15px; }
 .tol-dbox .tol-inp input::placeholder { font-weight: 400; color: var(--text-faint); font-size: 12px; }
-.btn-help { border: 1px solid var(--border); border-radius: 20px; background: transparent; font: 700 12px var(--mono); width: 30px; height: 26px; color: var(--text-muted); cursor: pointer; }
+.btn-help { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--blue); border-radius: 20px; background: var(--blue-dim); font: 600 11px var(--mono); padding: 5px 12px 5px 6px; color: var(--blue-dark); cursor: pointer; white-space: nowrap; }
+.btn-help b { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--blue-dark); color: #fff; font: 700 12px var(--mono); }
+.btn-help.on { background: var(--blue-dark); color: #fff; } .btn-help.on b { background: #fff; color: var(--blue-dark); }
 .tol-help { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg, 10px); box-shadow: var(--sh); padding: 14px 16px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; }
 .tol-help.on { display: block; }
 .tol-help ol { margin: 6px 0 10px; padding-left: 20px; } .tol-help li { margin: 4px 0; } .tol-help code { font: 700 12.5px var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
@@ -396,7 +404,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
         <button class="lang-chip active" data-lang="it">IT</button>
         <button class="lang-chip" data-lang="en">EN</button>
       </div>
-      <button class="btn-help" type="button" id="tol-help-btn" aria-label="Come si usa" title="Come si usa">?</button>
+      <button class="btn-help" type="button" id="tol-help-btn" aria-label="Come si usa" title="Come si usa"><b>?</b><span data-tx-it="Come si usa" data-tx-en="How to use">Come si usa</span></button>
       <button class="btn-print" type="button" id="tol-print-btn" data-tx-it="Stampa" data-tx-en="Print">Stampa</button>
     </div>
   </header>
@@ -563,7 +571,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span><br>
     <span data-tx-it="App realizzata da <b>NextCore AI Department</b> per UTR Tiberti." data-tx-en="App built by <b>NextCore AI Department</b> for UTR Tiberti.">App realizzata da <b>NextCore AI Department</b> per UTR Tiberti.</span><br>
-    Tolleranze ISO UTR v4.1 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v4.2 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -1998,6 +2006,14 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 22. v4.2: le righe «consigliati» e «trova» sono tasti riconoscibili; il tasto guida ha un testo, non solo «?» */
+    (function () {
+      var sm = $('tol-find-det').querySelector('summary'), cs = getComputedStyle(sm);
+      ck('v4.2: «Trova accoppiamento» ha bordo, sfondo e grassetto (sembra un tasto)', cs.borderTopWidth === '1px' && cs.borderTopStyle === 'solid' && parseInt(cs.fontWeight, 10) >= 700 && parseFloat(cs.paddingTop) >= 8);
+      ck('v4.2: sottotitolo su riga propria', getComputedStyle($('tol-fits-det').querySelector('summary > span > span')).display === 'block');
+      var hb = document.getElementById('tol-help-btn');
+      ck('v4.2: tasto guida «? Come si usa» con testo visibile', !!hb && /Come si usa/.test(hb.textContent) && hb.offsetWidth > 60);
+    })();
     /* 21. trova accoppiamento (v4.1) */
     (function () {
       var keepF = { type: finder.type, basis: finder.basis, a: finder.a, b: finder.b, all: finder.all, open: $('tol-find-det').open };
@@ -2296,7 +2312,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.1' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.2' };
   return API;
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
@@ -2321,8 +2337,9 @@ var TolISO = (function () {
 
   /* Aiuto «?» */
   var helpBox = document.getElementById('tol-help');
-  document.getElementById('tol-help-btn').addEventListener('click', function () { helpBox.classList.toggle('on'); if (helpBox.classList.contains('on')) helpBox.scrollIntoView({ block: 'nearest' }); });
-  document.getElementById('tol-help-close').addEventListener('click', function () { helpBox.classList.remove('on'); });
+  var helpBtn = document.getElementById('tol-help-btn');
+  helpBtn.addEventListener('click', function () { helpBox.classList.toggle('on'); helpBtn.classList.toggle('on', helpBox.classList.contains('on')); if (helpBox.classList.contains('on')) helpBox.scrollIntoView({ block: 'nearest' }); });
+  document.getElementById('tol-help-close').addEventListener('click', function () { helpBox.classList.remove('on'); helpBtn.classList.remove('on'); });
   /* Rete: pallino verde online, ambra offline (l'app funziona lo stesso) */
   function net() { var on = navigator.onLine !== false; document.getElementById('tol-net').classList.toggle('off', !on); document.getElementById('tol-net-txt').textContent = on ? 'online' : (document.documentElement.lang === 'en' ? 'offline · works from cache' : 'offline · funziona dalla memoria'); }
   window.addEventListener('online', net); window.addEventListener('offline', net); net();
