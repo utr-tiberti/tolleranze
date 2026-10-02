@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.3.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.4.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -527,11 +527,11 @@ var TolISO = (function () {
   var FL = { it: { lbl: { clearance: ['gioco minimo', 'gioco massimo'], transition: ['interferenza massima', 'gioco massimo'], interference: ['interferenza minima', 'interferenza massima'] },
                    basis: { hole: 'foro base H', shaft: 'albero base h', all: 'tutte le coppie' }, seg: { clearance: 'gioco', transition: 'incerto', interference: 'forzato' },
                    hint: 'Coppie della parete (fori A9…S8, alberi a9…u6) che a questo Ø rispettano i limiti scritti; campo vuoto = nessun vincolo. Ordinate dalla più fine alla più grossolana (somma dei gradi IT), senza giudizio di «migliore»: la scelta dipende dall\'uso. App. A = coppia consigliata da ISO 286-1.',
-                   none: 'Nessuna coppia della parete rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', n: 'coppie trovate', one: 'coppia trovata', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
+                   none: 'Nessuna coppia della parete rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', narrow: 'Tra i due limiti ci sono {w} µm, ma a questo Ø la coppia più fine ({p}) varia già di {s} µm: allarga il campo ad almeno {s} µm.', n: 'coppie trovate', one: 'coppia trovata', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
              en: { lbl: { clearance: ['minimum clearance', 'maximum clearance'], transition: ['maximum interference', 'maximum clearance'], interference: ['minimum interference', 'maximum interference'] },
                    basis: { hole: 'hole basis H', shaft: 'shaft basis h', all: 'all pairs' }, seg: { clearance: 'clearance', transition: 'transition', interference: 'interference' },
                    hint: 'Pairs from the chart (holes A9…S8, shafts a9…u6) that meet the limits entered at this Ø; empty field = no constraint. Sorted from finest to coarsest (sum of IT grades), with no “best” judgement: the choice depends on the application. App. A = pair recommended by ISO 286-1.',
-                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', n: 'pairs found', one: 'pair found', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
+                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', narrow: 'The two limits are {w} µm apart, but at this Ø the finest pair ({p}) already varies by {s} µm: widen the range to at least {s} µm.', n: 'pairs found', one: 'pair found', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
   function fl(k) { return FL[lang][k]; }
   function findRangeTxt(r) {
     if (r.type === 'clearance') return tu('clr') + ' ' + umAbs(r.clrMin) + '…' + umAbs(r.clrMax) + ' µm';
@@ -552,7 +552,16 @@ var TolISO = (function () {
     var cur = (st.hole && st.shaft) ? st.hole.letter + st.hole.grade + '/' + st.shaft.letter + st.shaft.grade : '';
     var col = finder.type === 'clearance' ? 'tol-c-green' : (finder.type === 'interference' ? 'tol-c-red' : 'tol-c-amber');
     $('tol-find-n').textContent = res.length ? (res.length + ' ' + (res.length === 1 ? fl('one') : fl('n')) + ' · Ø' + fmtD(st.D)) : '';
-    if (!res.length) { out.innerHTML = '<div class="none">' + fl('none') + '</div>'; return; }
+    if (!res.length) {
+      /* perché non c'è niente? se l'utente ha scritto due limiti più vicini della variazione della coppia più fine, glielo diciamo con i numeri */
+      var msg = fl('none'), a = parseFloat(String(finder.a).replace(',', '.')), b = parseFloat(String(finder.b).replace(',', '.'));
+      if (isFinite(a) && isFinite(b) && b > a) {
+        var free = findFits(st.D, { type: finder.type, basis: finder.basis }), best = null;
+        free.forEach(function (r) { var sp = r1(r.gmax - r.gmin); if (!best || sp < best.sp) best = { sp: sp, pair: r.hole + '/' + r.shaft }; });
+        if (best && best.sp > r1(b - a)) msg = fl('narrow').replace('{w}', umAbs(r1(b - a))).replace('{p}', best.pair).replace(/\{s\}/g, umAbs(best.sp));
+      }
+      out.innerHTML = '<div class="none">' + msg + '</div>'; return;
+    }
     var shown = finder.all ? res : res.slice(0, FIND_SHOW), h = '';
     shown.forEach(function (r) { var pair = r.hole + '/' + r.shaft; h += '<button type="button" class="tol-findrow' + (pair === cur ? ' on' : '') + '" data-fit="' + pair + '"><b>' + pair + '</b><i class="' + col + '">' + findRangeTxt(r) + '</i><span>IT' + r.hg + '+IT' + r.sg + (r.pref ? '<em class="appa">' + fl('appA') + '</em>' : '') + '</span></button>'; });
     if (res.length > FIND_SHOW) h += '<button type="button" class="tol-chip more" data-findmore="1">' + (finder.all ? fl('less') + ' ' + FIND_SHOW : fl('more') + ' ' + res.length) + '</button>';
@@ -1429,6 +1438,11 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 23. v4.4: niente zoom da doppio tocco, niente scorrimento orizzontale, avviso zoom spento a scala 1, riga diagnostica */
+    ck('v4.4: touch-action manipulation su body e tasti', getComputedStyle(document.body).touchAction === 'manipulation' && getComputedStyle($('tol-sum-copy')).touchAction === 'manipulation');
+    ck('v4.4: la pagina non è più larga dello schermo', document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+    ck('v4.4: avviso zoom presente e spento a scala 1', !!document.getElementById('tol-zoom') && !document.getElementById('tol-zoom').classList.contains('on'));
+    ck('v4.4: riga diagnostica schermo/pagina/scala', /schermo \d+×\d+ · pagina \d+ · scala \d+%/.test(document.getElementById('tol-vp').textContent));
     /* 22. v4.2: le righe «consigliati» e «trova» sono tasti riconoscibili; il tasto guida ha un testo, non solo «?» */
     (function () {
       var sm = $('tol-find-det').querySelector('summary'), cs = getComputedStyle(sm);
@@ -1452,6 +1466,9 @@ var TolISO = (function () {
       ck('trova UI: tocco su H7/p6 → classi impostate e riga evidenziata', $('tol-s-let').value === 'p' && $('tol-s-gr').value === '6' && $('tol-find-out').querySelector('[data-fit="H7/p6"]').classList.contains('on'));
       $('tol-find-type').querySelector('[data-ft="clearance"]').click(); $('tol-find-a').value = '10'; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = '12'; $('tol-find-b').dispatchEvent(new Event('input'));
       ck('trova UI: nessun risultato → messaggio, contatore vuoto', !!$('tol-find-out').querySelector('.none') && $('tol-find-n').textContent === '');
+      ck('trova UI: campo 10…12 (2 µm) più stretto della coppia più fine → dice quanto allargare (18 µm, H5/g5 o H5/h5)', /Tra i due limiti ci sono 2 µm, ma a questo Ø la coppia più fine \(H5\/(g5|h5)\) varia già di 18 µm: allarga il campo ad almeno 18 µm\./.test($('tol-find-out').querySelector('.none').textContent));
+      $('tol-find-a').value = '5'; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = '15'; $('tol-find-b').dispatchEvent(new Event('input'));
+      ck('trova UI: 5…15 a Ø25 foro base (lo screenshot dell\'utente) → stesso avviso con 10 µm', /ci sono 10 µm/.test($('tol-find-out').querySelector('.none').textContent) && /almeno 18 µm/.test($('tol-find-out').querySelector('.none').textContent));
       $('tol-find-a').value = ''; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = ''; $('tol-find-b').dispatchEvent(new Event('input')); $('tol-find-basis').value = 'all'; $('tol-find-basis').dispatchEvent(new Event('change'));
       var all = findFits(25, { type: 'clearance', basis: 'all' });
       ck('trova UI: «tutte le coppie» senza vincoli → prime ' + FIND_SHOW + ' e tasto «Mostra tutte le ' + all.length + '»', all.length > FIND_SHOW && $('tol-find-out').querySelectorAll('.tol-findrow').length === FIND_SHOW && new RegExp('Mostra tutte le ' + all.length).test($('tol-find-out').querySelector('[data-findmore]').textContent));
@@ -1735,7 +1752,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.3' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.4' };
   return API;
 })();
 /* TOL-ISO:JS END */

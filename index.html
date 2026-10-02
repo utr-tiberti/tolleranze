@@ -46,8 +46,9 @@
   --sh: 0 1px 2px oklch(60% .01 78/.16), 0 8px 22px oklch(60% .01 78/.08);
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; }
-body { background: var(--bg); color: var(--text); font: 14px/1.45 var(--sans); padding: 18px 16px 40px; }
+html, body { margin: 0; overflow-x: hidden; }   /* v4.4: la pagina non deve mai diventare più larga dello schermo */
+body { background: var(--bg); color: var(--text); font: 14px/1.45 var(--sans); padding: 18px 16px 40px; touch-action: manipulation; }   /* v4.4: il doppio tocco su una scheda NON ingrandisce la pagina (iPhone); il pizzico resta possibile */
+button, input, select, a, summary { touch-action: manipulation; }
 .wrap { max-width: 1180px; margin: 0 auto; }
 .hd { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--sh);
       padding: 16px 20px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -265,6 +266,9 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 .tol-install .ico { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; }
 .tol-update { display: none; position: sticky; top: 0; z-index: 30; background: var(--amber-dark); color: #fff; font: 600 12.5px var(--mono, monospace); padding: 9px 14px; border-radius: var(--r, 6px); margin-bottom: 12px; cursor: pointer; text-align: center; }
 .tol-update.on { display: block; }
+.tol-zoom { display: none; position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 40; background: var(--blue-dark); color: #fff; font: 600 12.5px/1.4 var(--mono, monospace); padding: 10px 14px; border-radius: var(--r-lg, 10px); box-shadow: 0 6px 20px oklch(20% .02 250/.35); }
+.tol-zoom.on { display: block; }
+.tol-vp { font: 10px var(--mono, monospace); color: var(--text-faint); }
 @media (max-width: 899px) {
   .tol-desk { display: none !important; }
   .tol-mob { display: block; }
@@ -410,6 +414,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
   </header>
   <div class="tol-update" id="tol-update" role="button" data-tx-it="Nuova versione disponibile &mdash; tocca per aggiornare" data-tx-en="New version available &mdash; tap to update">Nuova versione disponibile &mdash; tocca per aggiornare</div>
   <div class="tol-print-title" id="tol-print-title"></div>
+  <div class="tol-zoom tol-noprint" id="tol-zoom" role="status"></div>
   <div class="tol-alert tol-noprint" id="tol-alert" role="alert"></div>
   <div class="tol-help tol-noprint" id="tol-help">
     <b data-tx-it="Come si usa" data-tx-en="How to use">Come si usa</b>
@@ -569,9 +574,9 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
   <div class="ft">
     <span data-tx-it="Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate." data-tx-en="Reference: ISO 286-1:2010 system (IT grades, fundamental deviations, &Delta; rule for holes K&hellip;ZC) and ISO 286-2:2010 tables. Range 0&ndash;500 mm. js/JS = exact &plusmn;IT/2 (old slide charts round js7&hellip;js11 to the whole micron). Values checked against independent external sources: see the <em>verifica/</em> folder. Table 4 of ISO 286-1:2010 and its Cor.1:2013 read and applied on 2026-09-24 (cd, ef, fg up to 50 mm; ef 18&ndash;30 = &minus;28). The ISO 286-2 tables and their Cor.1 have not been compared.">Riferimento: sistema ISO 286-1:2010 (gradi IT, scostamenti fondamentali, regola &Delta; per i fori K&hellip;ZC) e tabelle ISO 286-2:2010. Campo 0&ndash;500 mm. js/JS = &plusmn;IT/2 esatto (i vecchi regoli arrotondano js7&hellip;js11 al micron intero). Valori verificati contro fonti esterne indipendenti: vedi cartella <em>verifica/</em>. Tabella 4 di ISO 286-1:2010 e il suo Cor.1:2013 letti e applicati il 24/09/2026 (cd, ef, fg fino a 50 mm; ef 18&ndash;30 = &minus;28). Le tabelle di ISO 286-2 e il relativo Cor.1 non sono state confrontate.</span><br>
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
-<span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span><br>
+<span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span> &middot; <span class="tol-vp" id="tol-vp"></span><br>
     <span data-tx-it="App realizzata da <b>NextCore AI Department</b> per UTR Tiberti." data-tx-en="App built by <b>NextCore AI Department</b> for UTR Tiberti.">App realizzata da <b>NextCore AI Department</b> per UTR Tiberti.</span><br>
-    Tolleranze ISO UTR v4.3 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v4.4 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -1104,11 +1109,11 @@ var TolISO = (function () {
   var FL = { it: { lbl: { clearance: ['gioco minimo', 'gioco massimo'], transition: ['interferenza massima', 'gioco massimo'], interference: ['interferenza minima', 'interferenza massima'] },
                    basis: { hole: 'foro base H', shaft: 'albero base h', all: 'tutte le coppie' }, seg: { clearance: 'gioco', transition: 'incerto', interference: 'forzato' },
                    hint: 'Coppie della parete (fori A9…S8, alberi a9…u6) che a questo Ø rispettano i limiti scritti; campo vuoto = nessun vincolo. Ordinate dalla più fine alla più grossolana (somma dei gradi IT), senza giudizio di «migliore»: la scelta dipende dall\'uso. App. A = coppia consigliata da ISO 286-1.',
-                   none: 'Nessuna coppia della parete rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', n: 'coppie trovate', one: 'coppia trovata', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
+                   none: 'Nessuna coppia della parete rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', narrow: 'Tra i due limiti ci sono {w} µm, ma a questo Ø la coppia più fine ({p}) varia già di {s} µm: allarga il campo ad almeno {s} µm.', n: 'coppie trovate', one: 'coppia trovata', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
              en: { lbl: { clearance: ['minimum clearance', 'maximum clearance'], transition: ['maximum interference', 'maximum clearance'], interference: ['minimum interference', 'maximum interference'] },
                    basis: { hole: 'hole basis H', shaft: 'shaft basis h', all: 'all pairs' }, seg: { clearance: 'clearance', transition: 'transition', interference: 'interference' },
                    hint: 'Pairs from the chart (holes A9…S8, shafts a9…u6) that meet the limits entered at this Ø; empty field = no constraint. Sorted from finest to coarsest (sum of IT grades), with no “best” judgement: the choice depends on the application. App. A = pair recommended by ISO 286-1.',
-                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', n: 'pairs found', one: 'pair found', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
+                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', narrow: 'The two limits are {w} µm apart, but at this Ø the finest pair ({p}) already varies by {s} µm: widen the range to at least {s} µm.', n: 'pairs found', one: 'pair found', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
   function fl(k) { return FL[lang][k]; }
   function findRangeTxt(r) {
     if (r.type === 'clearance') return tu('clr') + ' ' + umAbs(r.clrMin) + '…' + umAbs(r.clrMax) + ' µm';
@@ -1129,7 +1134,16 @@ var TolISO = (function () {
     var cur = (st.hole && st.shaft) ? st.hole.letter + st.hole.grade + '/' + st.shaft.letter + st.shaft.grade : '';
     var col = finder.type === 'clearance' ? 'tol-c-green' : (finder.type === 'interference' ? 'tol-c-red' : 'tol-c-amber');
     $('tol-find-n').textContent = res.length ? (res.length + ' ' + (res.length === 1 ? fl('one') : fl('n')) + ' · Ø' + fmtD(st.D)) : '';
-    if (!res.length) { out.innerHTML = '<div class="none">' + fl('none') + '</div>'; return; }
+    if (!res.length) {
+      /* perché non c'è niente? se l'utente ha scritto due limiti più vicini della variazione della coppia più fine, glielo diciamo con i numeri */
+      var msg = fl('none'), a = parseFloat(String(finder.a).replace(',', '.')), b = parseFloat(String(finder.b).replace(',', '.'));
+      if (isFinite(a) && isFinite(b) && b > a) {
+        var free = findFits(st.D, { type: finder.type, basis: finder.basis }), best = null;
+        free.forEach(function (r) { var sp = r1(r.gmax - r.gmin); if (!best || sp < best.sp) best = { sp: sp, pair: r.hole + '/' + r.shaft }; });
+        if (best && best.sp > r1(b - a)) msg = fl('narrow').replace('{w}', umAbs(r1(b - a))).replace('{p}', best.pair).replace(/\{s\}/g, umAbs(best.sp));
+      }
+      out.innerHTML = '<div class="none">' + msg + '</div>'; return;
+    }
     var shown = finder.all ? res : res.slice(0, FIND_SHOW), h = '';
     shown.forEach(function (r) { var pair = r.hole + '/' + r.shaft; h += '<button type="button" class="tol-findrow' + (pair === cur ? ' on' : '') + '" data-fit="' + pair + '"><b>' + pair + '</b><i class="' + col + '">' + findRangeTxt(r) + '</i><span>IT' + r.hg + '+IT' + r.sg + (r.pref ? '<em class="appa">' + fl('appA') + '</em>' : '') + '</span></button>'; });
     if (res.length > FIND_SHOW) h += '<button type="button" class="tol-chip more" data-findmore="1">' + (finder.all ? fl('less') + ' ' + FIND_SHOW : fl('more') + ' ' + res.length) + '</button>';
@@ -2006,6 +2020,11 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 23. v4.4: niente zoom da doppio tocco, niente scorrimento orizzontale, avviso zoom spento a scala 1, riga diagnostica */
+    ck('v4.4: touch-action manipulation su body e tasti', getComputedStyle(document.body).touchAction === 'manipulation' && getComputedStyle($('tol-sum-copy')).touchAction === 'manipulation');
+    ck('v4.4: la pagina non è più larga dello schermo', document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+    ck('v4.4: avviso zoom presente e spento a scala 1', !!document.getElementById('tol-zoom') && !document.getElementById('tol-zoom').classList.contains('on'));
+    ck('v4.4: riga diagnostica schermo/pagina/scala', /schermo \d+×\d+ · pagina \d+ · scala \d+%/.test(document.getElementById('tol-vp').textContent));
     /* 22. v4.2: le righe «consigliati» e «trova» sono tasti riconoscibili; il tasto guida ha un testo, non solo «?» */
     (function () {
       var sm = $('tol-find-det').querySelector('summary'), cs = getComputedStyle(sm);
@@ -2029,6 +2048,9 @@ var TolISO = (function () {
       ck('trova UI: tocco su H7/p6 → classi impostate e riga evidenziata', $('tol-s-let').value === 'p' && $('tol-s-gr').value === '6' && $('tol-find-out').querySelector('[data-fit="H7/p6"]').classList.contains('on'));
       $('tol-find-type').querySelector('[data-ft="clearance"]').click(); $('tol-find-a').value = '10'; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = '12'; $('tol-find-b').dispatchEvent(new Event('input'));
       ck('trova UI: nessun risultato → messaggio, contatore vuoto', !!$('tol-find-out').querySelector('.none') && $('tol-find-n').textContent === '');
+      ck('trova UI: campo 10…12 (2 µm) più stretto della coppia più fine → dice quanto allargare (18 µm, H5/g5 o H5/h5)', /Tra i due limiti ci sono 2 µm, ma a questo Ø la coppia più fine \(H5\/(g5|h5)\) varia già di 18 µm: allarga il campo ad almeno 18 µm\./.test($('tol-find-out').querySelector('.none').textContent));
+      $('tol-find-a').value = '5'; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = '15'; $('tol-find-b').dispatchEvent(new Event('input'));
+      ck('trova UI: 5…15 a Ø25 foro base (lo screenshot dell\'utente) → stesso avviso con 10 µm', /ci sono 10 µm/.test($('tol-find-out').querySelector('.none').textContent) && /almeno 18 µm/.test($('tol-find-out').querySelector('.none').textContent));
       $('tol-find-a').value = ''; $('tol-find-a').dispatchEvent(new Event('input')); $('tol-find-b').value = ''; $('tol-find-b').dispatchEvent(new Event('input')); $('tol-find-basis').value = 'all'; $('tol-find-basis').dispatchEvent(new Event('change'));
       var all = findFits(25, { type: 'clearance', basis: 'all' });
       ck('trova UI: «tutte le coppie» senza vincoli → prime ' + FIND_SHOW + ' e tasto «Mostra tutte le ' + all.length + '»', all.length > FIND_SHOW && $('tol-find-out').querySelectorAll('.tol-findrow').length === FIND_SHOW && new RegExp('Mostra tutte le ' + all.length).test($('tol-find-out').querySelector('[data-findmore]').textContent));
@@ -2312,7 +2334,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.3' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.4' };
   return API;
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
@@ -2324,6 +2346,7 @@ var TolISO = (function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-tx-it][data-tx-en]'), function (el) { el.innerHTML = el.getAttribute('data-tx-' + l); });
     Array.prototype.forEach.call(document.querySelectorAll('.lang-chip'), function (b) { b.classList.toggle('active', b.getAttribute('data-lang') === l); });
     TolISO.setLang(l);
+    if (window.tolVp) window.tolVp();
     try { localStorage.setItem('tolIso.lang', l); } catch (e) {}
   }
   Array.prototype.forEach.call(document.querySelectorAll('.lang-chip'), function (b) { b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang')); }); });
@@ -2343,6 +2366,18 @@ var TolISO = (function () {
   /* Rete: pallino verde online, ambra offline (l'app funziona lo stesso) */
   function net() { var on = navigator.onLine !== false; document.getElementById('tol-net').classList.toggle('off', !on); document.getElementById('tol-net-txt').textContent = on ? 'online' : (document.documentElement.lang === 'en' ? 'offline · works from cache' : 'offline · funziona dalla memoria'); }
   window.addEventListener('online', net); window.addEventListener('offline', net); net();
+  /* v4.4: se la pagina è ingrandita (doppio tocco o pizzico: nell'app dalla Home lo zoom resta e tutto esce dallo schermo) lo diciamo,
+     perché su iPhone non c'è nessun comando visibile per tornare a misura. Riga diagnostica a piè di pagina: schermo, pagina, scala. */
+  function vp() {
+    var vv = window.visualViewport, scale = vv ? vv.scale : 1, el = document.getElementById('tol-zoom'), en = document.documentElement.lang === 'en';
+    var zoomed = scale > 1.04;
+    el.textContent = en ? 'The page is zoomed in (' + Math.round(scale * 100) + '%): pinch with two fingers to shrink it back.' : 'La pagina è ingrandita (' + Math.round(scale * 100) + '%): avvicina due dita sullo schermo per tornare a misura.';
+    el.classList.toggle('on', zoomed);
+    var d = document.getElementById('tol-vp');
+    if (d) d.textContent = (en ? 'screen ' : 'schermo ') + window.innerWidth + '×' + window.innerHeight + ' · ' + (en ? 'page ' : 'pagina ') + document.documentElement.scrollWidth + ' · ' + (en ? 'scale ' : 'scala ') + Math.round(scale * 100) + '%' + (window.devicePixelRatio ? ' · ' + window.devicePixelRatio + 'x' : '');
+  }
+  if (window.visualViewport) { visualViewport.addEventListener('resize', vp); visualViewport.addEventListener('scroll', vp); }
+  window.addEventListener('resize', vp); vp(); window.tolVp = vp;
   /* Autoverifica all'avvio: il nucleo si ricontrolla da solo (≈ 2000 valori di riferimento) ogni volta che l'app parte.
      Se fallisce, avviso rosso: uno strumento di misura che non è sicuro di sé lo deve dire. */
   setTimeout(function () {
