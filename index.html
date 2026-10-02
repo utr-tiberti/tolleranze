@@ -323,6 +323,22 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 .tol-sum-txt .mbar .trk { flex: 1; position: relative; height: 8px; border-radius: 4px; background: oklch(42% .01 78); }
 .tol-sum-txt .mbar .mk { position: absolute; top: -4px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: var(--green); box-shadow: 0 0 0 1px oklch(20% .01 78); }
 .tol-sum-txt .mbar.ko .mk { background: var(--red); }
+/* v4.5: glossario */
+.tol-gloss .ask { background: var(--blue-dim); border: 1px solid var(--blue); border-radius: var(--r-lg, 10px); padding: 12px 14px; margin: 10px 0 14px; }
+.tol-gloss .ask .tol-inp { max-width: 220px; background: var(--surface); margin-top: 4px; }
+.tol-gloss .ans { font-size: 13.5px; line-height: 1.55; margin-top: 10px; }
+.tol-gloss .ans:empty { display: none; }
+.tol-gloss .ans b { color: var(--blue-dark); } .tol-gloss .ans .num { font: 700 13px var(--mono, monospace); background: var(--surface); padding: 1px 6px; border-radius: 4px; }
+.tol-gloss .ans .bad { color: var(--red-dark); }
+.tol-gloss h4 { font: 700 11px var(--mono, monospace); letter-spacing: .5px; text-transform: uppercase; color: var(--text-faint); margin: 16px 0 6px; }
+.tol-gloss table { border-collapse: collapse; width: 100%; font-size: 13px; line-height: 1.45; }
+.tol-gloss td, .tol-gloss th { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+.tol-gloss th { font: 700 10.5px var(--mono, monospace); letter-spacing: .3px; text-transform: uppercase; color: var(--text-faint); }
+.tol-gloss td.k { font: 700 13.5px var(--mono, monospace); white-space: nowrap; width: 1%; }
+.tol-gloss td.k .h { color: var(--blue-dark); } .tol-gloss td.k .s { color: var(--amber-dark); }
+.tol-gloss .tag { display: inline-block; font: 700 10px var(--mono, monospace); border-radius: 8px; padding: 1px 7px; margin-right: 6px; vertical-align: 1px; }
+.tol-gloss .tag.clr { background: var(--green-dim); color: var(--green-dark); } .tol-gloss .tag.trn { background: var(--amber-dim); color: var(--amber-dark); } .tol-gloss .tag.itf { background: var(--red-dim); color: var(--red-dark); } .tol-gloss .tag.base { background: var(--blue-dim); color: var(--blue-dark); }
+.tol-gloss dl { margin: 0; } .tol-gloss dt { font: 700 13px var(--mono, monospace); margin-top: 8px; } .tol-gloss dd { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
 /* v4.1: trova accoppiamento (ricerca inversa) */
 .tol-find .row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px 10px; margin: 8px 0; }
 .tol-find .tol-seg { margin-top: 6px; }
@@ -424,6 +440,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
       <li data-tx-it="Al collaudo scrivi la misura letta nel campo <b>misurato</b>: l'app dice DENTRO o FUORI, di quanto, lo scostamento dal nominale e quanta tolleranza è usata (barra MIN&ndash;MAX)." data-tx-en="At inspection type the reading into the <b>measured</b> field: the app says IN or OUT, by how much, the deviation from nominal and how much of the tolerance is used (MIN&ndash;MAX bar).">Al collaudo scrivi la misura letta nel campo <b>misurato</b>: l'app dice DENTRO o FUORI, di quanto, lo scostamento dal nominale e quanta tolleranza &egrave; usata (barra MIN&ndash;MAX).</li>
       <li data-tx-it="<b>Rapporto</b> (in basso, o in ACCOPPIAMENTO): scrivi pezzo, disegno e operatore e ottieni il rapporto di controllo con la misura e l'esito CONFORME / NON CONFORME, da stampare, salvare in PDF o mandare su WhatsApp." data-tx-en="<b>Report</b> (at the bottom, or in FIT): enter part, drawing and inspector to get the inspection report with the reading and the PASS / FAIL verdict, to print, save as PDF or send via WhatsApp."><b>Rapporto</b> (in basso, o in ACCOPPIAMENTO): scrivi pezzo, disegno e operatore e ottieni il rapporto di controllo con la misura e l'esito CONFORME / NON CONFORME, da stampare, salvare in PDF o mandare su WhatsApp.</li>
       <li data-tx-it="<b>Trova accoppiamento</b> (in ACCOPPIAMENTO): scrivi il gioco o l'interferenza che ti serve in &micro;m e l'app elenca le coppie ISO che li rispettano a quel &Oslash;; un tocco la imposta." data-tx-en="<b>Find a fit</b> (in FIT): type the clearance or interference you need in &micro;m and the app lists the ISO pairs that meet them at that &Oslash;; one tap applies it."><b>Trova accoppiamento</b> (in ACCOPPIAMENTO): scrivi il gioco o l'interferenza che ti serve in &micro;m e l'app elenca le coppie ISO che li rispettano a quel &Oslash;; un tocco la imposta.</li>
+      <li data-tx-it="Non sai cosa vuol dire <code>H7</code> o <code>k6</code>? In fondo alla pagina c'&egrave; il <b>Glossario</b>: scrivi la classe e te la spiega con i numeri del tuo &Oslash;; dal riepilogo in basso ci arrivi col tasto <b>Cos'&egrave; H7?</b>." data-tx-en="Not sure what <code>H7</code> or <code>k6</code> means? At the bottom of the page there is the <b>Glossary</b>: type the class and it explains it with the numbers of your &Oslash;; the <b>What is H7?</b> button in the summary takes you there.">Non sai cosa vuol dire <code>H7</code> o <code>k6</code>? In fondo alla pagina c'&egrave; il <b>Glossario</b>: scrivi la classe e te la spiega con i numeri del tuo &Oslash;; dal riepilogo in basso ci arrivi col tasto <b>Cos'&egrave; H7?</b>.</li>
       <li data-tx-it="ACCOPPIAMENTO disegna albero e foro con gioco o interferenza, e propone gli accoppiamenti consigliati dalla norma." data-tx-en="FIT draws shaft and hole with clearance or interference, and lists the fits recommended by the standard.">ACCOPPIAMENTO disegna albero e foro con gioco o interferenza, e propone gli accoppiamenti consigliati dalla norma.</li>
     </ol>
     <button type="button" class="tol-chip" id="tol-help-close" data-tx-it="Chiudi" data-tx-en="Close">Chiudi</button>
@@ -554,6 +571,17 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
         <summary><span data-tx-it="Provenienza dei dati" data-tx-en="Where the data comes from">Provenienza dei dati</span><span class="chev"></span></summary>
         <div class="body"><div id="tol-prov" class="tol-prov"></div></div>
       </details>
+      <details class="tol-acc tol-noprint" id="tol-acc-gloss">
+        <summary><span data-tx-it="Glossario <span class=&quot;sub&quot;>cosa vogliono dire lettere, numeri e parole</span>" data-tx-en="Glossary <span class=&quot;sub&quot;>what letters, numbers and words mean</span>">Glossario <span class="sub">cosa vogliono dire lettere, numeri e parole</span></span><span class="chev"></span></summary>
+        <div class="body tol-gloss" id="tol-gloss">
+          <div class="ask">
+            <div class="tol-lbl" data-tx-it="Spiegami una classe <span>es. H7 · g6 · k6 · P7</span>" data-tx-en="Explain a class <span>e.g. H7 · g6 · k6 · P7</span>">Spiegami una classe <span>es. H7 &middot; g6 &middot; k6 &middot; P7</span></div>
+            <div class="tol-inp"><input id="tol-gloss-q" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="H7"></div>
+            <div class="ans" id="tol-gloss-ans"></div>
+          </div>
+          <div id="tol-gloss-body"></div>
+        </div>
+      </details>
       <details class="tol-acc" id="tol-acc-it">
         <summary><span data-tx-it="Gradi di tolleranza normalizzati IT <span class=&quot;sub&quot;>ampiezza in micron</span>" data-tx-en="Standard tolerance grades IT <span class=&quot;sub&quot;>width in microns</span>">Gradi di tolleranza normalizzati IT <span class="sub">ampiezza in micron</span></span><span class="chev"></span></summary>
         <div class="body"><div class="tol-tablewrap"><table class="tol-table" id="tol-ittable"></table></div></div>
@@ -565,6 +593,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
       <button type="button" class="tol-chip tol-copy tol-sum-copy" id="tol-sum-copy" data-copy="" data-tx-it="Copia quota" data-tx-en="Copy dimension">Copia quota</button>
       <button type="button" class="tol-chip tol-sum-copy" id="tol-sum-share" data-share="" data-tx-it="Condividi" data-tx-en="Share">Condividi</button>
       <button type="button" class="tol-chip tol-sum-copy" id="tol-sum-rep" data-tx-it="Rapporto" data-tx-en="Report">Rapporto</button>
+      <button type="button" class="tol-chip tol-sum-copy" id="tol-sum-gloss"></button>
     </div>
     <div class="tol-rep-print" id="tol-rep-print-box"></div>
 
@@ -576,7 +605,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span> &middot; <span class="tol-vp" id="tol-vp"></span><br>
     <span data-tx-it="App realizzata da <b>NextCore AI Department</b> per UTR Tiberti." data-tx-en="App built by <b>NextCore AI Department</b> for UTR Tiberti.">App realizzata da <b>NextCore AI Department</b> per UTR Tiberti.</span><br>
-    Tolleranze ISO UTR v4.4 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v4.5 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -830,6 +859,112 @@ var TolISO = (function () {
     return { ok: true, hole: H, shaft: S, type: type, gmax: gmax, gmin: gmin,
              clrMax: gmax > 0 ? gmax : 0, clrMin: gmin > 0 ? gmin : 0,
              intMax: gmin < 0 ? -gmin : 0, intMin: gmax < 0 ? -gmax : 0 };
+  }
+
+  /* ── GLOSSARIO (v4.5): significato delle lettere di posizione, dei gradi IT e dei termini, in parole semplici.
+        Le lettere sono descritte per l'ALBERO (minuscole); per il FORO (maiuscole) il senso è speculare e il testo lo dice.
+        type: clr = dalla parte del gioco · base = scostamento zero · trn = a cavallo dello zero · itf = dalla parte dell'interferenza. ── */
+  var GLOSS = {
+    letters: [
+      ['a', 'clr', 'Gioco molto grande', 'Very large clearance', 'parti grezze o che lavorano molto calde; raro', 'rough parts or parts running very hot; rare'],
+      ['b', 'clr', 'Gioco molto grande', 'Very large clearance', 'come a, un po\' meno', 'as a, slightly less'],
+      ['c', 'clr', 'Gioco grande', 'Large clearance', 'perni e cerniere grezze, parti smontabili a mano (H11/c11)', 'rough pins and hinges, hand-removable parts (H11/c11)'],
+      ['cd', 'clr', 'Gioco grande', 'Large clearance', 'tra c e d; solo fino a 50 mm, uso raro', 'between c and d; only up to 50 mm, rare'],
+      ['d', 'clr', 'Gioco ampio', 'Wide clearance', 'parti che ruotano libere, macchine agricole (H9/d9)', 'free-running parts, agricultural machinery (H9/d9)'],
+      ['e', 'clr', 'Gioco medio', 'Medium clearance', 'alberi lunghi su più supporti, temperatura variabile (H8/e8)', 'long shafts on several supports, varying temperature (H8/e8)'],
+      ['ef', 'clr', 'Gioco medio', 'Medium clearance', 'tra e e f; solo fino a 50 mm, meccanica fine', 'between e and f; only up to 50 mm, fine mechanics'],
+      ['f', 'clr', 'Gioco normale', 'Normal clearance', 'alberi che girano in supporti e bronzine (H8/f7, H7/f7)', 'shafts turning in supports and bushes (H8/f7, H7/f7)'],
+      ['fg', 'clr', 'Gioco piccolo', 'Small clearance', 'tra f e g; solo fino a 50 mm, meccanica fine', 'between f and g; only up to 50 mm, fine mechanics'],
+      ['g', 'clr', 'Gioco piccolo', 'Small clearance', 'scorrevole di precisione: perni, guide lubrificate (H7/g6)', 'precision sliding: pins, lubricated guides (H7/g6)'],
+      ['h', 'base', 'Scostamento zero (pezzo base)', 'Zero deviation (basic member)', 'H = FORO BASE, il sistema più usato: il foro resta fisso e si sceglie l\'albero (H7/g6, H7/k6, H7/p6). h = ALBERO BASE, speculare; con H7 si monta a mano senza gioco apprezzabile (H7/h6)', 'H = HOLE BASIS, the most used system: the hole stays fixed and the shaft is chosen (H7/g6, H7/k6, H7/p6). h = SHAFT BASIS, mirror image; with H7 it is hand-assembled with no appreciable clearance (H7/h6)'],
+      ['js', 'trn', 'Simmetrica, ±IT/2', 'Symmetrical, ±IT/2', 'incerto leggero: metà sopra e metà sotto il nominale (H7/js6)', 'light transition: half above and half below nominal (H7/js6)'],
+      ['j', 'trn', 'Quasi simmetrica', 'Nearly symmetrical', 'incerto leggero, valori tabellati; esiste solo per pochi gradi', 'light transition, tabulated values; only a few grades exist'],
+      ['k', 'trn', 'Incerto', 'Transition', 'si monta con un mazzuolo di gomma: sedi cuscinetti sull\'albero, pulegge (H7/k6)', 'rubber-mallet assembly: bearing seats on shafts, pulleys (H7/k6)'],
+      ['m', 'trn', 'Incerto stretto', 'Tight transition', 'si monta con mazzuolo, si smonta senza danni (H7/m6)', 'mallet assembly, removable without damage (H7/m6)'],
+      ['n', 'trn', 'Incerto forzato', 'Tight transition', 'ingranaggi e boccole che non devono girare; smontaggio a pressa (H7/n6)', 'gears and bushes that must not turn; press removal (H7/n6)'],
+      ['p', 'itf', 'Forzato leggero', 'Light interference', 'boccole e ruote dentate montate a pressa (H7/p6)', 'bushes and gears pressed in (H7/p6)'],
+      ['r', 'itf', 'Forzato medio', 'Medium interference', 'alberi nei mozzi, a pressa o a caldo (H7/r6)', 'shafts in hubs, press or shrink fit (H7/r6)'],
+      ['s', 'itf', 'Forzato pesante', 'Heavy interference', 'montaggio a caldo, trasmette coppia senza chiavetta (H7/s6)', 'shrink fit, transmits torque without a key (H7/s6)'],
+      ['t', 'itf', 'Forzato molto pesante', 'Very heavy interference', 'calettamenti permanenti', 'permanent shrink fits'],
+      ['u', 'itf', 'Forzato molto pesante', 'Very heavy interference', 'calettamenti permanenti, pezzi che non si smontano più (H7/u6)', 'permanent shrink fits, parts never taken apart (H7/u6)'],
+      ['v', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'], ['x', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'], ['y', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'],
+      ['z', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'], ['za', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'], ['zb', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare'], ['zc', 'itf', 'Forzato estremo', 'Extreme interference', 'raro', 'rare']
+    ],
+    grades: [
+      [1, 4, 'Calibri e strumenti di misura', 'Gauges and measuring instruments', 'lappatura, rettifica finissima', 'lapping, very fine grinding'],
+      [5, 5, 'Precisione molto alta', 'Very high precision', 'rettifica fine; cuscinetti di precisione', 'fine grinding; precision bearings'],
+      [6, 7, 'Precisione normale per accoppiamenti', 'Normal precision for fits', 'rettifica, alesatura, tornitura fine (H7, g6, k6, p6…)', 'grinding, reaming, fine turning (H7, g6, k6, p6…)'],
+      [8, 9, 'Meccanica corrente', 'General machining', 'tornitura e fresatura accurate (H8/f7, H9/d9)', 'accurate turning and milling (H8/f7, H9/d9)'],
+      [10, 11, 'Meccanica grossolana', 'Coarse machining', 'tornitura e fresatura normali, foratura (H11/c11)', 'ordinary turning and milling, drilling (H11/c11)'],
+      [12, 14, 'Parti non accoppiate', 'Non-mating parts', 'quote generali, lamiera, grezzi lavorati', 'general dimensions, sheet metal, machined blanks'],
+      [15, 18, 'Molto grossolano', 'Very coarse', 'fusione, stampaggio, saldatura', 'casting, forging, welding']
+    ],
+    terms: {
+      it: [['Dimensione nominale', 'La quota scritta sul disegno (es. Ø25): da lì si misurano gli scostamenti.'],
+           ['Linea dello zero', 'Il nominale visto come riga di riferimento: sopra = scostamenti positivi, sotto = negativi.'],
+           ['Scostamento superiore / inferiore', 'Quanto il limite massimo (ES, es) e il limite minimo (EI, ei) distano dal nominale, in µm. Maiuscolo per il foro, minuscolo per l\'albero.'],
+           ['Tolleranza', 'La differenza fra limite massimo e minimo: quanto può variare il pezzo e restare buono. Non ha segno.'],
+           ['µm (micron)', 'Un millesimo di millimetro. 21 µm = 0,021 mm.'],
+           ['Grado IT', 'Il numero della classe (il 7 di H7): dice quanto è larga la tolleranza. Più il numero è basso, più la lavorazione è precisa.'],
+           ['Lettera di posizione', 'La lettera della classe (la H di H7): dice dove sta la tolleranza rispetto al nominale. Maiuscola = foro, minuscola = albero.'],
+           ['Foro base (H)', 'Sistema in cui il foro ha sempre scostamento inferiore 0 e si sceglie l\'albero per ottenere gioco o interferenza. È il più usato: i fori si fanno con utensili a misura fissa.'],
+           ['Albero base (h)', 'Sistema speculare: albero con scostamento superiore 0, si sceglie il foro. Utile con alberi commerciali rettificati.'],
+           ['Gioco', 'Foro più grande dell\'albero: le parti scorrono o ruotano. Gioco minimo = foro min − albero max; gioco massimo = foro max − albero min.'],
+           ['Interferenza (forzato)', 'Albero più grande del foro: si monta a pressa o a caldo e le parti restano unite.'],
+           ['Incerto (di transizione)', 'A seconda dei pezzi reali può uscire un piccolo gioco o una piccola interferenza.'],
+           ['DENTRO / FUORI', 'La misura letta sta fra i due limiti (pezzo conforme) oppure no.'],
+           ['App. A', 'Appendice A di ISO 286-1: l\'elenco degli accoppiamenti consigliati dalla norma per coprire i casi più comuni.']],
+      en: [['Nominal size', 'The size written on the drawing (e.g. Ø25): deviations are measured from it.'],
+           ['Zero line', 'The nominal seen as a reference line: above = positive deviations, below = negative.'],
+           ['Upper / lower deviation', 'How far the maximum limit (ES, es) and the minimum limit (EI, ei) are from nominal, in µm. Capitals for the hole, lower case for the shaft.'],
+           ['Tolerance', 'The difference between maximum and minimum limit: how much the part may vary and still be good. It has no sign.'],
+           ['µm (micron)', 'One thousandth of a millimetre. 21 µm = 0.021 mm.'],
+           ['IT grade', 'The number of the class (the 7 in H7): how wide the tolerance is. The lower the number, the more precise the machining.'],
+           ['Position letter', 'The letter of the class (the H in H7): where the tolerance sits with respect to nominal. Capital = hole, lower case = shaft.'],
+           ['Hole basis (H)', 'System where the hole always has lower deviation 0 and the shaft is chosen to get clearance or interference. The most used: holes are made with fixed-size tools.'],
+           ['Shaft basis (h)', 'Mirror system: shaft with upper deviation 0, the hole is chosen. Useful with ground commercial shafts.'],
+           ['Clearance', 'Hole larger than shaft: parts slide or rotate. Min clearance = hole min − shaft max; max clearance = hole max − shaft min.'],
+           ['Interference (press fit)', 'Shaft larger than hole: assembled by press or heat, parts stay together.'],
+           ['Transition', 'Depending on the actual parts, a small clearance or a small interference may result.'],
+           ['IN / OUT', 'The reading lies between the two limits (conforming part) or not.'],
+           ['Annex A', 'Annex A of ISO 286-1: the list of fits recommended by the standard to cover the most common cases.']]
+    }
+  };
+  function glossLetter(letter) { var L = letter.toLowerCase(); for (var i = 0; i < GLOSS.letters.length; i++) if (GLOSS.letters[i][0] === L) return GLOSS.letters[i]; return null; }
+  function glossGrade(g) { for (var i = 0; i < GLOSS.grades.length; i++) if (g >= GLOSS.grades[i][0] && g <= GLOSS.grades[i][1]) return GLOSS.grades[i]; return null; }
+  /* Spiegazione in parole di una classe («H7», «g6»), con i numeri del Ø se dato: {ok, html, text} o {ok:false, err} */
+  function explain(cls, D, l) {
+    l = l || lang; var en = l === 'en', pc = parseClass(String(cls || '').trim());
+    if (!pc) return { ok: false, err: en ? 'Write a class like H7, g6, k6 or P7.' : 'Scrivi una classe come H7, g6, k6 o P7.' };
+    var gl = glossLetter(pc.letter), gg = glossGrade(pc.grade), isH = pc.kind === 'hole', name = pc.letter + pc.grade;
+    if (!gl || !gg) return { ok: false, err: en ? 'Class not recognised.' : 'Classe non riconosciuta.' };
+    var who = isH ? (en ? 'hole' : 'foro') : (en ? 'shaft' : 'albero');
+    var side;
+    if (gl[1] === 'base') side = isH ? (en ? 'HOLE BASIS: the lower deviation is 0, the minimum size is exactly the nominal and the tolerance is all above it.' : 'FORO BASE: lo scostamento inferiore è 0, la dimensione minima è esattamente il nominale e tutta la tolleranza sta sopra.')
+                                   : (en ? 'SHAFT BASIS: the upper deviation is 0, the maximum size is exactly the nominal and the tolerance is all below it.' : 'ALBERO BASE: lo scostamento superiore è 0, la dimensione massima è esattamente il nominale e tutta la tolleranza sta sotto.');
+    else if (gl[1] === 'clr') side = isH ? (en ? 'the tolerance sits ABOVE the nominal (larger hole): paired with a shaft h it gives clearance.' : 'la tolleranza sta SOPRA il nominale (foro più grande): accoppiato a un albero h dà gioco.')
+                                        : (en ? 'the tolerance sits BELOW the nominal (smaller shaft): paired with a hole H it gives clearance.' : 'la tolleranza sta SOTTO il nominale (albero più piccolo): accoppiato a un foro H dà gioco.');
+    else if (gl[1] === 'trn') side = en ? 'the tolerance straddles the nominal: with the basic ' + (isH ? 'shaft h' : 'hole H') + ' the fit is a transition (small clearance or small interference).' : 'la tolleranza sta a cavallo del nominale: con ' + (isH ? 'l\'albero h' : 'il foro H') + ' di base l\'accoppiamento è incerto (piccolo gioco o piccola interferenza).';
+    else side = isH ? (en ? 'the tolerance sits BELOW the nominal (smaller hole): paired with a shaft h it gives interference.' : 'la tolleranza sta SOTTO il nominale (foro più piccolo): accoppiato a un albero h dà interferenza.')
+                    : (en ? 'the tolerance sits ABOVE the nominal (larger shaft): paired with a hole H it gives interference.' : 'la tolleranza sta SOPRA il nominale (albero più grande): accoppiato a un foro H dà interferenza.');
+    var nm = en ? gl[3] : gl[2], use = en ? gl[5] : gl[4];
+    if (gl[1] === 'base') {
+      nm = isH ? (en ? 'Lower deviation zero' : 'Scostamento inferiore zero') : (en ? 'Upper deviation zero' : 'Scostamento superiore zero');
+      use = isH ? (en ? 'the most used system: the hole stays fixed and the shaft is chosen to get clearance, transition or interference (H7/g6, H7/k6, H7/p6)' : 'il sistema più usato: il foro resta fisso e si sceglie l\'albero per avere gioco, incerto o forzato (H7/g6, H7/k6, H7/p6)')
+                : (en ? 'mirror image of the hole basis: the hole is chosen; with H7 it is hand-assembled with no appreciable clearance (H7/h6)' : 'speculare al foro base: si sceglie il foro; con H7 si monta a mano senza gioco apprezzabile (H7/h6)');
+    }
+    var p1 = '<b>' + esc(pc.letter) + '</b> = ' + nm + ' (' + who + '): ' + side + ' ' + (en ? 'Typical use: ' : 'Uso tipico: ') + esc(use) + '.';
+    var p2 = '<b>' + pc.grade + '</b> = ' + (en ? 'grade IT' : 'grado IT') + pc.grade + ', ' + (en ? gg[3] : gg[2]).toLowerCase() + ' (' + esc(en ? gg[5] : gg[4]) + ').';
+    var p3 = '', txt3 = '';
+    if (D > 0 && D <= 500) {
+      var o = limits(pc.kind, pc.letter, pc.grade, D);
+      if (o.ok) { var half = isHalf(o), f = formats(o, en ? '.' : ',');
+        p3 = (en ? 'At Ø' : 'A Ø') + fmtD(D) + ': ' + (en ? 'deviations ' : 'scostamenti ') + '<span class="num">' + um(o.up) + ' / ' + um(o.lo) + ' µm</span>' + (en ? ', so the part is good from ' : ', quindi il pezzo è buono da ') + '<span class="num">' + mm(o.min, half) + '</span>' + (en ? ' to ' : ' a ') + '<span class="num">' + mm(o.max, half) + ' mm</span> (' + (en ? 'tolerance ' : 'tolleranza ') + umAbs(o.it) + ' µm).';
+        txt3 = (en ? 'At Ø' : 'A Ø') + fmtD(D) + ': ' + um(o.up) + ' / ' + um(o.lo) + ' µm → ' + f.lim + ' mm.'; }
+      else p3 = '<span class="bad">' + esc(t('err')[o.err] || '') + '</span>';
+    }
+    var html = '<p>' + p1 + '</p><p>' + p2 + '</p>' + (p3 ? '<p>' + p3 + '</p>' : '');
+    return { ok: true, name: name, html: html, text: html.replace(/<[^>]+>/g, '') };
   }
 
   /* ── Ricerca inversa (v4.1): quali coppie della parete (fori A9…S8, alberi a9…u6) danno il gioco/interferenza richiesto a questo Ø.
@@ -1102,6 +1237,42 @@ var TolISO = (function () {
     else if (f.type === 'interference') { h += tile('I<sub>max</sub>', umAbs(f.intMax), 'µm', t('imax'), col) + tile('I<sub>min</sub>', umAbs(f.intMin), 'µm', t('imin'), col); }
     else { h += tile('G<sub>max</sub>', umAbs(f.clrMax), 'µm', t('gmax'), 'tol-c-green') + tile('I<sub>max</sub>', umAbs(f.intMax), 'µm', t('imax'), 'tol-c-red'); }
     return h + '</div>';
+  }
+
+  /* ── GLOSSARIO (v4.5): scheda in fondo; il campo «Spiegami una classe» usa explain() col Ø corrente ── */
+  function buildGloss() {
+    var box = $('tol-gloss-body'); if (!box) return;
+    var en = lang === 'en', h = '';
+    h += '<h4>' + (en ? 'Position letters — hole (capital) / shaft (lower case)' : 'Lettere di posizione — foro (maiuscola) / albero (minuscola)') + '</h4><table><tr><th>' + (en ? 'Letter' : 'Lettera') + '</th><th>' + (en ? 'Where the tolerance sits' : 'Dove sta la tolleranza') + '</th><th>' + (en ? 'Typical use' : 'Uso tipico') + '</th></tr>';
+    GLOSS.letters.forEach(function (g) {
+      var tag = g[1] === 'base' ? '<span class="tag base">' + (en ? 'basis' : 'base') + '</span>' : g[1] === 'trn' ? '<span class="tag trn">' + (en ? 'transition' : 'incerto') + '</span>' : '';
+      var col = g[1] === 'clr' ? 'tol-c-green' : g[1] === 'itf' ? 'tol-c-red' : g[1] === 'trn' ? 'tol-c-amber' : 'tol-c-blue';
+      h += '<tr><td class="k"><span class="h">' + g[0].toUpperCase() + '</span> / <span class="s">' + g[0] + '</span></td><td><b class="' + col + '">' + (en ? g[3] : g[2]) + '</b>' + (tag ? ' ' + tag : '') + '</td><td>' + esc(en ? g[5] : g[4]) + '</td></tr>';
+    });
+    h += '</table><div class="tol-hint" style="margin-top:6px">' + (en ? 'Hole and shaft mirror each other: g (shaft, below nominal) and G (hole, above nominal) both give clearance with the basic member; p and P both give interference.' : 'Foro e albero sono speculari: g (albero, sotto il nominale) e G (foro, sopra il nominale) danno entrambi gioco col pezzo base; p e P danno entrambi interferenza.') + '</div>';
+    h += '<h4>' + (en ? 'IT grades — how wide the tolerance is' : 'Gradi IT — quanto è larga la tolleranza') + '</h4><table><tr><th>IT</th><th>' + (en ? 'Meaning' : 'Significato') + '</th><th>' + (en ? 'Typical machining' : 'Lavorazione tipica') + '</th></tr>';
+    GLOSS.grades.forEach(function (g) { h += '<tr><td class="k">IT' + g[0] + (g[1] > g[0] ? '…IT' + g[1] : '') + '</td><td>' + (en ? g[3] : g[2]) + '</td><td>' + esc(en ? g[5] : g[4]) + '</td></tr>'; });
+    h += '</table><div class="tol-hint" style="margin-top:6px">' + (en ? 'The width in µm of each grade depends on the size: see the IT table below. Example at Ø25: IT6 = 13, IT7 = 21, IT8 = 33, IT11 = 130 µm.' : 'L\'ampiezza in µm di ogni grado dipende dalla dimensione: vedi la tabella IT qui sotto. Esempio a Ø25: IT6 = 13, IT7 = 21, IT8 = 33, IT11 = 130 µm.') + '</div>';
+    h += '<h4>' + (en ? 'Words' : 'Parole') + '</h4><dl>';
+    GLOSS.terms[lang].forEach(function (tm) { h += '<dt>' + esc(tm[0]) + '</dt><dd>' + esc(tm[1]) + '</dd>'; });
+    box.innerHTML = h + '</dl>';
+    renderGlossAns();
+  }
+  function renderGlossAns() {
+    var q = $('tol-gloss-q'), a = $('tol-gloss-ans'); if (!q || !a) return;
+    var v = q.value.trim(); if (!v) { a.innerHTML = ''; return; }
+    var st = getState(), r = explain(v, st.D);
+    a.innerHTML = r.ok ? r.html : '<span class="bad">' + esc(r.err) + '</span>';
+  }
+  function openGloss(cls) {
+    var det = $('tol-acc-gloss'); if (!det) return;
+    if (cls) $('tol-gloss-q').value = cls;
+    det.open = true; renderGlossAns();
+    try { det.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+  }
+  function glossBtnLabel() {
+    var st = getState(), cur = tab === 'fit' ? (st.hole || st.shaft) : st[side], c = cur ? cur.letter + cur.grade : 'H7';
+    return (lang === 'en' ? 'What is ' : 'Cos\'è ') + c + '?';
   }
 
   /* ── TROVA ACCOPPIAMENTO (v4.1): interfaccia sopra findFits(). Si ricalcola solo quando la scheda è aperta. ── */
@@ -1626,6 +1797,7 @@ var TolISO = (function () {
     $('tol-sum-txt').innerHTML = s.html;
     var b = $('tol-sum-copy'); b.setAttribute('data-copy', s.copy); b.style.display = s.copy ? '' : 'none';
     var sh = $('tol-sum-share'); sh.setAttribute('data-share', s.text || ''); sh.style.display = s.text ? '' : 'none';
+    var gb = $('tol-sum-gloss'); if (gb) gb.textContent = glossBtnLabel();
     box.classList.toggle('shaft', side === 'shaft');
     box.hidden = false; document.body.classList.add('tol-has-summary');
     /* v3.9: il riepilogo con la misura è più alto (barra): lo spazio libero in fondo alla pagina segue la sua altezza reale */
@@ -1679,7 +1851,7 @@ var TolISO = (function () {
       var cur = st[k] ? st[k].letter + st[k].grade : '';
       Array.prototype.forEach.call($('tol-' + (k === 'hole' ? 'h' : 's') + '-chips').children, function (b) { b.classList.toggle('on', b.getAttribute('data-cls') === cur); });
     });
-    renderBand(st); markTable(st); renderSummary(st); buildFits(); if (tab === 'fit') buildFinder(); renderRep();
+    renderBand(st); markTable(st); renderSummary(st); buildFits(); if (tab === 'fit') buildFinder(); renderRep(); renderGlossAns();
     saveState();
   }
 
@@ -1752,7 +1924,8 @@ var TolISO = (function () {
     Array.prototype.forEach.call($('tol-filter').children, function (b) { b.classList.toggle('on', b.getAttribute('data-filter') === filter); });
     loadRecent(); renderRecent(); loadFav(); renderFav(); loadRep(); preloadPhoto();
     try { if (window.matchMedia && window.matchMedia('(min-width: 900px)').matches) $('tol-fits-det').open = true; } catch (e) {}
-    setTab(tab); buildItTable(); renderProv(); buildFinder();
+    setTab(tab); buildItTable(); renderProv(); buildFinder(); buildGloss();
+    $('tol-gloss-q').addEventListener('input', renderGlossAns);
     if (tab === 'fit') rebuildTables();
 
     ['tol-h-let', 'tol-h-gr', 'tol-s-let', 'tol-s-gr'].forEach(function (id) {
@@ -1781,7 +1954,7 @@ var TolISO = (function () {
     $('tol-find-basis').addEventListener('change', function () { finder.basis = this.value; finder.all = false; buildFinder(); });
     root.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'tol-find-det') buildFinder(); if (e.target && e.target.id === 'tol-press-det') press.open = e.target.open; if (e.target && e.target.id === 'tol-insp-det') insp.open = e.target.open; }, true);
     root.addEventListener('click', function (e) {
-      var el = e.target.closest ? e.target.closest('[data-cls],[data-tab],[data-filter],[data-band],[data-copy],[data-share],[data-quick],[data-fit],[data-favdel],[data-recdel],[data-ft],[data-findmore],#tol-fav-btn,#tol-sheet-btn,#tol-rep-btn,#tol-sum-rep,#tol-rep-close,#tol-rep-print,#tol-rep-share,#tol-rep-copy') : null;
+      var el = e.target.closest ? e.target.closest('[data-cls],[data-tab],[data-filter],[data-band],[data-copy],[data-share],[data-quick],[data-fit],[data-favdel],[data-recdel],[data-ft],[data-findmore],#tol-sum-gloss,#tol-fav-btn,#tol-sheet-btn,#tol-rep-btn,#tol-sum-rep,#tol-rep-close,#tol-rep-print,#tol-rep-share,#tol-rep-copy') : null;
       if (!el || !root.contains(el)) return;
       if (el.id === 'tol-fav-btn') { var q = currentQuota(); if (!q) { TolISO.showAlert(lang === 'it' ? 'Prima imposta un Ø e almeno una classe.' : 'Set a Ø and at least one class first.'); return; } var nm = window.prompt(lang === 'it' ? 'Nome del preferito (es. Perno pinza):' : 'Favourite name (e.g. Gripper pin):', q); if (nm !== null) addFav(nm, q); return; }
       if (el.hasAttribute('data-favdel')) { var fi0 = parseInt(el.getAttribute('data-favdel'), 10), f0 = fav[fi0]; if (f0 && window.confirm((lang === 'it' ? 'Eliminare il preferito «' : 'Delete favourite “') + f0.n + (lang === 'it' ? '»?' : '”?'))) delFav(fi0); return; }
@@ -1789,6 +1962,7 @@ var TolISO = (function () {
       if (el.hasAttribute('data-ft')) { finder.type = el.getAttribute('data-ft'); finder.all = false; buildFinder(); return; }
       if (el.hasAttribute('data-findmore')) { finder.all = !finder.all; buildFinder(); return; }
       if (el.id === 'tol-rep-btn' || el.id === 'tol-sum-rep') { openRep(); return; }
+      if (el.id === 'tol-sum-gloss') { var stg = getState(), cg = stg[side]; openGloss(cg ? cg.letter + cg.grade : ''); return; }
       if (el.id === 'tol-rep-close') { rep.open = false; renderRep(); return; }
       if (el.id === 'tol-rep-print') { var d1 = reportData(); if (d1.err) { showAlert(rl(d1.err)); return; } renderRep(); API.repPrint = true; var pb1 = document.getElementById('tol-print-btn'); if (pb1) pb1.click(); return; }
       if (el.id === 'tol-rep-share') { var d2 = reportData(); if (d2.err) { showAlert(rl(d2.err)); return; } shareText(reportText(d2), el); return; }
@@ -1819,7 +1993,7 @@ var TolISO = (function () {
     if (!T[l]) return;
     lang = l;
     if (!root) return;
-    fillSelects(); rebuildTables(); buildItTable(); renderProv(); render(); renderRecent(); renderFav();
+    fillSelects(); rebuildTables(); buildItTable(); renderProv(); buildGloss(); render(); renderRecent(); renderFav();
     var mi = $('tol-m'); if (mi) mi.placeholder = mi.getAttribute('data-ph-' + lang) || mi.placeholder;
     Array.prototype.forEach.call(document.querySelectorAll('#tol-rep input[data-ph-it]'), function (i) { i.placeholder = i.getAttribute('data-ph-' + lang); });
     renderRep();
@@ -2020,6 +2194,21 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 24. v4.5: glossario */
+    (function () {
+      ck('glossario: scheda chiusa all\'avvio, tabelle e termini generati', !$('tol-acc-gloss').open && $('tol-gloss-body').querySelectorAll('table').length === 2 && $('tol-gloss-body').querySelectorAll('dt').length === GLOSS.terms.it.length && $('tol-gloss-body').querySelectorAll('table tr').length === GLOSS.letters.length + GLOSS.grades.length + 2);
+      setTab('hole'); $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; rebuildTables(); render();
+      ck('glossario: tasto del riepilogo dice «Cos\'è H7?»', $('tol-sum-gloss').textContent === 'Cos\'è H7?');
+      $('tol-sum-gloss').click();
+      ck('glossario: il tasto apre la scheda con H7 già scritto e spiegato coi numeri di Ø25', $('tol-acc-gloss').open && $('tol-gloss-q').value === 'H7' && /FORO BASE/.test($('tol-gloss-ans').textContent) && /25,021 mm/.test($('tol-gloss-ans').textContent));
+      $('tol-gloss-q').value = 'k6'; $('tol-gloss-q').dispatchEvent(new Event('input'));
+      ck('glossario: scrivendo k6 la spiegazione cambia (incerto, +15 / +2 a Ø25)', /a cavallo/.test($('tol-gloss-ans').textContent) && /\+15 \/ \+2 µm/.test($('tol-gloss-ans').textContent));
+      $('tol-d').value = '60'; render();
+      ck('glossario: cambiando il Ø i numeri seguono (k6 Ø60 = +21 / +2)', /\+21 \/ \+2 µm/.test($('tol-gloss-ans').textContent));
+      $('tol-gloss-q').value = 'xyz'; $('tol-gloss-q').dispatchEvent(new Event('input'));
+      ck('glossario: classe sbagliata → messaggio', /Scrivi una classe|non riconosciuta/.test($('tol-gloss-ans').textContent));
+      $('tol-gloss-q').value = ''; $('tol-gloss-q').dispatchEvent(new Event('input')); $('tol-acc-gloss').open = false; $('tol-d').value = '25'; render();
+    })();
     /* 23. v4.4: niente zoom da doppio tocco, niente scorrimento orizzontale, avviso zoom spento a scala 1, riga diagnostica */
     ck('v4.4: touch-action manipulation su body e tasti', getComputedStyle(document.body).touchAction === 'manipulation' && getComputedStyle($('tol-sum-copy')).touchAction === 'manipulation');
     ck('v4.4: la pagina non è più larga dello schermo', document.documentElement.scrollWidth <= document.documentElement.clientWidth);
@@ -2309,6 +2498,25 @@ var TolISO = (function () {
       c = checkMeasure(S, 24.985); ck('misura 24,985 su g6: dentro, −15 dal nominale, 38%', c.ok && c.dev === -15 && c.pct === 38);
       c = checkMeasure(S, 24.975); ck('misura 24,975 su g6: fuori sotto, −38%', !c.ok && c.toMin === -5 && c.pct === -38);
     })();
+    /* 9f. glossario (v4.5): ogni lettera della norma ha una voce; explain() dà testo e numeri giusti */
+    (function () {
+      ck('glossario: tutte le ' + LETTERS.length + ' lettere di posizione hanno una voce', LETTERS.every(function (L) { return !!glossLetter(L); }) && GLOSS.letters.length === LETTERS.length);
+      ck('glossario: i gradi IT1…IT18 sono tutti coperti, senza buchi', (function () { for (var g = 1; g <= 18; g++) if (!glossGrade(g)) return false; return true; })());
+      ck('glossario: stesso numero di termini IT/EN', GLOSS.terms.it.length === GLOSS.terms.en.length && GLOSS.terms.it.length >= 12);
+      var e1 = explain('H7', 25, 'it');
+      ck('explain H7: «scostamento inferiore zero», mai la frase dell\'albero', /Scostamento inferiore zero/.test(e1.text) && !/ALBERO BASE/.test(e1.text) && /il sistema più usato/.test(e1.text));
+      ck('explain h6: «scostamento superiore zero», albero base', /Scostamento superiore zero/.test(explain('h6', 25, 'it').text) && /ALBERO BASE/.test(explain('h6', 25, 'it').text));
+      ck('explain H7 Ø25: foro base, grado IT7, +21 / 0 µm, 25,000 a 25,021', e1.ok && /FORO BASE/.test(e1.text) && /grado IT7/.test(e1.text) && /\+21 \/ 0 µm/.test(e1.text) && /25,000/.test(e1.text) && /25,021 mm/.test(e1.text) && /tolleranza 21 µm/.test(e1.text));
+      var e2 = explain('g6', 25, 'it');
+      ck('explain g6 Ø25: albero, gioco piccolo, sotto il nominale, −7 / −20', e2.ok && /albero/.test(e2.text) && /Gioco piccolo/.test(e2.text) && /SOTTO il nominale/.test(e2.text) && /−7 \/ −20 µm/.test(e2.text) && /24,980/.test(e2.text));
+      var e3 = explain('P7', 25, 'en');
+      ck('explain P7 Ø25 (en): hole, interference, below nominal', e3.ok && /hole/.test(e3.text) && /BELOW the nominal/.test(e3.text) && /interference/.test(e3.text) && /grade IT7/.test(e3.text));
+      ck('explain k6: incerto, a cavallo del nominale', /a cavallo del nominale/.test(explain('k6', 30, 'it').text) && /incerto/.test(explain('k6', 30, 'it').text));
+      ck('explain js7: simmetrica', /Simmetrica/.test(explain('js7', 30, 'it').text));
+      ck('explain senza Ø: solo lettera e grado, nessun numero', (function () { var r = explain('H7', null, 'it'); return r.ok && !/A Ø/.test(r.text) && /FORO BASE/.test(r.text); })());
+      ck('explain classe sbagliata → errore leggibile', !explain('Q7', 25, 'it').ok && /Scrivi una classe/.test(explain('', 25, 'it').err));
+      ck('explain classe non prevista a quel Ø → avviso della norma', /non è prevista|solo per|non si applica/.test(explain('a9', 0.5, 'it').text));
+    })();
     /* 9e. ricerca inversa (v4.1): ogni risultato rispetta tipo, vincoli e sistema; ordine per somma IT; App. A segnalata */
     (function () {
       function has(res, h, s2) { return res.some(function (r) { return r.hole === h && r.shaft === s2; }); }
@@ -2334,7 +2542,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, repPrint: false, version: '4.4' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.5' };
   return API;
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
