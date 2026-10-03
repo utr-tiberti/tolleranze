@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.5.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.6.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -323,7 +323,13 @@ var TolISO = (function () {
   function glossGrade(g) { for (var i = 0; i < GLOSS.grades.length; i++) if (g >= GLOSS.grades[i][0] && g <= GLOSS.grades[i][1]) return GLOSS.grades[i]; return null; }
   /* Spiegazione in parole di una classe («H7», «g6»), con i numeri del Ø se dato: {ok, html, text} o {ok:false, err} */
   function explain(cls, D, l) {
-    l = l || lang; var en = l === 'en', pc = parseClass(String(cls || '').trim());
+    /* v4.6: la lingua richiesta vale per TUTTO il testo, numeri compresi (num/mm/um e t('err') leggono «lang»): la si imposta per la durata
+       della chiamata e si ripristina. Senza questo l'autoverifica all'avvio falliva con l'app in inglese (3 errori su 2066, iPhone, 03/10). */
+    var prev = lang; if (l && T[l]) lang = l;
+    try { return explainIn(cls, D); } finally { lang = prev; }
+  }
+  function explainIn(cls, D) {
+    var l = lang, en = l === 'en', pc = parseClass(String(cls || '').trim());
     if (!pc) return { ok: false, err: en ? 'Write a class like H7, g6, k6 or P7.' : 'Scrivi una classe come H7, g6, k6 o P7.' };
     var gl = glossLetter(pc.letter), gg = glossGrade(pc.grade), isH = pc.kind === 'hole', name = pc.letter + pc.grade;
     if (!gl || !gg) return { ok: false, err: en ? 'Class not recognised.' : 'Classe non riconosciuta.' };
@@ -1583,6 +1589,8 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 25. v4.6: l'autoverifica del nucleo deve passare in TUTTE le lingue (sul telefono gira nella lingua dell'utente) */
+    (function () { var keepL = lang; ['en', 'it'].forEach(function (L) { setLang(L); var r = selfTest(); ck('autoverifica del nucleo in «' + L + '»: ' + r.pass + '/' + r.total, r.fail === 0); }); setLang(keepL); })();
     /* 24. v4.5: glossario */
     (function () {
       ck('glossario: scheda chiusa all\'avvio, tabelle e termini generati', !$('tol-acc-gloss').open && $('tol-gloss-body').querySelectorAll('table').length === 2 && $('tol-gloss-body').querySelectorAll('dt').length === GLOSS.terms.it.length && $('tol-gloss-body').querySelectorAll('table tr').length === GLOSS.letters.length + GLOSS.grades.length + 2);
@@ -1931,7 +1939,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.5' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.6' };
   return API;
 })();
 /* TOL-ISO:JS END */
