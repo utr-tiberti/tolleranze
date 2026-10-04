@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.6.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.7.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -1589,6 +1589,16 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 26. v4.7: aiuto all'installazione iPhone con i disegni dello schermo */
+    (function () {
+      var box = document.getElementById('tol-install'), was = box ? box.hidden : true;
+      if (!window.tolInstallHint) { ck('install: tolInstallHint presente', false); return; }
+      window.tolInstallHint.show('ios-safari');
+      ck('install iPhone/Safari: due passi, due disegni (barra di Safari + foglio Condividi), voce evidenziata', box.querySelectorAll('.steps li').length === 2 && box.querySelectorAll('svg.fig').length === 2 && /Aggiungi alla schermata Home/.test(box.querySelector('svg.fig[aria-label="Foglio Condividi"]').textContent) && /Condividi/.test(box.textContent));
+      window.tolInstallHint.show('ios-other');
+      ck('install iPhone/Chrome: barra dell\'indirizzo con Condividi + foglio, tasto Copia il link', box.querySelectorAll('svg.fig').length === 2 && /utr-tiberti\.github\.io/.test(box.querySelector('svg.fig').textContent) && /Copia il link/.test(box.textContent));
+      window.tolInstallHint.close(false); box.hidden = was;
+    })();
     /* 25. v4.6: l'autoverifica del nucleo deve passare in TUTTE le lingue (sul telefono gira nella lingua dell'utente) */
     (function () { var keepL = lang; ['en', 'it'].forEach(function (L) { setLang(L); var r = selfTest(); ck('autoverifica del nucleo in «' + L + '»: ' + r.pass + '/' + r.total, r.fail === 0); }); setLang(keepL); })();
     /* 24. v4.5: glossario */
@@ -1939,7 +1949,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.6' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.7' };
   return API;
 })();
 /* TOL-ISO:JS END */

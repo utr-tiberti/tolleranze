@@ -264,6 +264,10 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 .tol-install .tol-chip { font-size: 12px; padding: 6px 12px; }
 .tol-install .tol-chip.main { background: var(--blue-dark); color: #fff; border-color: var(--blue-dark); }
 .tol-install .ico { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; }
+/* v4.7: i due passi per iPhone con il disegno dello schermo (barra di Safari e foglio Condividi), così si riconoscono a colpo d'occhio */
+.tol-install .steps li { margin: 6px 0 10px; }
+.tol-install .fig { display: block; width: 100%; max-width: 340px; height: auto; margin: 6px 0 2px; border-radius: 8px; box-shadow: 0 1px 4px oklch(20% .02 250/.18); }
+.tol-install .fig text { font-family: -apple-system, 'SF Pro Text', var(--sans); }
 .tol-update { display: none; position: sticky; top: 0; z-index: 30; background: var(--amber-dark); color: #fff; font: 600 12.5px var(--mono, monospace); padding: 9px 14px; border-radius: var(--r, 6px); margin-bottom: 12px; cursor: pointer; text-align: center; }
 .tol-update.on { display: block; }
 .tol-zoom { display: none; position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 40; background: var(--blue-dark); color: #fff; font: 600 12.5px/1.4 var(--mono, monospace); padding: 10px 14px; border-radius: var(--r-lg, 10px); box-shadow: 0 6px 20px oklch(20% .02 250/.35); }
@@ -605,7 +609,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span> &middot; <span class="tol-vp" id="tol-vp"></span><br>
     <span data-tx-it="App realizzata da <b>NextCore AI Department</b> per UTR Tiberti." data-tx-en="App built by <b>NextCore AI Department</b> for UTR Tiberti.">App realizzata da <b>NextCore AI Department</b> per UTR Tiberti.</span><br>
-    Tolleranze ISO UTR v4.6 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v4.7 &middot; <a href="?selftest" style="color:inherit;">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -2200,6 +2204,16 @@ var TolISO = (function () {
     insp.mh = ''; insp.ms = ''; insp.open = false; render();
     ck('collaudo: senza misure solo il suggerimento', /Scrivi le due misure/.test($('tol-insp-det').textContent));
     ck('scheda PDF: tasto presente in ACCOPPIAMENTO', !!$('tol-sheet-btn'));
+    /* 26. v4.7: aiuto all'installazione iPhone con i disegni dello schermo */
+    (function () {
+      var box = document.getElementById('tol-install'), was = box ? box.hidden : true;
+      if (!window.tolInstallHint) { ck('install: tolInstallHint presente', false); return; }
+      window.tolInstallHint.show('ios-safari');
+      ck('install iPhone/Safari: due passi, due disegni (barra di Safari + foglio Condividi), voce evidenziata', box.querySelectorAll('.steps li').length === 2 && box.querySelectorAll('svg.fig').length === 2 && /Aggiungi alla schermata Home/.test(box.querySelector('svg.fig[aria-label="Foglio Condividi"]').textContent) && /Condividi/.test(box.textContent));
+      window.tolInstallHint.show('ios-other');
+      ck('install iPhone/Chrome: barra dell\'indirizzo con Condividi + foglio, tasto Copia il link', box.querySelectorAll('svg.fig').length === 2 && /utr-tiberti\.github\.io/.test(box.querySelector('svg.fig').textContent) && /Copia il link/.test(box.textContent));
+      window.tolInstallHint.close(false); box.hidden = was;
+    })();
     /* 25. v4.6: l'autoverifica del nucleo deve passare in TUTTE le lingue (sul telefono gira nella lingua dell'utente) */
     (function () { var keepL = lang; ['en', 'it'].forEach(function (L) { setLang(L); var r = selfTest(); ck('autoverifica del nucleo in «' + L + '»: ' + r.pass + '/' + r.total, r.fail === 0); }); setLang(keepL); })();
     /* 24. v4.5: glossario */
@@ -2550,7 +2564,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.6' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.7' };
   return API;
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
@@ -2672,16 +2686,46 @@ var TolISO = (function () {
     var box = document.getElementById('tol-install'); if (!box) return;
     var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
     var dismissed = false; try { dismissed = localStorage.getItem('tolIso.installHint') === 'no'; } catch (e) {}
-    if (standalone || dismissed || !/^https?:$/.test(location.protocol)) return;
+    var auto = !(standalone || dismissed || !/^https?:$/.test(location.protocol));   /* v4.7: le funzioni esistono sempre (autotest), il riquadro si mostra da solo solo se serve */
     var ua = navigator.userAgent, isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var isIOSSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo/.test(ua), isAndroid = /Android/.test(ua);
     var L = (document.documentElement.lang === 'en') ? 'en' : 'it';
-    var T = { it: { title: 'Mettila tra le tue app:', s1: 'tocca <b>Condividi</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> in basso',
-                    s2: 'scorri la lista e tocca <b>Aggiungi alla schermata Home</b>, poi <b>Aggiungi</b>', s1chrome: 'tocca l\'icona <b>Condividi</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> a destra nella <b>barra dell\'indirizzo</b>, in alto (non nel menu dei tre puntini)', other: '(serve iOS 16.4 o più recente)', open: 'Apri in Safari', copy: 'Copia il link', copied: 'copiato', inst: 'Installa l\'app', later: 'Non ora', never: 'Non mostrare più',
+    var T = { it: { title: 'Mettila tra le tue app:', s1: 'tocca <b>Condividi</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg>, il tasto al centro della barra in basso:',
+                    s2: 'nella lista che sale scorri verso il basso fino a <b>Aggiungi alla schermata Home</b>, toccala e poi tocca <b>Aggiungi</b> in alto a destra:', s1chrome: 'tocca l\'icona <b>Condividi</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> a destra nella <b>barra dell\'indirizzo</b>, in alto (non nel menu dei tre puntini)', other: '(serve iOS 16.4 o più recente)', open: 'Apri in Safari', copy: 'Copia il link', copied: 'copiato', inst: 'Installa l\'app', later: 'Non ora', never: 'Non mostrare più',
                     android: 'Installala come app: si apre dall\'icona e funziona anche senza rete.' },
-              en: { title: 'Add it to your apps:', s1: 'tap <b>Share</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> at the bottom',
-                    s2: 'scroll the list and tap <b>Add to Home Screen</b>, then <b>Add</b>', s1chrome: 'tap the <b>Share</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> icon at the right of the <b>address bar</b>, at the top (not in the three-dot menu)', other: '(needs iOS 16.4 or later)', open: 'Open in Safari', copy: 'Copy link', copied: 'copied', inst: 'Install app', later: 'Not now', never: 'Don\'t show again',
+              en: { title: 'Add it to your apps:', s1: 'tap <b>Share</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg>, the button in the middle of the bottom bar:',
+                    s2: 'in the sheet that slides up scroll down to <b>Add to Home Screen</b>, tap it, then tap <b>Add</b> at the top right:', s1chrome: 'tap the <b>Share</b> <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> icon at the right of the <b>address bar</b>, at the top (not in the three-dot menu)', other: '(needs iOS 16.4 or later)', open: 'Open in Safari', copy: 'Copy link', copied: 'copied', inst: 'Install app', later: 'Not now', never: 'Don\'t show again',
                     android: 'Install it as an app: it opens from the icon and works offline.' } }[L];
+    /* Disegni vettoriali degli elementi di iOS (misure in px di un viewBox largo 320 = larghezza di un iPhone piccolo):
+       barra inferiore di Safari con 5 comandi a passo 64 px e il tasto Condividi evidenziato; tre righe da 44 px del foglio Condividi
+       con «Aggiungi alla schermata Home» evidenziata; barra dell'indirizzo di Chrome con il tasto Condividi a destra. */
+    var SHARE = '<path d="M0 -9v12M-5 -4l5 -5 5 5M-7 1v9h14v-9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+    function figSafari() {
+      var g = '<svg class="fig" viewBox="0 0 320 56" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barra di Safari"><rect width="320" height="56" fill="#f7f7f8"/><rect width="320" height="1" fill="#d0d0d4"/>' +
+        '<path d="M38 20l-10 8 10 8" fill="none" stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M90 20l10 8-10 8" fill="none" stroke="#b9b9c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<circle cx="160" cy="28" r="20" fill="#1f4b7a"/><g transform="translate(160 29)" stroke="#fff" stroke-width="2.2">' + SHARE + '</g>' +
+        '<path d="M216 19h8a4 4 0 0 1 4 4v15h-8a4 4 0 0 0-4 4z M232 19h-8a4 4 0 0 0-4 4v15h8a4 4 0 0 1 4 4z" fill="none" stroke="#1a73e8" stroke-width="1.8" stroke-linejoin="round"/>' +
+        '<rect x="279" y="22" width="14" height="14" rx="2.5" fill="none" stroke="#1a73e8" stroke-width="1.8"/><rect x="284" y="17" width="14" height="14" rx="2.5" fill="#f7f7f8" stroke="#1a73e8" stroke-width="1.8"/></svg>';
+      return g;
+    }
+    function figSheet(labels) {
+      var rows = '', icons = ['<rect x="-5" y="-7" width="10" height="13" rx="1.5" fill="none" stroke="#1a73e8" stroke-width="1.6"/><rect x="-2" y="-10" width="10" height="13" rx="1.5" fill="#fff" stroke="#1a73e8" stroke-width="1.6"/>',
+                               '<path d="M-7 -8h6a3 3 0 0 1 3 3v12h-6a3 3 0 0 0-3 3z M7 -8h-6a3 3 0 0 0-3 3v12h6a3 3 0 0 1 3 3z" fill="none" stroke="#1a73e8" stroke-width="1.6" stroke-linejoin="round"/>',
+                               '<rect x="-9" y="-9" width="18" height="18" rx="4" fill="none" stroke="#1f4b7a" stroke-width="1.8"/><path d="M0 -5v10M-5 0h10" stroke="#1f4b7a" stroke-width="1.8" stroke-linecap="round"/>'];
+      for (var i = 0; i < 3; i++) {
+        var y = i * 44, hl = i === 2;
+        rows += (hl ? '<rect x="4" y="' + (y + 2) + '" width="312" height="40" rx="8" fill="#e3effc" stroke="#1f4b7a" stroke-width="1.5"/>' : '') +
+                '<text x="16" y="' + (y + 27) + '" font-size="14" fill="' + (hl ? '#1f4b7a' : '#1c1c1e') + '"' + (hl ? ' font-weight="700"' : '') + '>' + labels[i] + '</text>' +
+                '<g transform="translate(292 ' + (y + 22) + ')">' + icons[i] + '</g>' +
+                (i < 2 ? '<rect x="16" y="' + (y + 43.5) + '" width="300" height="1" fill="#e2e2e6"/>' : '');
+      }
+      return '<svg class="fig" viewBox="0 0 320 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Foglio Condividi"><rect width="320" height="132" rx="10" fill="#fff"/>' + rows + '</svg>';
+    }
+    function figChrome(url) {
+      return '<svg class="fig" viewBox="0 0 320 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barra dell\'indirizzo di Chrome"><rect width="320" height="48" fill="#f7f7f8"/><rect x="10" y="8" width="300" height="32" rx="16" fill="#e9e9ec"/>' +
+        '<text x="30" y="29" font-size="13" fill="#1c1c1e">' + url + '</text><circle cx="290" cy="24" r="15" fill="#1f4b7a"/><g transform="translate(290 25)" stroke="#fff" stroke-width="2" ">' + SHARE.replace(/-9v12/, '-7v10').replace('M-5 -4l5 -5 5 5', 'M-4 -3l4 -4 4 4').replace('M-7 1v9h14v-9', 'M-6 1v7h12v-7') + '</g></svg>';
+    }
     var txt = document.getElementById('tol-install-txt'), row = document.getElementById('tol-install-row'), deferred = null;
     var base = location.href.replace(/[^\/]*(\?.*)?$/, '');
     function chip(label, cls, fn) { var b = document.createElement('button'); b.type = 'button'; b.className = 'tol-chip ' + (cls || ''); b.innerHTML = label; b.addEventListener('click', fn); row.appendChild(b); return b; }
@@ -2689,21 +2733,22 @@ var TolISO = (function () {
     function copyLink(b) { var done = function () { b.textContent = '✓ ' + T.copied; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(base).then(done, function () {}); else { window.prompt('Link', base); } }
     function show(mode) {
       row.innerHTML = '';
-      if (mode === 'ios-safari') { txt.innerHTML = '<b>' + T.title + '</b><ol class="steps"><li>' + T.s1 + '</li><li>' + T.s2 + '</li></ol>'; }
+      var sheetLabels = L === 'en' ? ['Copy', 'Add to Favourites', 'Add to Home Screen'] : ['Copia', 'Aggiungi ai Preferiti', 'Aggiungi alla schermata Home'];
+      if (mode === 'ios-safari') { txt.innerHTML = '<b>' + T.title + '</b><ol class="steps"><li>' + T.s1 + figSafari() + '</li><li>' + T.s2 + figSheet(sheetLabels) + '</li></ol>'; }
       else if (mode === 'ios-other') { /* Chrome, Firefox, Edge su iPhone: il foglio Condividi di iOS ha «Aggiungi alla schermata Home» da iOS 16.4 */
-        txt.innerHTML = '<b>' + T.title + '</b> ' + T.other + '<ol class="steps"><li>' + T.s1chrome + '</li><li>' + T.s2 + '</li></ol>';
+        txt.innerHTML = '<b>' + T.title + '</b> ' + T.other + '<ol class="steps"><li>' + T.s1chrome + figChrome('utr-tiberti.github.io/tolleranze') + '</li><li>' + T.s2 + figSheet(sheetLabels) + '</li></ol>';
         chip(T.copy, '', function () { copyLink(this); }); }
       else if (mode === 'android') { txt.innerHTML = '<b>' + T.title + '</b> ' + T.android;
         chip(T.inst, 'main', function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; close(true); }); }); }
       chip(T.later, '', function () { close(false); }); chip(T.never, '', function () { close(true); });
       box.hidden = false; box.classList.add('on');
     }
-    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; show('android'); });
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; if (auto) show('android'); });
     window.addEventListener('appinstalled', function () { close(true); });
     window.tolInstallHint = { show: show, close: close };   /* per prove e autotest */
+    if (!auto) return;
     if (isIOSSafari) show('ios-safari'); else if (isIOS) show('ios-other');
     /* Android senza beforeinstallprompt (già installata o browser senza supporto): nessun riquadro */
-    if (!isIOS && !isAndroid) return;
   })();
 
   if (/[?&]selftest/.test(location.search)) {
