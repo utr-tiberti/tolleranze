@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.8.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_4.9.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -133,6 +133,7 @@ var TolISO = (function () {
 
   function fineIdx(D) { for (var i = 0; i < R_FINE.length; i++) if (D <= R_FINE[i]) return i; return -1; }
   function r1(v) { return Math.round(v * 10) / 10; }
+  function r6(v) { return Math.round(v * 1e6) / 1e6; }
   function rangeBounds(fi, fine) {
     var arr = fine ? R_FINE : R_MAIN;
     return [fi === 0 ? 0 : arr[fi - 1], arr[fi]];
@@ -210,7 +211,7 @@ var TolISO = (function () {
     var fdSym = (L === 'js'), fdUp = fdSym ? false : (kind === 'hole' ? !UPPER_DEV[L] : !!UPPER_DEV[L]);
     var fdTipo = fdSym ? (kind === 'hole' ? 'JS' : 'js') : (kind === 'hole' ? (fdUp ? 'ES' : 'EI') : (fdUp ? 'es' : 'ei'));
     return { ok: true, kind: kind, letter: kind === 'hole' ? L.toUpperCase() : L, grade: grade, D: D,
-             up: up, lo: lo, it: it, max: D + up / 1000, min: D + lo / 1000, mean: D + (up + lo) / 2000,
+             up: up, lo: lo, it: it, max: r6(D + up / 1000), min: r6(D + lo / 1000), mean: r6(D + (up + lo) / 2000),   /* v4.9: arrotondati al µm/1000 (6,35 h6 dava min = 6,340999…) */
              from: rb[0], to: rb[1],
              fd: fdSym ? up : (fdUp ? up : lo), fdTipo: fdTipo, fdSimmetrico: fdSym };
   }
@@ -229,7 +230,9 @@ var TolISO = (function () {
      (spazi strani, tab e spazio unificatore diventano spazi normali; il resto deve tornare tutto, niente pezzi buttati via) */
   function parse(str) {
     var s = String(str || '').replace(/[\s  ]+/g, ' ');
-    var CL = '([A-Za-z]{1,2}\\s?\\d{1,2})', NUM = '[Øø⌀]?\\s*(\\d+(?:[.,]\\d+)?)\\s*(?:mm)?';
+    /* v4.9: la Ⓔ (requisito d'inviluppo, ISO 8015/14405) viene tolta e segnalata: l'app controlla la dimensione, non l'inviluppo */
+    var env = /[ⒺⓔⒺ]|\(E\)/.test(s); if (env) s = s.replace(/[ⒺⓔⒺ]|\(E\)/g, ' ').replace(/\s+/g, ' ').trim();
+    var CL = '([A-Za-z]{1,2}\\s?\\d{1,2})', NUM = '[Øø⌀]?\\s*(\\d+(?:[.,]\\d+)?|[.,]\\d+)\\s*(?:mm)?';   /* v4.9: anche «.5 H7» senza lo zero */
     var mt = new RegExp('^\\s*' + NUM + '\\s*' + CL + '(?:\\s*[\\/\\-]\\s*|\\s+|(?=[A-Za-z]))?' + '(?:' + CL + ')?\\s*$').exec(s);
     if (!mt) { var mr = new RegExp('^\\s*' + CL + '\\s+' + NUM + '\\s*$').exec(s); if (mr) mt = [mr[0], mr[2], mr[1], undefined]; }
     if (!mt) return null;
@@ -239,6 +242,7 @@ var TolISO = (function () {
     if (c2 && c1.kind === c2.kind) return null;
     if (c2 && c1.kind === 'shaft') { var sw = c1; c1 = c2; c2 = sw; }   /* «40 g6/H7» = «40 H7/g6» */
     [c1, c2].forEach(function (c) { if (c) out[c.kind] = c; });
+    if (env) out.envelope = true;
     return out;
   }
 
@@ -257,6 +261,8 @@ var TolISO = (function () {
   function whyBad(str) {
     var s = String(str || '').trim(), it = lang !== 'en';
     if (!s) return '';
+    /* v4.9: «40 ±0,05», «40 +0,02/-0,01» → quote con scostamenti numerici: non previste, e lo diciamo (ISO 2768 non coperta) */
+    if (/±|\+\s*\d+(?:[.,]\d+)?\s*\/\s*[-−]\s*\d/.test(s)) return it ? 'Quota con scostamenti numerici (es. ±0,05): non prevista. L\'app lavora con le classi ISO 286 (H7, g6…); le tolleranze generali ISO 2768 non sono coperte.' : 'Dimension with numeric deviations (e.g. ±0.05): not supported. The app works with ISO 286 classes (H7, g6…); ISO 2768 general tolerances are not covered.';
     var two = /([A-Za-z]{1,2})\s?\d{1,2}\s*[\/\- ]?\s*([A-Za-z]{1,2})\s?\d{1,2}\s*$/.exec(s);
     if (two) {
       var a = two[1], b = two[2], up = function (x) { return x === x.toUpperCase(); }, lo = function (x) { return x === x.toLowerCase(); };
@@ -650,6 +656,7 @@ var TolISO = (function () {
   }
   /* ── COLLAUDO DELL'ACCOPPIAMENTO: misure reali di foro e albero → dentro/fuori per ciascuno e gioco/interferenza effettivi ── */
   var insp = { mh: '', ms: '', open: false };
+  var lastD = null;   /* v4.9: Ø dell'ultimo render: se cambia, misura e collaudo si azzerano (erano del pezzo precedente → falsi FUORI) */
   function inspectBlock(H, S, D) {
     var L = lang === 'it' ? { title: 'Collaudo: misure reali di foro e albero', mh: 'Foro misurato', ms: 'Albero misurato', gap: 'gioco effettivo', itf: 'interferenza effettiva', teo: 'teorico', okH: 'foro DENTRO', koH: 'foro FUORI', okS: 'albero DENTRO', koS: 'albero FUORI', both: 'Coppia conforme: entrambi i pezzi in tolleranza', bad: 'Coppia NON conforme', over: 'oltre il max', under: 'sotto il min', hint: 'Scrivi le due misure lette al collaudo (mm).' }
                           : { title: 'Inspection: measured hole and shaft', mh: 'Measured hole', ms: 'Measured shaft', gap: 'actual clearance', itf: 'actual interference', teo: 'theoretical', okH: 'hole IN', koH: 'hole OUT', okS: 'shaft IN', koS: 'shaft OUT', both: 'Pair conforms: both parts within tolerance', bad: 'Pair does NOT conform', over: 'above max', under: 'below min', hint: 'Enter the two readings from inspection (mm).' };
@@ -729,12 +736,12 @@ var TolISO = (function () {
                    basis: { hole: 'foro base H', shaft: 'albero base h', all: 'tutte le coppie' }, seg: { clearance: 'gioco', transition: 'incerto', interference: 'forzato' },
                    hint: 'Coppie della tabella (fori A9…S8, alberi a9…u6) che a questo Ø rispettano i limiti scritti in µm (0,020 mm = 20 µm); campo vuoto = nessun vincolo. Ordine a scelta: dalla più fine, dalla più economica da lavorare (gradi IT più larghi) o prima le App. A (coppie consigliate da ISO 286-1). La scelta finale dipende dall\'uso.',
                    sort: { fine: 'dalla più fine', coarse: 'dalla più economica', appA: 'prima le App. A' }, badN: 'Scrivi solo numeri in µm (es. 20).', swap: 'Il primo valore è più grande del secondo: scambiali.', mmHint: 'Sembrano millimetri: qui i valori vanno in µm (0,02 mm = 20 µm).',
-                   none: 'Nessuna coppia della tabella rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', narrow: 'Tra i due limiti ci sono {w} µm, ma a questo Ø la coppia più fine ({p}) varia già di {s} µm: allarga il campo ad almeno {s} µm.', n: 'coppie trovate', one: 'coppia trovata', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
+                   none: 'Nessuna coppia della tabella rientra in questi limiti a questo Ø: allarga il campo o cambia sistema.', narrow: 'Tra i due limiti ci sono {w} µm, ma a questo Ø la coppia più fine ({p}) varia già di {s} µm: allarga il campo ad almeno {s} µm.', n: 'coppie trovate', one: 'coppia trovata', nearest: 'Le più vicine ai limiti scritti:', off: 'fuori di', more: 'Mostra tutte le', less: 'Mostra solo le prime', appA: 'App. A', noD: 'Scrivi prima il Ø in alto.' },
              en: { lbl: { clearance: ['minimum clearance', 'maximum clearance'], transition: ['maximum interference', 'maximum clearance'], interference: ['minimum interference', 'maximum interference'] },
                    basis: { hole: 'hole basis H', shaft: 'shaft basis h', all: 'all pairs' }, seg: { clearance: 'clearance', transition: 'transition', interference: 'interference' },
                    hint: 'Pairs from the chart (holes A9…S8, shafts a9…u6) that meet the limits entered in µm (0.020 mm = 20 µm) at this Ø; empty field = no constraint. Order of your choice: finest first, cheapest to machine first (wider IT grades) or App. A first (pairs recommended by ISO 286-1). The final choice depends on the application.',
                    sort: { fine: 'finest first', coarse: 'cheapest first', appA: 'App. A first' }, badN: 'Type numbers only, in µm (e.g. 20).', swap: 'The first value is larger than the second: swap them.', mmHint: 'These look like millimetres: values here are in µm (0.02 mm = 20 µm).',
-                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', narrow: 'The two limits are {w} µm apart, but at this Ø the finest pair ({p}) already varies by {s} µm: widen the range to at least {s} µm.', n: 'pairs found', one: 'pair found', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
+                   none: 'No pair from the chart meets these limits at this Ø: widen the range or change the system.', narrow: 'The two limits are {w} µm apart, but at this Ø the finest pair ({p}) already varies by {s} µm: widen the range to at least {s} µm.', n: 'pairs found', one: 'pair found', nearest: 'Closest to the limits entered:', off: 'off by', more: 'Show all', less: 'Show only the first', appA: 'App. A', noD: 'Enter the Ø at the top first.' } };
   function fl(k) { return FL[lang][k]; }
   function findRangeTxt(r) {
     if (r.type === 'clearance') return tu('clr') + ' ' + umAbs(r.clrMin) + '…' + umAbs(r.clrMax) + ' µm';
@@ -772,7 +779,20 @@ var TolISO = (function () {
         free.forEach(function (r) { var sp = r1(r.gmax - r.gmin); if (!best || sp < best.sp) best = { sp: sp, pair: r.hole + '/' + r.shaft }; });
         if (best && best.sp > r1(b - a)) msg = fl('narrow').replace('{w}', umAbs(r1(b - a))).replace('{p}', best.pair).replace(/\{s\}/g, umAbs(best.sp));
       }
-      out.innerHTML = '<div class="none">' + (mmLike ? fl('mmHint') : msg) + '</div>'; return;
+      var h0 = '<div class="none">' + (mmLike ? fl('mmHint') : msg) + '</div>';
+      /* v4.9: le 3 coppie più vicine ai limiti scritti (di quanto sforano), cliccabili come le altre */
+      if (!mmLike && (isFinite(a) || isFinite(b))) {
+        var all = findFits(st.D, { type: finder.type, basis: finder.basis }), lo0 = isFinite(a) ? a : null, hi0 = isFinite(b) ? b : null;
+        function dist(r) { var d = 0; if (finder.type === 'clearance') { if (lo0 !== null) d += Math.max(0, lo0 - r.clrMin); if (hi0 !== null) d += Math.max(0, r.clrMax - hi0); }
+          else if (finder.type === 'interference') { if (lo0 !== null) d += Math.max(0, lo0 - r.intMin); if (hi0 !== null) d += Math.max(0, r.intMax - hi0); }
+          else { if (lo0 !== null) d += Math.max(0, r.intMax - lo0); if (hi0 !== null) d += Math.max(0, r.clrMax - hi0); } return r1(d); }
+        var near = all.map(function (r) { return { r: r, d: dist(r) }; }).sort(function (x, y) { return x.d - y.d || x.r.itSum - y.r.itSum; }).slice(0, 3);
+        if (near.length) {
+          h0 += '<div class="n">' + fl('nearest') + '</div>';
+          near.forEach(function (n) { var r = n.r, pair = r.hole + '/' + r.shaft; h0 += '<button type="button" class="tol-findrow" data-fit="' + pair + '"><b>' + pair + '</b><i class="' + col + '">' + findRangeTxt(r) + '</i><span>' + fl('off') + ' ' + umAbs(n.d) + ' µm' + (r.pref ? '<em class="appa">' + fl('appA') + '</em>' : '') + '</span></button>'; });
+        }
+      }
+      out.innerHTML = h0; return;
     }
     var shown = finder.all ? res : res.slice(0, FIND_SHOW), h = '';
     shown.forEach(function (r) { var pair = r.hole + '/' + r.shaft; h += '<button type="button" class="tol-findrow' + (pair === cur ? ' on' : '') + '" data-fit="' + pair + '"><b>' + pair + '</b><i class="' + col + '">' + findRangeTxt(r) + '</i><span>IT' + r.hg + '+IT' + r.sg + (r.pref ? '<em class="appa">' + fl('appA') + '</em>' : '') + '</span></button>'; });
@@ -782,12 +802,12 @@ var TolISO = (function () {
 
   /* ── RAPPORTO DI CONTROLLO (v4.0): dati del pezzo + quota, limiti, misura, esito. Testo (WhatsApp), anteprima, stampa A4 solo del rapporto. ── */
   var rep = { pezzo: '', disegno: '', operatore: '', data: '', note: '', strumento: '', U: '', temp: '', open: false };
-  var RL = { it: { title: 'RAPPORTO DI CONTROLLO', pezzo: 'Pezzo', disegno: 'Disegno', op: 'Operatore', data: 'Data', note: 'Note', quota: 'Quota', lim: 'Limiti', mis: 'Misura', ctl: 'Controllo', esito: 'ESITO', ok: 'CONFORME', ko: 'NON CONFORME', fitq: 'Accoppiamento', gap: 'Gioco effettivo', itf: 'Interferenza effettiva', teo: 'teorico', pair: 'Coppia', sign: 'Firma operatore', sign2: 'Visto', needM: 'Scrivi prima la misura nel campo «misurato», poi tocca Rapporto.', needF: 'Scrivi prima le misure di foro e albero nel Collaudo, poi tocca Rapporto.', needQ: 'Prima imposta un Ø e una classe di tolleranza.', badM: 'La misura scritta non è valida: correggila (solo il numero in mm), poi tocca Rapporto.', strum: 'Strumento', U: 'Incertezza U', temp: 'Temperatura', unc: 'NON DECIDIBILE (entro l\'incertezza)', local: 'da due misure locali', ruleL: 'Regola decisionale', rule0: 'confronto diretto della misura con i limiti; incertezza di misura non considerata (per ISO 14253-1 scrivere U)', ruleU: 'ISO 14253-1 con U = {U} µm: conforme se dentro i limiti di almeno U, non conforme se fuori di almeno U, altrimenti non decidibile', foot: 'Limiti secondo ISO 286-1:2010 e ISO 286-2:2010, a 20 °C (ISO 1); il modulo è confrontato con tabelle di costruttori (Talide, Walter, EVO: 2930 caselle, 0 errori), non con il testo di ISO 286-2. Strumento di consultazione: per il collaudo fa fede la norma. App realizzata da NextCore AI Department per UTR Tiberti · utr-tiberti.github.io/tolleranze' },
-             en: { title: 'INSPECTION REPORT', pezzo: 'Part', disegno: 'Drawing', op: 'Inspector', data: 'Date', note: 'Notes', quota: 'Dimension', lim: 'Limits', mis: 'Reading', ctl: 'Check', esito: 'RESULT', ok: 'PASS', ko: 'FAIL', fitq: 'Fit', gap: 'Actual clearance', itf: 'Actual interference', teo: 'theoretical', pair: 'Pair', sign: 'Inspector signature', sign2: 'Approved', needM: 'Type the reading into the «measured» field first, then tap Report.', needF: 'Enter the hole and shaft readings in Inspection first, then tap Report.', needQ: 'Set a Ø and a tolerance class first.', badM: 'The reading entered is not valid: correct it (only the number in mm), then tap Report.', strum: 'Instrument', U: 'Uncertainty U', temp: 'Temperature', unc: 'UNDECIDED (within the uncertainty)', local: 'from two local readings', ruleL: 'Decision rule', rule0: 'direct comparison of the reading with the limits; measurement uncertainty not considered (enter U for ISO 14253-1)', ruleU: 'ISO 14253-1 with U = {U} µm: pass if inside the limits by at least U, fail if outside by at least U, otherwise undecided', foot: 'Limits per ISO 286-1:2010 and ISO 286-2:2010, at 20 °C (ISO 1); the module is compared with manufacturers\' tables (Talide, Walter, EVO: 2930 cells, 0 errors), not with the text of ISO 286-2. Reference tool: the standard prevails for inspection. App built by NextCore AI Department for UTR Tiberti · utr-tiberti.github.io/tolleranze' } };
+  var RL = { it: { title: 'RAPPORTO DI CONTROLLO', pezzo: 'Pezzo', disegno: 'Disegno', op: 'Operatore', data: 'Data', note: 'Note', quota: 'Quota', lim: 'Limiti', mis: 'Misura', ctl: 'Controllo', esito: 'ESITO', ok: 'CONFORME', ko: 'NON CONFORME', fitq: 'Accoppiamento', gap: 'Gioco effettivo', itf: 'Interferenza effettiva', teo: 'teorico', pair: 'Coppia', sign: 'Firma operatore', sign2: 'Visto', needM: 'Scrivi prima la misura nel campo «misurato», poi tocca Rapporto.', needF: 'Scrivi prima le misure di foro e albero nel Collaudo, poi tocca Rapporto.', needQ: 'Prima imposta un Ø e una classe di tolleranza.', badM: 'La misura scritta non è valida: correggila (solo il numero in mm), poi tocca Rapporto.', strum: 'Strumento', U: 'Incertezza U estesa (k = 2)', temp: 'Temperatura (annotata)', unc: 'NON DECIDIBILE (entro l\'incertezza)', local: 'da due misure locali', ruleL: 'Regola decisionale', rule0: 'confronto diretto della misura con i limiti; incertezza di misura non considerata (per ISO 14253-1 scrivere U)', ruleU: 'ISO 14253-1 con U = {U} µm: conforme se dentro i limiti di almeno U, non conforme se fuori di almeno U, altrimenti non decidibile', foot: 'Limiti secondo ISO 286-1:2010 e ISO 286-2:2010, a 20 °C (ISO 1); il modulo è confrontato con tabelle di costruttori (Talide, Walter, EVO: 2930 caselle, 0 errori), non con il testo di ISO 286-2. Strumento di consultazione: per il collaudo fa fede la norma. Non copre ISO 2768, quote con scostamenti numerici (±), requisito d\'inviluppo Ⓔ, pollici. App realizzata da NextCore AI Department per UTR Tiberti · utr-tiberti.github.io/tolleranze' },
+             en: { title: 'INSPECTION REPORT', pezzo: 'Part', disegno: 'Drawing', op: 'Inspector', data: 'Date', note: 'Notes', quota: 'Dimension', lim: 'Limits', mis: 'Reading', ctl: 'Check', esito: 'RESULT', ok: 'PASS', ko: 'FAIL', fitq: 'Fit', gap: 'Actual clearance', itf: 'Actual interference', teo: 'theoretical', pair: 'Pair', sign: 'Inspector signature', sign2: 'Approved', needM: 'Type the reading into the «measured» field first, then tap Report.', needF: 'Enter the hole and shaft readings in Inspection first, then tap Report.', needQ: 'Set a Ø and a tolerance class first.', badM: 'The reading entered is not valid: correct it (only the number in mm), then tap Report.', strum: 'Instrument', U: 'Expanded uncertainty U (k = 2)', temp: 'Temperature (noted)', unc: 'UNDECIDED (within the uncertainty)', local: 'from two local readings', ruleL: 'Decision rule', rule0: 'direct comparison of the reading with the limits; measurement uncertainty not considered (enter U for ISO 14253-1)', ruleU: 'ISO 14253-1 with U = {U} µm: pass if inside the limits by at least U, fail if outside by at least U, otherwise undecided', foot: 'Limits per ISO 286-1:2010 and ISO 286-2:2010, at 20 °C (ISO 1); the module is compared with manufacturers\' tables (Talide, Walter, EVO: 2930 cells, 0 errors), not with the text of ISO 286-2. Reference tool: the standard prevails for inspection. Does not cover ISO 2768, dimensions with numeric deviations (±), envelope requirement Ⓔ, inches. App built by NextCore AI Department for UTR Tiberti · utr-tiberti.github.io/tolleranze' } };
   function rl(k) { return RL[lang][k]; }
   function loadRep() { try { var r = JSON.parse(localStorage.getItem('tolIso.rep') || 'null'); if (r) { rep.pezzo = r.pezzo || ''; rep.disegno = r.disegno || ''; rep.operatore = r.operatore || ''; rep.note = r.note || ''; rep.strumento = r.strumento || ''; rep.U = r.U || ''; } } catch (e) {} }
   function saveRep() { try { localStorage.setItem('tolIso.rep', JSON.stringify({ pezzo: rep.pezzo, disegno: rep.disegno, operatore: rep.operatore, note: rep.note, strumento: rep.strumento, U: rep.U })); } catch (e) {} }
-  function todayStr() { var d = new Date(); return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear(); }
+  function todayStr() { var d = new Date(), dd = ('0' + d.getDate()).slice(-2), mm = ('0' + (d.getMonth() + 1)).slice(-2), y = d.getFullYear(); return lang === 'en' ? (y + '-' + mm + '-' + dd) : (dd + '/' + mm + '/' + y); }   /* v4.9: IT gg/mm/aaaa, EN ISO 8601; la stampa usa la stessa data del campo */
   function fitTypeTxt(f) { return f.type === 'clearance' ? t('clearance') : (f.type === 'interference' ? t('interference') : t('transition')); }
   function fitTeoTxt(f) { return f.type === 'clearance' ? (umAbs(f.clrMin) + '…' + umAbs(f.clrMax) + ' µm ' + tu('clr')) : (f.type === 'interference' ? (umAbs(f.intMin) + '…' + umAbs(f.intMax) + ' µm ' + tu('itf')) : (tu('clr') + ' ≤ ' + umAbs(f.clrMax) + ' · ' + tu('itf') + ' ≤ ' + umAbs(f.intMax) + ' µm')); }
   /* v4.8 — REGOLA DECISIONALE. Senza incertezza U: confronto diretto della misura con i limiti (lo si dichiara nel rapporto).
@@ -1346,6 +1366,13 @@ var TolISO = (function () {
   function render() {
     var st = getState(), out = '', msgs = [], zones = [];
     var dOk = st.D > 0 && st.D <= 500;
+    if (dOk) {
+      if (lastD !== null && Math.abs(lastD - st.D) > 1e-9) {
+        if (String($('tol-m').value).trim() !== '') $('tol-m').value = '';
+        if (insp.mh || insp.ms) { insp.mh = ''; insp.ms = ''; }
+      }
+      lastD = st.D;
+    }
     /* v4.8: scrittura non capita → messaggio che dice cosa correggere, e niente risultato (prima restava quello vecchio) */
     var dv = String($('tol-d').value).trim(), dBad = dv !== '' && isNaN(st.D);
     $('tol-d-wrap').classList.toggle('tol-bad', !dOk && dv !== '');
@@ -1402,6 +1429,7 @@ var TolISO = (function () {
   }
   function applyRecent(txt) {
     var p = parse(txt); if (!p) return;
+    var nt = $('tol-note'); if (nt) nt.innerHTML = '';
     $('tol-d').value = p.D; viewFi = -1;
     if (p.hole && p.shaft) { setClass(p.hole); setClass(p.shaft); setTab('fit'); }
     else if (p.hole) { setClass(p.hole); setTab('hole'); }
@@ -1466,7 +1494,21 @@ var TolISO = (function () {
       dMsgHold = true; clearTimeout(dHold); dHold = setTimeout(function () { dMsgHold = false; render(); }, 900);
       rebuildTables(); render();
     });
-    function applyD() { dMsgHold = false; var v = $('tol-d').value.trim(); if (!/[a-z]/i.test(v)) { render(); return; } var p = parse(v); if (!p) { render(); return; } applyRecent(v); $('tol-d').blur(); }
+    function applyD() {
+      dMsgHold = false; var v = $('tol-d').value.trim(); if (!/[a-z]/i.test(v)) { render(); return; } var p = parse(v); if (!p) { render(); return; }
+      applyRecent(v); $('tol-d').blur();
+      /* v4.9: dopo una classe sola, diciamo come l'abbiamo letta e offriamo il contrario: «30K6» → FORO K6, era l'albero k6? */
+      var notes = [], it = lang !== 'en';
+      if (p.envelope) notes.push(it ? 'Ⓔ letta e ignorata: l\'app controlla la dimensione, non il requisito d\'inviluppo (ISO 8015 / ISO 14405).' : 'Ⓔ read and ignored: the app checks the size, not the envelope requirement (ISO 8015 / ISO 14405).');
+      if ((p.hole && !p.shaft) || (p.shaft && !p.hole)) {
+        var c = p.hole || p.shaft, isH = !!p.hole, sw = (isH ? c.letter.toLowerCase() : c.letter.toUpperCase()) + c.grade, q = fmtD(p.D) + ' ' + sw;
+        notes.push((it ? ('Letto come ' + (isH ? 'FORO ' : 'ALBERO ') + c.letter + c.grade + (isH ? ' (maiuscola). Era l\'albero ' : ' (minuscola). Era il foro ') + sw + '?')
+                       : ('Read as ' + (isH ? 'HOLE ' : 'SHAFT ') + c.letter + c.grade + (isH ? ' (capital). Did you mean the shaft ' : ' (lower case). Did you mean the hole ') + sw + '?'))
+                   + ' <button type="button" class="tol-chip" data-quick="' + esc(q) + '">' + (isH ? (it ? 'Albero ' : 'Shaft ') : (it ? 'Foro ' : 'Hole ')) + sw + '</button>');
+      }
+      $('tol-note').innerHTML = notes.join('<br>');
+    }
+    $('tol-d').addEventListener('input', function () { $('tol-note').innerHTML = ''; });
     $('tol-d').addEventListener('keydown', function (e) { if (e.key === 'Enter') applyD(); });
     $('tol-d').addEventListener('change', applyD);
     ['input', 'change'].forEach(function (ev) { $('tol-m').addEventListener(ev, render); });
@@ -1736,7 +1778,7 @@ var TolISO = (function () {
     ck('preferiti: nome vuoto rifiutato', addFav('   ', '20 H7') === false);
     fav = keepFav; saveFav();
     /* 19. collaudo: dentro/fuori per foro e albero, gioco effettivo, verdetto */
-    $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6';
+    $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; render();   /* v4.9: prima il Ø, poi le misure */
     insp.mh = '25,010'; insp.ms = '24,985'; insp.open = true; render();
     ck('collaudo: foro DENTRO, albero DENTRO, gioco effettivo 25 µm, coppia conforme', /foro DENTRO/.test($('tol-insp-det').textContent) && /albero DENTRO/.test($('tol-insp-det').textContent) && /gioco effettivo/.test($('tol-insp-det').textContent) && /gioco effettivo\s*25 µm/.test($('tol-insp-det').textContent) && /Coppia conforme/.test($('tol-insp-det').textContent));
     insp.ms = '24,975'; render();
@@ -1777,6 +1819,51 @@ var TolISO = (function () {
       $('tol-gloss-q').value = 'xyz'; $('tol-gloss-q').dispatchEvent(new Event('input'));
       ck('glossario: classe sbagliata → messaggio', /Scrivi una classe|non riconosciuta/.test($('tol-gloss-ans').textContent));
       $('tol-gloss-q').value = ''; $('tol-gloss-q').dispatchEvent(new Event('input')); $('tol-acc-gloss').open = false; $('tol-d').value = '25'; render();
+    })();
+    /* 27. v4.9: correzioni del collaudo con 4 operatori */
+    (function () {
+      /* misura e collaudo si azzerano quando cambia il Ø */
+      setTab('hole'); $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; rebuildTables(); render();
+      $('tol-m').value = '25,013'; render();
+      ck('v4.9 misura: con Ø25 H7 e 25,013 → DENTRO', /DENTRO/.test($('tol-sum-txt').textContent));
+      $('tol-d').value = '26'; render();
+      ck('v4.9 misura: cambiando il Ø a 26 la misura si azzera (prima: FUORI 987 µm del pezzo vecchio)', $('tol-m').value === '' && !/FUORI|DENTRO/.test($('tol-sum-txt').textContent));
+      $('tol-m').value = '26,010'; render(); $('tol-h-gr').value = '8'; render();
+      ck('v4.9 misura: cambiando solo la classe (H7→H8) la misura resta (stesso pezzo, confronto fra classi)', $('tol-m').value === '26,010' && /DENTRO/.test($('tol-sum-txt').textContent));
+      $('tol-m').value = ''; $('tol-h-gr').value = '7';
+      setTab('fit'); $('tol-d').value = '25'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; render();
+      insp.mh = '25,010'; insp.ms = '24,985'; insp.open = true; render();
+      ck('v4.9 collaudo: coppia conforme a Ø25', /Coppia conforme/.test($('tol-insp-det').textContent));
+      $('tol-d').value = '26'; render();
+      ck('v4.9 collaudo: cambiando il Ø le misure si azzerano, niente «NON conforme» finto', insp.mh === '' && insp.ms === '' && !/NON conforme|FUORI/.test($('tol-insp-det').textContent));
+      insp.mh = '26,010'; insp.ms = '25,985'; render(); $('tol-s-let').value = 'p'; render();
+      ck('v4.9 collaudo: cambiando solo la classe le misure restano', insp.mh === '26,010' && insp.ms === '25,985');
+      insp.mh = ''; insp.ms = ''; insp.open = false; $('tol-s-let').value = 'g'; render();
+      /* nota maiuscola/minuscola con tasto di scambio (il percorso del campo unico passa da applyD: lo simuliamo con change) */
+      $('tol-d').value = '30K6'; $('tol-d').dispatchEvent(new Event('change'));
+      ck('v4.9 «30K6»: va in FORO e la nota dice «Letto come FORO K6 (maiuscola). Era l\'albero k6?»', tab === 'hole' && /Letto come FORO K6 \(maiuscola\)\. Era l\'albero k6\?/.test($('tol-note').textContent) && !!$('tol-note').querySelector('[data-quick="30 k6"]'));
+      $('tol-note').querySelector('[data-quick="30 k6"]').click();
+      ck('v4.9 «30K6»: il tasto porta all\'albero k6 e la nota sparisce', tab === 'shaft' && $('tol-s-let').value === 'k' && $('tol-s-gr').value === '6' && $('tol-note').textContent === '');
+      $('tol-d').value = '40 h7'; $('tol-d').dispatchEvent(new Event('change'));
+      ck('v4.9 «40 h7»: nota «Letto come ALBERO h7 (minuscola). Era il foro H7?»', /Letto come ALBERO h7 \(minuscola\)\. Era il foro H7\?/.test($('tol-note').textContent));
+      $('tol-d').value = '25 H7/g6'; $('tol-d').dispatchEvent(new Event('change'));
+      ck('v4.9 coppia completa: nessuna nota', $('tol-note').textContent === '');
+      $('tol-d').value = '40 H7 Ⓔ'; $('tol-d').dispatchEvent(new Event('change'));
+      ck('v4.9 «40 H7 Ⓔ»: accettata come 40 H7, nota «Ⓔ letta e ignorata»', tab === 'hole' && $('tol-h-gr').value === '7' && /Ⓔ letta e ignorata/.test($('tol-note').textContent) && !$('tol-d-wrap').classList.contains('tol-bad'));
+      $('tol-d').value = '40 ±0,05'; $('tol-d').dispatchEvent(new Event('input')); $('tol-d').dispatchEvent(new Event('change'));
+      ck('v4.9 «40 ±0,05»: messaggio sugli scostamenti numerici e ISO 2768', /scostamenti numerici/.test($('tol-dmsg').textContent) && /ISO 2768/.test($('tol-dmsg').textContent));
+      $('tol-d').value = '25'; $('tol-d').dispatchEvent(new Event('input')); render();
+      /* Trova accoppiamento: a zero risultati, le più vicine */
+      setTab('fit'); $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; render();
+      $('tol-find-det').open = true; finder.type = 'clearance'; finder.basis = 'hole'; finder.a = '12.7'; finder.b = '38.1'; finder.all = false; buildFinder();
+      ck('v4.9 Trova 12,7…38,1 foro base Ø25: nessuna coppia ma 3 «più vicine» cliccabili, la prima H5/f6 (20…42, sfora il max di 3,9 µm), poi H5/g5 e H5/g6 (5,7)', (function () { var rows = $('tol-find-out').querySelectorAll('.tol-findrow'); return !!$('tol-find-out').querySelector('.none') && /Le più vicine/.test($('tol-find-out').textContent) && rows.length === 3 && rows[0].getAttribute('data-fit') === 'H5/f6' && /fuori di 3,9 µm/.test(rows[0].textContent) && rows[1].getAttribute('data-fit') === 'H5/g5' && /fuori di 5,7 µm/.test(rows[1].textContent) && rows[2].getAttribute('data-fit') === 'H5/g6'; })());
+      finder.a = ''; finder.b = ''; $('tol-find-det').open = false; buildFinder();
+      /* etichette e piè */
+      ck('v4.9 rapporto: etichetta «Incertezza U estesa (k = 2)» e temperatura «solo annotata»', /Incertezza U estesa \(k = 2\)/.test($('tol-rep').textContent) && /solo annotata/.test($('tol-rep').textContent));
+      ck('v4.9 aiuto: riga «Cosa NON fa» con ISO 2768 e Ⓔ', /Cosa NON fa/.test(document.getElementById('tol-help').textContent) && /ISO 2768/.test(document.getElementById('tol-help').textContent));
+      ck('v4.9 piè di pagina EN: link tradotti (data-tx)', (function () { var a = document.querySelectorAll('.ft a[data-tx-en]'); return a.length === 2 && a[1].getAttribute('data-tx-en') === 'external check'; })());
+      ck('v4.9 piè del rapporto dichiara cosa non copre', /Non copre ISO 2768/.test(RL.it.foot) && /Does not cover ISO 2768/.test(RL.en.foot));
+      setTab(keep.tab);
     })();
     /* 23. v4.4: niente zoom da doppio tocco, niente scorrimento orizzontale, avviso zoom spento a scala 1, riga diagnostica */
     ck('v4.4: touch-action manipulation su body e tasti', getComputedStyle(document.body).touchAction === 'manipulation' && getComputedStyle($('tol-sum-copy')).touchAction === 'manipulation');
@@ -1854,7 +1941,7 @@ var TolISO = (function () {
     ck('schede: contenuti generati', !!$('tol-prov').querySelector('table') && !!$('tol-ittable').querySelector('tbody'));
     $('tol-acc-prov').open = true; ck('schede: si apre', $('tol-acc-prov').open); $('tol-acc-prov').open = false;
     /* 13. virgola dal tastierino del telefono: «25,5» e «25.5» valgono uguale, nel Ø e nel misurato */
-    setTab('hole'); $('tol-d').value = '25,5'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-m').value = '25,51'; rebuildTables(); render();
+    setTab('hole'); $('tol-d').value = '25,5'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; rebuildTables(); render(); $('tol-m').value = '25,51'; render();   /* v4.9: prima il Ø, poi la misura */
     ck('virgola: Ø 25,5 accettato (fascia 24…30) e misura 25,51 DENTRO', /> 24 … 30/.test($('tol-band').textContent) && /DENTRO/.test($('tol-sum-txt').textContent) && /Ø25,5 H7/.test($('tol-sum-txt').textContent));
     $('tol-d').value = '25.5'; $('tol-m').value = '25.51'; render();
     ck('punto: stesso risultato', /DENTRO/.test($('tol-sum-txt').textContent) && /Ø25,5 H7/.test($('tol-sum-txt').textContent));
@@ -2079,6 +2166,12 @@ var TolISO = (function () {
       ck('foto: H7/p6 albero max sopra foro min → interferenza', gp.ySmax < gp.yHmin && g.ySmax > g.yHmin);
       ck('foto: senza albero, albero a scala 1', Math.abs(photoLayout(H, null, 25).shaftScale - 1) < 1e-9);
     })();
+    /* 9g. v4.9: «.5 H7», Ⓔ ignorata e segnalata, limiti senza rumore di virgola mobile, data */
+    ck('parse «.5 H7» = Ø0,5 foro H7', (function () { var p = parse('.5 H7'); return p && p.D === 0.5 && p.hole && p.hole.letter === 'H'; })());
+    ck('parse «40 H7 Ⓔ» → H7 con envelope=true; «40 H7» senza', (function () { var p = parse('40 H7 Ⓔ'), q = parse('40 H7'); return p && p.D === 40 && p.hole && p.envelope === true && q && !q.envelope; })());
+    ck('parse «40 ±0,05» rifiutata e whyBad spiega gli scostamenti numerici', parse('40 ±0,05') === null && /scostamenti numerici|numeric deviations/.test(whyBad('40 ±0,05')) && /scostamenti numerici|numeric deviations/.test(whyBad('40 +0,02/-0,01')));
+    ck('limits: min/max esatti al µm/1000 (6,35 h6 → 6,341 / 6,35)', (function () { var o = limits('shaft', 'h', 6, 6.35); return o.min === 6.341 && o.max === 6.35 && limits('hole', 'H', 7, 25).max === 25.021; })());
+    ck('data del rapporto: gg/mm/aaaa in IT, ISO in EN', (function () { var k = lang, a, b; lang = 'it'; a = todayStr(); lang = 'en'; b = todayStr(); lang = k; return /^\d\d\/\d\d\/\d{4}$/.test(a) && /^\d{4}-\d\d-\d\d$/.test(b); })());
     /* 9d. controllo misura (v3.9): scarti dai limiti, scostamento dal nominale, posizione nel campo di tolleranza */
     (function () {
       var H = limits('hole', 'H', 7, 25), S = limits('shaft', 'g', 6, 25), c;
@@ -2153,7 +2246,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.8' };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.9', reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
