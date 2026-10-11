@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_5.2.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_5.3.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -679,10 +679,12 @@ var TolISO = (function () {
      Tmax = temperatura oltre la quale scaldare il mozzo rovina il materiale (acciaio bonificato: rinvenimento; leghe di Al: perdita di resistenza). */
   var MAT = { steel: { E: 210000, nu: 0.30, Re: 355, a: 11.5e-6, Tmax: 250, it: 'Acciaio', en: 'Steel' }, cast: { E: 110000, nu: 0.26, Re: 200, a: 10.5e-6, Tmax: 250, brittle: true, it: 'Ghisa', en: 'Cast iron' },
               alu: { E: 70000, nu: 0.33, Re: 240, a: 23e-6, Tmax: 150, it: 'Alluminio', en: 'Aluminium' }, bronze: { E: 110000, nu: 0.34, Re: 200, a: 18e-6, Tmax: 250, it: 'Bronzo', en: 'Bronze' } };
-  var press = { De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null };
+  var press = { De: null, di: 0, L: null, mu: 0.15, Rzh: 0, Rza: 0, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null };
   function pressCalc(d, deltaUm, q) {
     /* d, De, di, L in mm · delta in µm · E in MPa → p in MPa, F in N, M in N·mm, sigma in MPa */
-    var De = q.De, di = q.di || 0, delta = deltaUm / 1000;
+    var De = q.De, di = q.di || 0, rz = Math.max(0, q.Rzh || 0) + Math.max(0, q.Rza || 0);
+    /* v5.3: le creste della rugosità si schiacciano nel montaggio: interferenza efficace = nominale − 0,8·(Rz mozzo + Rz albero) (Niemann/Roloff-Matek); Rz = 0 → nessuna correzione */
+    var dEffUm = Math.max(0, deltaUm - 0.8 * rz), delta = dEffUm / 1000;
     if (!(d > 0) || !(De > d) || !(di >= 0) || !(di < d) || !(q.L > 0) || !(q.Eh > 0) || !(q.Es > 0)) return null;
     var kh = (De * De + d * d) / (De * De - d * d), ks = (d * d + di * di) / (d * d - di * di);
     var c = (kh + q.nuh) / q.Eh + (ks - q.nus) / q.Es;
@@ -691,27 +693,28 @@ var TolISO = (function () {
     /* v4.8: al bordo del foro c'è anche la pressione radiale −p: la verifica a snervamento va fatta sulla tensione equivalente
        di von Mises (stato piano) σ_eq = p·√(3De⁴ + d⁴)/(De² − d²) = p·√(kh² + kh + 1), non sulla sola σ tangenziale */
     var sigVM = p * Math.sqrt(kh * kh + kh + 1);
-    return { p: p, F: F, M: M, sig: sig, sigVM: sigVM, kh: kh };
+    return { p: p, F: F, M: M, sig: sig, sigVM: sigVM, kh: kh, dEff: dEffUm, smooth: 0.8 * rz };
   }
   function pressBlock(f, D) {
     if (!(f.intMax > 0)) return '';
-    var q = { De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: press.mu,
+    var q = { Rzh: press.Rzh || 0, Rza: press.Rza || 0, De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: press.mu,
               Eh: press.Eh || MAT[press.mh].E, nuh: (press.nuh !== null ? press.nuh : MAT[press.mh].nu), Es: press.Es || MAT[press.ms].E, nus: (press.nus !== null ? press.nus : MAT[press.ms].nu), Re: press.Re || MAT[press.mh].Re };
-    var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
+    var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', Rzh: 'Rugosità Rz foro (mozzo)', Rza: 'Rugosità Rz albero', eff: 'Interferenza efficace (meno 0,8·ΣRz)', flat: 'Con questa rugosità l\'interferenza minima è tutta schiacciata: nel caso peggiore l\'accoppiamento non tiene. Ridurre la rugosità (rettifica, lappatura) o scegliere una classe più forzata.', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
                              col: ['', 'interf. min', 'interf. max'], rows: ['Interferenza', 'Pressione di contatto', 'Forza di montaggio (pressa)', 'Coppia trasmissibile', 'Tensione tangenziale mozzo (bordo foro)', 'Tensione equivalente mozzo (von Mises)'], dT: 'Calettamento a caldo: scaldare il mozzo di circa', warn: 'La tensione equivalente nel mozzo (von Mises) supera lo snervamento: il mozzo si deforma in modo permanente. Ridurre l\'interferenza o aumentare lo spessore del mozzo.', brittle: 'Mozzo in ghisa: materiale fragile, il confronto con Re non basta; verificare con la resistenza a trazione e un coefficiente di sicurezza.', hot: 'Oltre circa {T} °C il materiale del mozzo si rovina (acciaio: rinvenimento; alluminio: perde resistenza): valutare il raffreddamento dell\'albero (ghiaccio secco, azoto liquido) o un\'interferenza minore.', alpha: 'con α del mozzo = {a}·10⁻⁶/K e 1 µm/mm di gioco di infilaggio',
-                             note: 'Modello elastico dei cilindri spessi (Lamé), stato piano di tensione, pressione uniforme, mozzo e albero di uguale lunghezza (niente effetti di bordo), stesso μ per montaggio e coppia; senza rugosità né effetti termici, albero cavo non verificato. L\'interferenza effettiva è un po\' minore di quella nominale per lo schiacciamento delle creste (≈ 0,8·(Rz mozzo + Rz albero)): qui NON è sottratta. Valori indicativi per dimensionare la pressa: per un forzato importante fa fede il calcolo del progettista.' }
-                          : { title: 'Interference fit: pressure and assembly force', De: 'Hub outside Ø', di: 'Shaft bore Ø (0 = solid)', L: 'Joint length', mu: 'Friction μ', mh: 'Hub material', ms: 'Shaft material', Re: 'Hub yield strength Re',
+                             note: 'Modello elastico dei cilindri spessi (Lamé), stato piano di tensione, pressione uniforme, mozzo e albero di uguale lunghezza (niente effetti di bordo), stesso μ per montaggio e coppia; senza effetti termici, albero cavo non verificato. Rugosità: lo schiacciamento delle creste riduce l\'interferenza di ≈ 0,8·(Rz mozzo + Rz albero), sottratto solo se inserisci le Rz (a 0 il calcolo è sul nominale, più ottimistico). Valori indicativi per dimensionare la pressa: per un forzato importante fa fede il calcolo del progettista.' }
+                          : { title: 'Interference fit: pressure and assembly force', De: 'Hub outside Ø', di: 'Shaft bore Ø (0 = solid)', L: 'Joint length', mu: 'Friction μ', Rzh: 'Roughness Rz bore (hub)', Rza: 'Roughness Rz shaft', eff: 'Effective interference (less 0.8·ΣRz)', flat: 'With this roughness the minimum interference is entirely flattened: in the worst case the joint will not hold. Reduce the roughness (grinding, lapping) or choose a heavier fit class.', mh: 'Hub material', ms: 'Shaft material', Re: 'Hub yield strength Re',
                              col: ['', 'min interf.', 'max interf.'], rows: ['Interference', 'Contact pressure', 'Assembly force (press)', 'Transmissible torque', 'Hub hoop stress (bore edge)', 'Hub equivalent stress (von Mises)'], dT: 'Shrink fit: heat the hub by about', warn: 'The hub equivalent stress (von Mises) exceeds the yield strength: the hub deforms permanently. Reduce the interference or increase the hub thickness.', brittle: 'Cast-iron hub: brittle material, comparing with Re is not enough; check against the tensile strength with a safety factor.', hot: 'Above about {T} °C the hub material is damaged (steel: tempering; aluminium: loses strength): consider cooling the shaft (dry ice, liquid nitrogen) or a smaller interference.', alpha: 'with hub α = {a}·10⁻⁶/K and 1 µm/mm insertion clearance',
-                             note: 'Elastic thick-cylinder model (Lamé), plane stress, uniform pressure, hub and shaft of equal length (no edge effects), same μ for assembly and torque; no roughness or thermal effects, hollow shaft not checked. The effective interference is slightly below nominal due to asperity flattening (≈ 0.8·(Rz hub + Rz shaft)): it is NOT subtracted here. Indicative values to size the press: for an important fit the designer\'s calculation prevails.' };
+                             note: 'Elastic thick-cylinder model (Lamé), plane stress, uniform pressure, hub and shaft of equal length (no edge effects), same μ for assembly and torque; no thermal effects, hollow shaft not checked. Roughness: asperity flattening lowers the interference by ≈ 0.8·(Rz hub + Rz shaft), subtracted only if you enter the Rz values (at 0 the calculation uses the nominal value, more optimistic). Indicative values to size the press: for an important fit the designer\'s calculation prevails.' };
     var imin = Math.max(0, f.intMin || 0), imax = f.intMax, a = pressCalc(D, imin, q), b = pressCalc(D, imax, q);
     function inp(id, val, step, lbl) { return '<div><div class="tol-lbl">' + lbl + '</div><div class="tol-inp"><input type="text" inputmode="decimal" data-press="' + id + '" value="' + esc(String(val).replace('.', lang === 'it' ? ',' : '.')) + '"></div></div>'; }   /* v4.8: virgola in italiano */
     function sel(id, val, lbl) { var h = '<div><div class="tol-lbl">' + lbl + '</div><div class="tol-inp"><select data-press="' + id + '">'; Object.keys(MAT).forEach(function (k) { h += '<option value="' + k + '"' + (k === val ? ' selected' : '') + '>' + MAT[k][lang] + ' (E ' + (MAT[k].E / 1000) + ' GPa)</option>'; }); return h + '</select></div></div>'; }
     var h = '<details class="tol-acc tol-press" id="tol-press-det"' + (press.open ? ' open' : '') + '><summary><span>' + L2.title + '</span><span class="chev"></span></summary><div class="body">';
-    h += '<div class="grid">' + inp('De', q.De, 0.1, L2.De + ' <span>mm</span>') + inp('di', q.di, 0.1, L2.di + ' <span>mm</span>') + inp('L', q.L, 0.1, L2.L + ' <span>mm</span>') + inp('mu', q.mu, 0.01, L2.mu) + sel('mh', press.mh, L2.mh) + sel('ms', press.ms, L2.ms) + inp('Re', q.Re, 5, L2.Re + ' <span>MPa</span>') + '</div>';
+    h += '<div class="grid">' + inp('De', q.De, 0.1, L2.De + ' <span>mm</span>') + inp('di', q.di, 0.1, L2.di + ' <span>mm</span>') + inp('L', q.L, 0.1, L2.L + ' <span>mm</span>') + inp('mu', q.mu, 0.01, L2.mu) + inp('Rzh', q.Rzh, 1, L2.Rzh + ' <span>µm</span>') + inp('Rza', q.Rza, 1, L2.Rza + ' <span>µm</span>') + sel('mh', press.mh, L2.mh) + sel('ms', press.ms, L2.ms) + inp('Re', q.Re, 5, L2.Re + ' <span>MPa</span>') + '</div>';
     if (!a || !b) return h + '<div class="warn">' + (lang === 'it' ? 'Dati non validi: Ø esterno mozzo > Ø nominale, Ø interno albero < Ø nominale, lunghezza > 0.' : 'Invalid data: hub OD > nominal Ø, shaft bore < nominal Ø, length > 0.') + '</div></div></details>';
     function n1(v) { return num(v, 1); } function n2(v) { return num(v, 2); }
     h += '<table><tr><th>' + L2.col[0] + '</th><th>' + L2.col[1] + '</th><th>' + L2.col[2] + '</th></tr>';
     h += '<tr><td>' + L2.rows[0] + '</td><td>' + umAbs(imin) + ' µm</td><td>' + umAbs(imax) + ' µm</td></tr>';
+    if (q.Rzh + q.Rza > 0) h += '<tr><td>' + L2.eff + '</td><td>' + n1(a.dEff) + ' µm</td><td>' + n1(b.dEff) + ' µm</td></tr>';
     h += '<tr><td>' + L2.rows[1] + '</td><td><b>' + n1(a.p) + '</b> MPa</td><td><b>' + n1(b.p) + '</b> MPa</td></tr>';
     h += '<tr><td>' + L2.rows[2] + '</td><td><b>' + n2(a.F / 1000) + '</b> kN</td><td><b>' + n2(b.F / 1000) + '</b> kN</td></tr>';
     h += '<tr><td>' + L2.rows[3] + '</td><td>' + n1(a.M / 1000) + ' N·m</td><td>' + n1(b.M / 1000) + ' N·m</td></tr>';
@@ -721,6 +724,7 @@ var TolISO = (function () {
     h += '<div class="note">' + L2.dT + ' <b>' + Math.round(dT) + ' °C</b> (' + L2.alpha.replace('{a}', num(alpha * 1e6, 1)) + ').</div>';
     if (dT > M0.Tmax) h += '<div class="warn">' + L2.hot.replace('{T}', M0.Tmax) + '</div>';
     if (b.sigVM > q.Re) h += '<div class="warn">' + L2.warn + ' (' + n1(b.sigVM) + ' MPa > Re ' + q.Re + ' MPa)</div>';
+    if (q.Rzh + q.Rza > 0 && a.dEff <= 0) h += '<div class="warn">' + L2.flat + '</div>';
     if (M0.brittle) h += '<div class="warn">' + L2.brittle + '</div>';
     h += '<div class="note">' + L2.note + '</div>';
     return h + '</div></details>';
@@ -1955,6 +1959,10 @@ var TolISO = (function () {
     ck('forzato: presente con H7/u6', !!$('tol-press-det') && /MPa/.test($('tol-press-det').textContent));
     pressPreset({ De: 50, di: 0, L: 25, mu: 0.10, mh: 'steel', ms: 'steel', Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29, Re: null }); render();
     ck('forzato: con i dati TolerangeLab mostra 83,0 MPa e 16,30 kN', /83,0/.test($('tol-press-det').textContent) && /16,30/.test($('tol-press-det').textContent));
+    ck('forzato: senza Rz niente riga «Interferenza efficace»', !/Interferenza efficace/.test($('tol-press-det').textContent) && !!$('tol-press-det').querySelector('[data-press="Rzh"]'));
+    ['Rzh', 'Rza'].forEach(function (k, i) { var e = $('tol-press-det').querySelector('[data-press="' + k + '"]'); e.value = i ? '2,5' : '4'; e.dispatchEvent(new Event('change', { bubbles: true })); });
+    ck('forzato: Rz 4 + 2,5 → riga «Interferenza efficace» 21,8 µm e pressione più bassa di 83,0', press.Rzh === 4 && press.Rza === 2.5 && /Interferenza efficace[^]*21,8 µm/.test($('tol-press-det').textContent) && !/83,0/.test($('tol-press-det').textContent));
+    pressPreset({ Rzh: 0, Rza: 0 }); render();
     var deIn = $('tol-press-det').querySelector('[data-press="De"]'); deIn.value = '100'; deIn.dispatchEvent(new Event('change', { bubbles: true }));
     ck('forzato: cambio Ø esterno mozzo → pressione più alta e scheda aperta', press.De === 100 && $('tol-press-det').open && !/83,0/.test($('tol-press-det').textContent));
     pressPreset({ De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null, open: false });
@@ -2449,6 +2457,15 @@ var TolISO = (function () {
       ck('foto: H7/p6 albero max sopra foro min → interferenza', gp.ySmax < gp.yHmin && g.ySmax > g.yHmin);
       ck('foto: senza albero, albero a scala 1', Math.abs(photoLayout(H, null, 25).shaftScale - 1) < 1e-9);
     })();
+    /* 9j. v5.3: rugosità Rz nel forzato — interferenza efficace = nominale − 0,8·(Rzh+Rza) */
+    (function () {
+      var q = { De: 50, di: 0, L: 25, mu: 0.10, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }, a0 = pressCalc(25, 27, q);
+      var a1 = pressCalc(25, 27, { De: 50, di: 0, L: 25, mu: 0.10, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29, Rzh: 4, Rza: 2.5 });
+      ck('Rz: a Rz = 0 nulla cambia (83,02 MPa) e interferenza efficace = nominale', Math.abs(a0.p - 83.02) < 0.05 && a0.dEff === 27);
+      ck('Rz: 4 + 2,5 µm → efficace 27 − 5,2 = 21,8 µm', Math.abs(a1.dEff - 21.8) < 1e-9);
+      ck('Rz: pressione proporzionale all\'interferenza efficace', Math.abs(a1.p / a0.p - 21.8 / 27) < 1e-9);
+      ck('Rz: rugosità maggiore dell\'interferenza → p = 0, F = 0', pressCalc(25, 5, { De: 50, di: 0, L: 25, mu: 0.1, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29, Rzh: 8, Rza: 8 }).p === 0);
+    })();
     /* 9i. v5.2: risoluzione implicita della misura e AL LIMITE */
     (function () {
       ck('measRes: «40,02» → 10 µm · «40,025» → 1 · «40» → 1000 · «40.0250» → 0,1', measRes('40,02') === 10 && measRes('40,025') === 1 && measRes('40') === 1000 && measRes('40.0250') === 0.1);
@@ -2560,7 +2577,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.2', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.3', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
