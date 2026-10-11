@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_5.1.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_5.2.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -358,7 +358,7 @@ var TolISO = (function () {
       ['h', 'base', 'Scostamento zero (pezzo base)', 'Zero deviation (basic member)', 'H = FORO BASE, il sistema più usato: il foro resta fisso e si sceglie l\'albero (H7/g6, H7/k6, H7/p6). h = ALBERO BASE, speculare; con H7 si monta a mano con gioco minimo zero (H7/h6)', 'H = HOLE BASIS, the most used system: the hole stays fixed and the shaft is chosen (H7/g6, H7/k6, H7/p6). h = SHAFT BASIS, mirror image; with H7 it is hand-assembled with zero minimum clearance (H7/h6)'],
       ['js', 'trn', 'Simmetrica, ±IT/2', 'Symmetrical, ±IT/2', 'incerto leggero: metà sopra e metà sotto il nominale (H7/js6)', 'light transition: half above and half below nominal (H7/js6)'],
       ['j', 'trn', 'Quasi simmetrica', 'Nearly symmetrical', 'incerto leggero, valori tabellati; esiste solo per pochi gradi', 'light transition, tabulated values; only a few grades exist'],
-      ['k', 'trn', 'Incerto', 'Transition', 'si monta con un mazzuolo di gomma: sedi cuscinetti sull\'albero, pulegge (H7/k6)', 'rubber-mallet assembly: bearing seats on shafts, pulleys (H7/k6)'],
+      ['k', 'trn', 'Incerto', 'Transition', 'si monta con un mazzuolo di gomma: sedi cuscinetti sull\'albero, pulegge (H7/k6); gli anelli del cuscinetto hanno tolleranze proprie del costruttore, non ISO 286', 'rubber-mallet assembly: bearing seats on shafts, pulleys (H7/k6); the bearing rings have the maker\'s own tolerances, not ISO 286'],
       ['m', 'trn', 'Incerto stretto', 'Tight transition', 'si monta con mazzuolo, si smonta senza danni (H7/m6)', 'mallet assembly, removable without damage (H7/m6)'],
       ['n', 'trn', 'Incerto forzato', 'Tight transition, press-fit side', 'ingranaggi e boccole che non devono girare; smontaggio a pressa (H7/n6)', 'gears and bushes that must not turn; press removal (H7/n6)'],
       ['p', 'itf', 'Forzato leggero', 'Light interference', 'boccole e ruote dentate montate a pressa (H7/p6)', 'bushes and gears pressed in (H7/p6)'],
@@ -893,7 +893,7 @@ var TolISO = (function () {
     if (c.toMax <= -U || c.toMin <= -U) return 'ko';
     return 'unc';
   }
-  function partLines(o, m, txt) {
+  function partLines(o, m, txt, res) {
     /* righe di un pezzo misurato: quota, limiti, misura (con le cifre scritte), controllo, esito parziale */
     var c = checkMeasure(o, m), isH = o.kind === 'hole', half = isHalf(o), z = decide(c, repU());
     var ctl = c.ok ? (umAbs(c.toMax) + ' µm ' + tu('mFromMax') + ' · ' + umAbs(c.toMin) + ' µm ' + tu('mFromMin')) : (umAbs(c.toMax < 0 ? -c.toMax : -c.toMin) + ' µm ' + (c.toMax < 0 ? tu('mOver') : tu('mUnder')));
@@ -901,7 +901,7 @@ var TolISO = (function () {
       [rl('quota'), o.num ? ('Ø' + fmtD(o.D) + ' ' + o.name + (o.src === '2768' ? ' (' + rl('gen') + ' · ' + t('range') + ' ' + rangeTxt(o.from, o.to) + ' mm)' : ' (' + rl('numq') + ')')) : ('Ø' + fmtD(o.D) + ' ' + o.letter + o.grade + ' (' + (isH ? t('hole') : t('shaft')) + ') · ' + t('range') + ' ' + rangeTxt(o.from, o.to) + ' mm · IT' + o.grade + ' = ' + umAbs(o.it) + ' µm')],
       [rl('lim'), 'max ' + mm(o.max, half) + ' · min ' + mm(o.min, half) + ' mm (' + (o.num ? (devMm(o.up) + ' / ' + devMm(o.lo) + ' mm') : ((isH ? 'ES' : 'es') + ' ' + um(o.up) + ' · ' + (isH ? 'EI' : 'ei') + ' ' + um(o.lo) + ' µm')) + ')'],
       [rl('mis'), (txt || num(m, 3)) + ' mm'],
-      [rl('ctl'), devPctTxt(c) + ' · ' + ctl] ] };
+      [rl('ctl'), devPctTxt(c) + ' · ' + ctl + ((!(repU() > 0) && res > 0 && limitNear(c, res)) ? ' · ' + tu('mLim') + ' (' + tu('mLimHint').replace('{r}', tolMm(res)).replace('{h}', umAbs(res / 2)) + ')' : '')] ] };
   }
   function zoneTxt(z) { return z === 'ok' ? rl('ok') : (z === 'ko' ? rl('ko') : rl('unc')); }
   /* Dati del rapporto per la situazione corrente: {err} se manca qualcosa, altrimenti {head, rows, ok, cls, verdict} */
@@ -922,7 +922,8 @@ var TolISO = (function () {
       var ls = lotStats(ol, U); if (ls.nBad) return { err: 'badLot' };
       var pl0 = partLines(ol, ls.rows[0].v, ls.rows[0].txt), halfL = isHalf(ol);
       rows.push(pl0.rows[0], pl0.rows[1]);
-      rows.push([rl('pcs'), ls.n + ' · ' + ls.nOk + ' ' + lt('ok') + ' · ' + ls.nKo + ' ' + lt('ko') + (ls.nUnc ? ' · ' + ls.nUnc + ' ' + lt('unc') : '')]);
+      var nNear = ls.rows.filter(function (r) { return r.near; }).length;
+      rows.push([rl('pcs'), ls.n + ' · ' + ls.nOk + ' ' + lt('ok') + ' · ' + ls.nKo + ' ' + lt('ko') + (ls.nUnc ? ' · ' + ls.nUnc + ' ' + lt('unc') : '') + (nNear ? ' · ' + nNear + ' ' + tu('mLim').toLowerCase() : '')]);
       ls.rows.forEach(function (r) { rows.push([rl('piece') + ' ' + (r.i + 1), r.txt + ' mm · ' + devPctTxt(r.c).split(' · ')[0] + ' · ' + zoneTxt(r.z)]); });
       rows.push([rl('stats'), rl('min') + ' ' + mm(ls.st.min, halfL) + ' · ' + rl('max') + ' ' + mm(ls.st.max, halfL) + ' · ' + rl('mean') + ' ' + mm(ls.st.mean, true) + ' mm · ' + rl('range') + ' ' + umAbs(ls.st.range) + ' µm']);
       zone = ls.zone; verdict = (zone === 'ok' ? rl('lotOk') : (zone === 'ko' ? rl('lotKo') : rl('lotUnc'))) + (zone === 'ok' ? '' : ' — ' + lotOutList(ls));
@@ -930,14 +931,14 @@ var TolISO = (function () {
     } else if (tab !== 'fit') {
       var o = sideObj(st); if (!o || !o.ok) return { err: 'needQ' };
       var mq = measState(); if (mq.bad) return { err: 'badM' }; var m = mq.v === undefined ? null : mq.v; if (m === null) return { err: 'needM' };
-      var pl = partLines(o, m, mq.txt); rows = pl.rows; zone = pl.zone; verdict = zoneTxt(zone);
+      var pl = partLines(o, m, mq.txt, mq.res); rows = pl.rows; zone = pl.zone; verdict = zoneTxt(zone);
     } else {
       var H = st.hole && limits('hole', st.hole.letter, st.hole.grade, st.D), S = st.shaft && limits('shaft', st.shaft.letter, st.shaft.grade, st.D);
       if (!(H && H.ok && S && S.ok)) return { err: 'needQ' };
       var qh = measParse(insp.mh, st.D), qs = measParse(insp.ms, st.D), mh = qh.v, ms = qs.v;
       if (qh.bad || qs.bad) return { err: 'badM' };
       if (!(mh > 0 && ms > 0)) return { err: 'needF' };
-      var f = fit(st.D, H, S), ph = partLines(H, mh, qh.txt), ps = partLines(S, ms, qs.txt), g = Math.round((mh - ms) * 10000) / 10;
+      var f = fit(st.D, H, S), ph = partLines(H, mh, qh.txt, qh.res), ps = partLines(S, ms, qs.txt, qs.res), g = Math.round((mh - ms) * 10000) / 10;
       rows.push([rl('fitq'), 'Ø' + fmtD(st.D) + ' ' + H.letter + H.grade + '/' + S.letter + S.grade + ' — ' + fitTypeTxt(f) + ' · ' + rl('teo') + ': ' + fitTeoTxt(f)]);
       ph.rows.forEach(function (r, i) { rows.push([(i === 0 ? t('hole').toUpperCase() + ' · ' : '') + r[0], r[1]]); });
       rows.push([t('hole'), zoneTxt(ph.zone)]);
@@ -1019,7 +1020,7 @@ var TolISO = (function () {
       if (q.bad || q.v === undefined) { nBad++; rows.push({ i: i, raw: raw, bad: true }); return; }
       var c = checkMeasure(o, q.v), z = decide(c, U || 0); vals.push(q.v);
       if (z === 'ok') nOk++; else if (z === 'ko') nKo++; else nUnc++;
-      rows.push({ i: i, raw: raw, v: q.v, txt: q.txt || num(q.v, 3), c: c, z: z });
+      rows.push({ i: i, raw: raw, v: q.v, txt: q.txt || num(q.v, 3), c: c, z: z, near: !(U > 0) && limitNear(c, q.res) });
     });
     var st = null;
     if (vals.length) { var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals), mean = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
@@ -1040,7 +1041,7 @@ var TolISO = (function () {
     h += '<table>';
     ls.rows.forEach(function (r) {
       if (r.bad) { h += '<tr><td class="n">' + (r.i + 1) + '</td><td class="bad">' + esc(r.raw) + ' — ' + lt('inval') + '</td><td></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>'; return; }
-      h += '<tr><td class="n">' + (r.i + 1) + '</td><td><b>' + esc(r.txt) + '</b> mm</td><td class="' + r.z + '">' + zoneTxt(r.z) + ' <small style="font-weight:400;color:var(--text-faint)">' + esc(devPctTxt(r.c).split(' · ')[0]) + '</small></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>';
+      h += '<tr><td class="n">' + (r.i + 1) + '</td><td><b>' + esc(r.txt) + '</b> mm</td><td class="' + r.z + '">' + zoneTxt(r.z) + (r.near ? ' <small class="near">' + tu('mLim') + '</small>' : '') + ' <small style="font-weight:400;color:var(--text-faint)">' + esc(devPctTxt(r.c).split(' · ')[0]) + '</small></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>';
     });
     h += '</table>';
     if (ls.st) h += '<div class="stats"><b>' + ls.n + '</b> ' + lt('nPcs') + ' · <b>' + ls.nOk + '</b> ' + lt('ok') + ' · <b>' + ls.nKo + '</b> ' + lt('ko') + (ls.nUnc ? ' · <b>' + ls.nUnc + '</b> ' + lt('unc') : '') + (ls.nBad ? ' · <b>' + ls.nBad + '</b> ' + lt('inval') : '') + '<br>' +
@@ -1253,8 +1254,8 @@ var TolISO = (function () {
                    band: 'fascia', bandNo: 'Ø da 0 a 500 mm', bandOf: 'fascia del Ø', bandOther: 'altra fascia', na: 'non prevista', pick: 'tocca una casella per il riepilogo', printHole: 'FORI', printShaft: 'ALBERI' },
              en: { titleHole: 'HOLE tolerances — upper and lower deviations in µm (1/1000 mm)', titleShaft: 'SHAFT tolerances — upper and lower deviations in µm (1/1000 mm)',
                    band: 'range', bandNo: 'Ø from 0 to 500 mm', bandOf: 'range of Ø', bandOther: 'other range', na: 'not provided', pick: 'tap a cell for the summary', printHole: 'HOLES', printShaft: 'SHAFTS' } };
-  TU.it.mIn = 'DENTRO'; TU.it.mOut = 'FUORI'; TU.it.mOver = 'oltre il massimo'; TU.it.mUnder = 'sotto il minimo'; TU.it.mFromMax = 'dal max'; TU.it.mFromMin = 'dal min'; TU.it.mAlso = 'rientra anche in'; TU.it.recent = 'Recenti'; TU.it.share = 'Condividi'; TU.it.shared = 'inviato'; TU.it.clr = 'gioco'; TU.it.trn = 'incerto'; TU.it.itf = 'forzato'; TU.it.mNone = 'nessuna classe della tabella'; TU.it.mDev = 'dal nominale'; TU.it.mPct = 'della tolleranza usata'; TU.it.delRec = 'Togli dai recenti';
-  TU.en.mIn = 'IN'; TU.en.mOut = 'OUT'; TU.en.mOver = 'above max'; TU.en.mUnder = 'below min'; TU.en.mFromMax = 'from max'; TU.en.mFromMin = 'from min'; TU.en.mAlso = 'also within'; TU.en.recent = 'Recent'; TU.en.share = 'Share'; TU.en.shared = 'sent'; TU.en.clr = 'clearance'; TU.en.trn = 'transition'; TU.en.itf = 'interference'; TU.en.mNone = 'no chart class'; TU.en.mDev = 'from nominal'; TU.en.mPct = 'of tolerance used'; TU.en.delRec = 'Remove from recent';
+  TU.it.mIn = 'DENTRO'; TU.it.mOut = 'FUORI'; TU.it.mOver = 'oltre il massimo'; TU.it.mUnder = 'sotto il minimo'; TU.it.mFromMax = 'dal max'; TU.it.mFromMin = 'dal min'; TU.it.mAlso = 'rientra anche in'; TU.it.recent = 'Recenti'; TU.it.share = 'Condividi'; TU.it.shared = 'inviato'; TU.it.clr = 'gioco'; TU.it.trn = 'incerto'; TU.it.itf = 'forzato'; TU.it.mNone = 'nessuna classe della tabella'; TU.it.mLim = 'AL LIMITE'; TU.it.mLimHint = 'letta con risoluzione {r} mm: a {h} µm dal limite non si può decidere, serve uno strumento più fine o l\'incertezza U nel rapporto'; TU.it.mDev = 'dal nominale'; TU.it.mPct = 'della tolleranza usata'; TU.it.delRec = 'Togli dai recenti';
+  TU.en.mIn = 'IN'; TU.en.mOut = 'OUT'; TU.en.mOver = 'above max'; TU.en.mUnder = 'below min'; TU.en.mFromMax = 'from max'; TU.en.mFromMin = 'from min'; TU.en.mAlso = 'also within'; TU.en.recent = 'Recent'; TU.en.share = 'Share'; TU.en.shared = 'sent'; TU.en.clr = 'clearance'; TU.en.trn = 'transition'; TU.en.itf = 'interference'; TU.en.mNone = 'no chart class'; TU.en.mLim = 'BORDERLINE'; TU.en.mLimHint = 'read with {r} mm resolution: {h} µm from the limit cannot be decided, use a finer instrument or the uncertainty U in the report'; TU.en.mDev = 'from nominal'; TU.en.mPct = 'of tolerance used'; TU.en.delRec = 'Remove from recent';
   function tu(k) { return TU[lang][k]; }
   /* Accoppiamenti consigliati: coppie preferite di ISO 286-1:2010 Appendice A (sistema foro base e albero base).
      Il TIPO (gioco/incerto/forzato) lo calcola il modulo per il Ø corrente; l'uso è indicativo, da pratica d'officina. */
@@ -1262,7 +1263,7 @@ var TolISO = (function () {
     ['H7', 'g6', 'Scorrevole di precisione: perni, alberi in bronzine, guide lubrificate', 'Precision sliding: pins, shafts in bushes, lubricated guides'],
     ['H7', 'h6', 'Scorrevole con gioco minimo zero: parti montate a mano che non ruotano', 'Close sliding, zero minimum clearance: hand-assembled parts that do not rotate'],
     ['H7', 'js6', 'Incerto leggero: montaggio a mano, cuscinetti con carico leggero', 'Light transition: hand assembly, bearings with light load'],
-    ['H7', 'k6', 'Incerto: sedi cuscinetti su albero (anello interno rotante), pulegge', 'Transition: bearing seats on shafts (rotating inner ring), pulleys'],
+    ['H7', 'k6', 'Incerto: sedi cuscinetti su albero (anello interno rotante), pulegge. Il foro del cuscinetto non è H7: ha la tolleranza del costruttore', 'Transition: bearing seats on shafts (rotating inner ring), pulleys. The bearing bore is not H7: it has the maker\'s own tolerance'],
     ['H7', 'm6', 'Incerto stretto: si monta con mazzuolo, si smonta senza danni', 'Tight transition: mallet assembly, removable without damage'],
     ['H7', 'n6', 'Incerto forzato: ingranaggi e boccole che non devono ruotare, smontaggio a pressa', 'Tight transition, press-fit side: gears and bushes that must not turn, press removal'],
     ['H7', 'p6', 'Forzato leggero: boccole, ruote dentate, montaggio a pressa', 'Light press fit: bushes, gears, press assembly'],
@@ -1276,7 +1277,7 @@ var TolISO = (function () {
     ['H11', 'h11', 'Gioco grezzo: parti non finite, distanziali', 'Rough clearance: unfinished parts, spacers'],
     ['G7', 'h6', 'Albero base: scorrevole di precisione (come H7/g6)', 'Shaft basis: precision sliding (as H7/g6)'],
     ['F8', 'h7', 'Albero base: scorrevole con gioco (come H8/f7)', 'Shaft basis: running fit (as H8/f7)'],
-    ['K7', 'h6', 'Albero base: incerto, alloggiamenti cuscinetti (anello esterno rotante)', 'Shaft basis: transition, bearing housings (rotating outer ring)'],
+    ['K7', 'h6', 'Albero base: incerto, alloggiamenti cuscinetti (anello esterno rotante). L\'anello esterno non è h6: ha la tolleranza del costruttore', 'Shaft basis: transition, bearing housings (rotating outer ring). The outer ring is not h6: it has the maker\'s own tolerance'],
     ['N7', 'h6', 'Albero base: incerto forzato', 'Shaft basis: tight transition'],
     ['P7', 'h6', 'Albero base: forzato leggero', 'Shaft basis: light press fit']
   ];
@@ -1338,8 +1339,10 @@ var TolISO = (function () {
       var ex = fmtD(D) + (it ? ',' : '.') + '012';
       return { bad: 'far', msg: it ? 'La misura ' + num(n, 3) + ' mm è troppo lontana da Ø' + fmtD(D) + ': va scritta in mm, es. ' + ex + ' (1 µm = 0,001 mm).' : 'The reading ' + num(n, 3) + ' mm is too far from Ø' + fmtD(D) + ': type it in mm, e.g. ' + ex + ' (1 µm = 0.001 mm).' };
     }
-    return { v: n, txt: measTxt(raw) };
+    return { v: n, txt: measTxt(raw), res: measRes(raw) };
   }
+  /* v5.2: risoluzione implicita della lettura, in µm, dalle cifre scritte: «40,02» → 10 (calibro centesimale), «40,025» → 1, «40» → 1000 */
+  function measRes(raw) { var sR = String(raw).replace(/mm/i, '').replace(/[\s  ]+/g, '').replace(',', '.'), dec = (sR.split('.')[1] || '').length; return Math.round(1000 / Math.pow(10, dec) * 1000) / 1000; }
   /* la misura come l'ha scritta l'operatore (con almeno 3 decimali): 25,0214 resta 25,0214, non diventa 25,021 = il limite */
   function measTxt(raw) {
     var s = String(raw).replace(/mm/i, '').replace(/[\s  ]+/g, '').replace(/^\+/, '').replace(',', '.');
@@ -1355,6 +1358,10 @@ var TolISO = (function () {
        (fuori dal campo esce <0 o >100) · pct = pos arrotondata all'intero per il testo */
     var dev = Math.round((m - o.D) * 10000) / 10, pos = (toMin + toMax) > 0 ? toMin / (toMin + toMax) * 100 : 0;
     return { ok: toMax >= 0 && toMin >= 0, toMax: toMax, toMin: toMin, dev: dev, pos: pos, pct: Math.round(pos) };
+  }
+  /* v5.2: AL LIMITE = la misura dista dal limite più vicino meno di mezza divisione dello strumento (dalle cifre scritte): con un centesimale
+     «40,02» su 40 H7 (max 40,025) il valore vero sta fra 40,015 e 40,025 → non si può decidere. Vale solo se non c'è U (con U decide ISO 14253-1). */
+  function limitNear(c, res) { return res > 0 && Math.min(Math.abs(c.toMax), Math.abs(c.toMin)) <= res / 2 + 1e-9;
   }
   /* «+10 µm dal nominale · 48% della tolleranza usata» (segno meno tipografico anche sulla percentuale) */
   function devPctTxt(c) { return (c.dev > 0 ? '+' : (c.dev < 0 ? '−' : '')) + umAbs(Math.abs(c.dev)) + ' µm ' + tu('mDev') + (c.ok ? ' · ' + Math.abs(c.pct) + '% ' + tu('mPct') : ''); }   /* v4.8: la % solo dentro il campo («102 % usata» su un pezzo fuori non ha senso) */
@@ -1475,9 +1482,10 @@ var TolISO = (function () {
       var c = checkMeasure(o, m), ms = ms0.txt, line;
       if (c.ok) line = '<span class="ok">' + tu('mIn') + '</span> ' + ms + ' · ' + umAbs(c.toMax) + ' µm ' + tu('mFromMax') + ' · ' + umAbs(c.toMin) + ' µm ' + tu('mFromMin');
       else line = '<span class="ko">' + tu('mOut') + '</span> ' + ms + ' · ' + umAbs(c.toMax < 0 ? -c.toMax : -c.toMin) + ' µm ' + (c.toMax < 0 ? tu('mOver') : tu('mUnder'));
-      var devTxt = devPctTxt(c);
+      var devTxt = devPctTxt(c), near = !(repU() > 0) && limitNear(c, ms0.res);
+      if (near) { line += ' <span class="lim">' + tu('mLim') + '</span>'; devTxt += ' · ' + tu('mLimHint').replace('{r}', tolMm(ms0.res)).replace('{h}', umAbs(ms0.res / 2)); }
       html += '<div class="m">' + line + '</div><div class="m2">' + devTxt + '</div>' + measureBar(o, c, isHalf(o));
-      text += ' · ' + (c.ok ? tu('mIn') : tu('mOut')) + ' ' + ms + ' (' + devTxt + ')';
+      text += ' · ' + (c.ok ? tu('mIn') : tu('mOut')) + (near ? ' · ' + tu('mLim') : '') + ' ' + ms + ' (' + devTxt + ')';
     }
     return { html: html, copy: f.both, text: text };
   }
@@ -2006,6 +2014,25 @@ var TolISO = (function () {
       ck('glossario: classe sbagliata → messaggio', /Scrivi una classe|non riconosciuta/.test($('tol-gloss-ans').textContent));
       $('tol-gloss-q').value = ''; $('tol-gloss-q').dispatchEvent(new Event('input')); $('tol-acc-gloss').open = false; $('tol-d').value = '25'; render();
     })();
+    /* 30. v5.2: modo officina e AL LIMITE */
+    (function () {
+      var wasBig = document.body.classList.contains('tol-big');
+      ck('officina: tasto in testa', !!document.getElementById('tol-big-btn'));
+      if (window.tolBig) { window.tolBig(true); ck('officina: body.tol-big, tasto acceso, salvato, limiti ≥ 30 px nel riepilogo', document.body.classList.contains('tol-big') && document.getElementById('tol-big-btn').classList.contains('on') && localStorage.getItem('tolIso.big') === '1' && parseFloat(getComputedStyle($('tol-sum-txt').querySelector('.lim') || $('tol-sum-txt')).fontSize) >= 30); window.tolBig(wasBig); }
+      setTab('hole'); numSel = null; gen = ''; $('tol-d').value = '40'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; rebuildTables(); render();
+      rep.U = ''; $('tol-m').value = '40,02'; render();
+      ck('AL LIMITE: 40,02 (centesimo) su 40 H7 → DENTRO + AL LIMITE con la spiegazione', /DENTRO/.test($('tol-sum-txt').textContent) && !!$('tol-sum-txt').querySelector('.m .lim') && /risoluzione 0,01 mm/.test($('tol-sum-txt').textContent) && /5 µm dal limite/.test($('tol-sum-txt').textContent));
+      $('tol-m').value = '40,020'; render();
+      ck('AL LIMITE: 40,020 (millesimo) → DENTRO senza AL LIMITE', /DENTRO/.test($('tol-sum-txt').textContent) && !$('tol-sum-txt').querySelector('.m .lim'));
+      $('tol-m').value = '40,03'; render();
+      ck('AL LIMITE: 40,03 (centesimo) → FUORI + AL LIMITE', /FUORI/.test($('tol-sum-txt').textContent) && !!$('tol-sum-txt').querySelector('.m .lim'));
+      rep.U = '3'; render(); ck('AL LIMITE: con U scritta non compare (decide ISO 14253-1)', !$('tol-sum-txt').querySelector('.m .lim')); rep.U = '';
+      $('tol-m').value = '40,02'; render(); var dL = reportData();
+      ck('rapporto: riga Controllo con AL LIMITE e risoluzione', !dL.err && /AL LIMITE \(letta con risoluzione 0,01 mm/.test(dL.rows[3][1]));
+      var keepLot3 = { q: lot.q, m: lot.m.slice() }; lotClear(); lotAdd('40,02 40,010 40,03'); var ls3 = lotStats(lotLimits(), 0);
+      ck('lotto: righe al limite segnate (1ª e 3ª), conteggio nel rapporto', ls3.rows[0].near === true && ls3.rows[1].near === false && ls3.rows[2].near === true && /2 al limite/.test(reportData().rows.filter(function (r) { return r[0] === 'Pezzi'; })[0][1]));
+      lotClear(); lot.q = keepLot3.q; lot.m = keepLot3.m; saveLot(); $('tol-m').value = ''; render();
+    })();
     /* 29. v5.1: quote numeriche e tolleranze generali nell'interfaccia */
     (function () {
       var keepGen = gen, keepNum = numSel; gen = ''; numSel = null;
@@ -2422,6 +2449,15 @@ var TolISO = (function () {
       ck('foto: H7/p6 albero max sopra foro min → interferenza', gp.ySmax < gp.yHmin && g.ySmax > g.yHmin);
       ck('foto: senza albero, albero a scala 1', Math.abs(photoLayout(H, null, 25).shaftScale - 1) < 1e-9);
     })();
+    /* 9i. v5.2: risoluzione implicita della misura e AL LIMITE */
+    (function () {
+      ck('measRes: «40,02» → 10 µm · «40,025» → 1 · «40» → 1000 · «40.0250» → 0,1', measRes('40,02') === 10 && measRes('40,025') === 1 && measRes('40') === 1000 && measRes('40.0250') === 0.1);
+      var H = limits('hole', 'H', 7, 40);
+      ck('AL LIMITE: 40,02 letto al centesimo su 40 H7 (5 µm dal max) → sì; 40,015 → no; 40,03 (5 oltre) → sì; 40,025 al millesimo → sì (0 µm); 40,024 al millesimo → no',
+         limitNear(checkMeasure(H, 40.02), 10) === true && limitNear(checkMeasure(H, 40.015), 10) === false && limitNear(checkMeasure(H, 40.03), 10) === true && limitNear(checkMeasure(H, 40.025), 1) === true && limitNear(checkMeasure(H, 40.024), 1) === false);
+      ck('AL LIMITE: senza risoluzione (0) mai', limitNear(checkMeasure(H, 40.025), 0) === false);
+      ck('consigliati: H7/k6 e K7/h6 dicono che gli anelli del cuscinetto hanno tolleranze proprie', /tolleranza del costruttore/.test(FITS.filter(function (f) { return f[0] === 'H7' && f[1] === 'k6'; })[0][2]) && /tolleranza del costruttore/.test(FITS.filter(function (f) { return f[0] === 'K7'; })[0][2]));
+    })();
     /* 9h. v5.1: quote numeriche e ISO 2768 */
     (function () {
       var p1 = parse('40 ±0,05'); ck('parse «40 ±0,05» → +50/−50 µm, nome ±0,05', p1 && p1.num && p1.D === 40 && p1.num.up === 50 && p1.num.lo === -50 && /^±0[.,]05$/.test(p1.num.name));
@@ -2524,7 +2560,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.1', gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.2', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
