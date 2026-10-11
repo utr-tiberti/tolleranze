@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_5.3.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_5.4.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -693,16 +693,19 @@ var TolISO = (function () {
     /* v4.8: al bordo del foro c'è anche la pressione radiale −p: la verifica a snervamento va fatta sulla tensione equivalente
        di von Mises (stato piano) σ_eq = p·√(3De⁴ + d⁴)/(De² − d²) = p·√(kh² + kh + 1), non sulla sola σ tangenziale */
     var sigVM = p * Math.sqrt(kh * kh + kh + 1);
-    return { p: p, F: F, M: M, sig: sig, sigVM: sigVM, kh: kh, dEff: dEffUm, smooth: 0.8 * rz };
+    /* v5.4: chiusura del foro di una boccola (albero cavo, di > 0) sotto la pressione esterna p: Lamé, σθ al foro = −2p·d²/(d²−di²), σr = 0 →
+       Δdi = di·σθ/E_albero = 2·p·d²·di / (E·(d²−di²)); albero pieno → 0. In µm. Tonnellate-forza: 1 t = 9806,65 N */
+    var closeUm = di > 0 ? 2 * p * d * d * di / (q.Es * (d * d - di * di)) * 1000 : 0;
+    return { p: p, F: F, M: M, sig: sig, sigVM: sigVM, kh: kh, dEff: dEffUm, smooth: 0.8 * rz, tf: F / 9806.65, closeUm: closeUm };
   }
   function pressBlock(f, D) {
     if (!(f.intMax > 0)) return '';
     var q = { Rzh: press.Rzh || 0, Rza: press.Rza || 0, De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: press.mu,
               Eh: press.Eh || MAT[press.mh].E, nuh: (press.nuh !== null ? press.nuh : MAT[press.mh].nu), Es: press.Es || MAT[press.ms].E, nus: (press.nus !== null ? press.nus : MAT[press.ms].nu), Re: press.Re || MAT[press.mh].Re };
-    var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', Rzh: 'Rugosità Rz foro (mozzo)', Rza: 'Rugosità Rz albero', eff: 'Interferenza efficace (meno 0,8·ΣRz)', flat: 'Con questa rugosità l\'interferenza minima è tutta schiacciata: nel caso peggiore l\'accoppiamento non tiene. Ridurre la rugosità (rettifica, lappatura) o scegliere una classe più forzata.', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
+    var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero o boccola (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', close: 'Boccola: il foro interno si chiude di {a}…{b} µm per effetto della pressatura (a interferenza minima…massima). Per avere il Ø finito dopo il montaggio, lavorarlo di quel tanto più grande, oppure alesarlo dopo la pressatura. Calcolo elastico a pressione uniforme; boccola con spallamento o flangia: la chiusura è un po\' minore.', Rzh: 'Rugosità Rz foro (mozzo)', Rza: 'Rugosità Rz albero', eff: 'Interferenza efficace (meno 0,8·ΣRz)', flat: 'Con questa rugosità l\'interferenza minima è tutta schiacciata: nel caso peggiore l\'accoppiamento non tiene. Ridurre la rugosità (rettifica, lappatura) o scegliere una classe più forzata.', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
                              col: ['', 'interf. min', 'interf. max'], rows: ['Interferenza', 'Pressione di contatto', 'Forza di montaggio (pressa)', 'Coppia trasmissibile', 'Tensione tangenziale mozzo (bordo foro)', 'Tensione equivalente mozzo (von Mises)'], dT: 'Calettamento a caldo: scaldare il mozzo di circa', warn: 'La tensione equivalente nel mozzo (von Mises) supera lo snervamento: il mozzo si deforma in modo permanente. Ridurre l\'interferenza o aumentare lo spessore del mozzo.', brittle: 'Mozzo in ghisa: materiale fragile, il confronto con Re non basta; verificare con la resistenza a trazione e un coefficiente di sicurezza.', hot: 'Oltre circa {T} °C il materiale del mozzo si rovina (acciaio: rinvenimento; alluminio: perde resistenza): valutare il raffreddamento dell\'albero (ghiaccio secco, azoto liquido) o un\'interferenza minore.', alpha: 'con α del mozzo = {a}·10⁻⁶/K e 1 µm/mm di gioco di infilaggio',
                              note: 'Modello elastico dei cilindri spessi (Lamé), stato piano di tensione, pressione uniforme, mozzo e albero di uguale lunghezza (niente effetti di bordo), stesso μ per montaggio e coppia; senza effetti termici, albero cavo non verificato. Rugosità: lo schiacciamento delle creste riduce l\'interferenza di ≈ 0,8·(Rz mozzo + Rz albero), sottratto solo se inserisci le Rz (a 0 il calcolo è sul nominale, più ottimistico). Valori indicativi per dimensionare la pressa: per un forzato importante fa fede il calcolo del progettista.' }
-                          : { title: 'Interference fit: pressure and assembly force', De: 'Hub outside Ø', di: 'Shaft bore Ø (0 = solid)', L: 'Joint length', mu: 'Friction μ', Rzh: 'Roughness Rz bore (hub)', Rza: 'Roughness Rz shaft', eff: 'Effective interference (less 0.8·ΣRz)', flat: 'With this roughness the minimum interference is entirely flattened: in the worst case the joint will not hold. Reduce the roughness (grinding, lapping) or choose a heavier fit class.', mh: 'Hub material', ms: 'Shaft material', Re: 'Hub yield strength Re',
+                          : { title: 'Interference fit: pressure and assembly force', De: 'Hub outside Ø', di: 'Shaft or bushing bore Ø (0 = solid)', L: 'Joint length', mu: 'Friction μ', close: 'Bushing: the inner bore closes by {a}…{b} µm when pressed in (at minimum…maximum interference). To get the finished Ø after assembly, machine it that much larger, or bore it after pressing. Elastic calculation with uniform pressure; a bushing with a shoulder or flange closes a little less.', Rzh: 'Roughness Rz bore (hub)', Rza: 'Roughness Rz shaft', eff: 'Effective interference (less 0.8·ΣRz)', flat: 'With this roughness the minimum interference is entirely flattened: in the worst case the joint will not hold. Reduce the roughness (grinding, lapping) or choose a heavier fit class.', mh: 'Hub material', ms: 'Shaft material', Re: 'Hub yield strength Re',
                              col: ['', 'min interf.', 'max interf.'], rows: ['Interference', 'Contact pressure', 'Assembly force (press)', 'Transmissible torque', 'Hub hoop stress (bore edge)', 'Hub equivalent stress (von Mises)'], dT: 'Shrink fit: heat the hub by about', warn: 'The hub equivalent stress (von Mises) exceeds the yield strength: the hub deforms permanently. Reduce the interference or increase the hub thickness.', brittle: 'Cast-iron hub: brittle material, comparing with Re is not enough; check against the tensile strength with a safety factor.', hot: 'Above about {T} °C the hub material is damaged (steel: tempering; aluminium: loses strength): consider cooling the shaft (dry ice, liquid nitrogen) or a smaller interference.', alpha: 'with hub α = {a}·10⁻⁶/K and 1 µm/mm insertion clearance',
                              note: 'Elastic thick-cylinder model (Lamé), plane stress, uniform pressure, hub and shaft of equal length (no edge effects), same μ for assembly and torque; no thermal effects, hollow shaft not checked. Roughness: asperity flattening lowers the interference by ≈ 0.8·(Rz hub + Rz shaft), subtracted only if you enter the Rz values (at 0 the calculation uses the nominal value, more optimistic). Indicative values to size the press: for an important fit the designer\'s calculation prevails.' };
     var imin = Math.max(0, f.intMin || 0), imax = f.intMax, a = pressCalc(D, imin, q), b = pressCalc(D, imax, q);
@@ -716,10 +719,11 @@ var TolISO = (function () {
     h += '<tr><td>' + L2.rows[0] + '</td><td>' + umAbs(imin) + ' µm</td><td>' + umAbs(imax) + ' µm</td></tr>';
     if (q.Rzh + q.Rza > 0) h += '<tr><td>' + L2.eff + '</td><td>' + n1(a.dEff) + ' µm</td><td>' + n1(b.dEff) + ' µm</td></tr>';
     h += '<tr><td>' + L2.rows[1] + '</td><td><b>' + n1(a.p) + '</b> MPa</td><td><b>' + n1(b.p) + '</b> MPa</td></tr>';
-    h += '<tr><td>' + L2.rows[2] + '</td><td><b>' + n2(a.F / 1000) + '</b> kN</td><td><b>' + n2(b.F / 1000) + '</b> kN</td></tr>';
+    h += '<tr><td>' + L2.rows[2] + '</td><td><b>' + n2(a.F / 1000) + '</b> kN<br>≈ ' + n2(a.tf) + ' t</td><td><b>' + n2(b.F / 1000) + '</b> kN<br>≈ ' + n2(b.tf) + ' t</td></tr>';
     h += '<tr><td>' + L2.rows[3] + '</td><td>' + n1(a.M / 1000) + ' N·m</td><td>' + n1(b.M / 1000) + ' N·m</td></tr>';
     h += '<tr><td>' + L2.rows[4] + '</td><td>' + n1(a.sig) + ' MPa</td><td>' + n1(b.sig) + ' MPa</td></tr>';
     h += '<tr><td>' + L2.rows[5] + '</td><td><b>' + n1(a.sigVM) + '</b> MPa</td><td><b>' + n1(b.sigVM) + '</b> MPa</td></tr></table>';
+    if (q.di > 0) h += '<div class="note">' + L2.close.replace('{a}', n1(a.closeUm)).replace('{b}', n1(b.closeUm)) + '</div>';
     var M0 = MAT[press.mh] || MAT.steel, alpha = M0.a, dT = (imax / 1000 + 0.001 * D) / (alpha * D);
     h += '<div class="note">' + L2.dT + ' <b>' + Math.round(dT) + ' °C</b> (' + L2.alpha.replace('{a}', num(alpha * 1e6, 1)) + ').</div>';
     if (dT > M0.Tmax) h += '<div class="warn">' + L2.hot.replace('{T}', M0.Tmax) + '</div>';
@@ -1963,6 +1967,11 @@ var TolISO = (function () {
     ['Rzh', 'Rza'].forEach(function (k, i) { var e = $('tol-press-det').querySelector('[data-press="' + k + '"]'); e.value = i ? '2,5' : '4'; e.dispatchEvent(new Event('change', { bubbles: true })); });
     ck('forzato: Rz 4 + 2,5 → riga «Interferenza efficace» 21,8 µm e pressione più bassa di 83,0', press.Rzh === 4 && press.Rza === 2.5 && /Interferenza efficace[^]*21,8 µm/.test($('tol-press-det').textContent) && !/83,0/.test($('tol-press-det').textContent));
     pressPreset({ Rzh: 0, Rza: 0 }); render();
+    ck('forzato: riga forza con tonnellate «≈ 1,66 t»', /16,30 kN\s*≈ 1,66 t/.test($('tol-press-det').textContent));
+    ck('forzato: albero pieno → nessuna nota di chiusura del foro', !/si chiude di/.test($('tol-press-det').textContent));
+    pressPreset({ di: 15 }); render();
+    ck('forzato: boccola Ø interno 15 → nota «il foro interno si chiude di … µm»', /si chiude di [\d,]+…[\d,]+ µm/.test($('tol-press-det').textContent));
+    pressPreset({ di: 0 }); render();
     var deIn = $('tol-press-det').querySelector('[data-press="De"]'); deIn.value = '100'; deIn.dispatchEvent(new Event('change', { bubbles: true }));
     ck('forzato: cambio Ø esterno mozzo → pressione più alta e scheda aperta', press.De === 100 && $('tol-press-det').open && !/83,0/.test($('tol-press-det').textContent));
     pressPreset({ De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null, open: false });
@@ -2457,6 +2466,17 @@ var TolISO = (function () {
       ck('foto: H7/p6 albero max sopra foro min → interferenza', gp.ySmax < gp.yHmin && g.ySmax > g.yHmin);
       ck('foto: senza albero, albero a scala 1', Math.abs(photoLayout(H, null, 25).shaftScale - 1) < 1e-9);
     })();
+    /* 9k. v5.4: forza in tonnellate-forza e chiusura del foro della boccola */
+    (function () {
+      var q = { De: 50, di: 0, L: 25, mu: 0.10, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }, a = pressCalc(25, 27, q);
+      ck('t: 16,30 kN = 1,662 t (1 t = 9806,65 N)', Math.abs(a.tf - a.F / 9806.65) < 1e-12 && Math.abs(a.tf - 1.662) < 0.001);
+      ck('boccola: albero pieno → chiusura 0', a.closeUm === 0);
+      var c = pressCalc(40, 50, { De: 100, di: 30, L: 40, mu: 0.1, Eh: 210000, nuh: 0.3, Es: 210000, nus: 0.3 });
+      /* controllo indipendente con gli spostamenti di Lamé: u(a) = 2·a·A/E, A = −p·b²/(b²−a²) */
+      var aa = 15, bb = 20, A = -c.p * bb * bb / (bb * bb - aa * aa), clos = Math.abs(2 * (2 * aa * A / 210000)) * 1000;
+      ck('boccola: chiusura del foro = Lamé indipendente (' + clos.toFixed(2) + ' µm)', Math.abs(c.closeUm - clos) < 1e-9 && c.closeUm > 0);
+      ck('boccola: più parete → chiusura minore, a parità di p il foro grande si chiude di più', pressCalc(40, 50, { De: 100, di: 20, L: 40, mu: 0.1, Eh: 210000, nuh: 0.3, Es: 210000, nus: 0.3 }).closeUm / pressCalc(40, 50, { De: 100, di: 20, L: 40, mu: 0.1, Eh: 210000, nuh: 0.3, Es: 210000, nus: 0.3 }).p < c.closeUm / c.p);
+    })();
     /* 9j. v5.3: rugosità Rz nel forzato — interferenza efficace = nominale − 0,8·(Rzh+Rza) */
     (function () {
       var q = { De: 50, di: 0, L: 25, mu: 0.10, Eh: 205000, nuh: 0.29, Es: 205000, nus: 0.29 }, a0 = pressCalc(25, 27, q);
@@ -2577,7 +2597,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.3', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.4', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
