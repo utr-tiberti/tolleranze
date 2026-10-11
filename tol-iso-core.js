@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_4.9.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_5.0.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -801,12 +801,13 @@ var TolISO = (function () {
   }
 
   /* ── RAPPORTO DI CONTROLLO (v4.0): dati del pezzo + quota, limiti, misura, esito. Testo (WhatsApp), anteprima, stampa A4 solo del rapporto. ── */
-  var rep = { pezzo: '', disegno: '', operatore: '', data: '', note: '', strumento: '', U: '', temp: '', open: false };
-  var RL = { it: { title: 'RAPPORTO DI CONTROLLO', pezzo: 'Pezzo', disegno: 'Disegno', op: 'Operatore', data: 'Data', note: 'Note', quota: 'Quota', lim: 'Limiti', mis: 'Misura', ctl: 'Controllo', esito: 'ESITO', ok: 'CONFORME', ko: 'NON CONFORME', fitq: 'Accoppiamento', gap: 'Gioco effettivo', itf: 'Interferenza effettiva', teo: 'teorico', pair: 'Coppia', sign: 'Firma operatore', sign2: 'Visto', needM: 'Scrivi prima la misura nel campo «misurato», poi tocca Rapporto.', needF: 'Scrivi prima le misure di foro e albero nel Collaudo, poi tocca Rapporto.', needQ: 'Prima imposta un Ø e una classe di tolleranza.', badM: 'La misura scritta non è valida: correggila (solo il numero in mm), poi tocca Rapporto.', strum: 'Strumento', U: 'Incertezza U estesa (k = 2)', temp: 'Temperatura (annotata)', unc: 'NON DECIDIBILE (entro l\'incertezza)', local: 'da due misure locali', ruleL: 'Regola decisionale', rule0: 'confronto diretto della misura con i limiti; incertezza di misura non considerata (per ISO 14253-1 scrivere U)', ruleU: 'ISO 14253-1 con U = {U} µm: conforme se dentro i limiti di almeno U, non conforme se fuori di almeno U, altrimenti non decidibile', foot: 'Limiti secondo ISO 286-1:2010 e ISO 286-2:2010, a 20 °C (ISO 1); il modulo è confrontato con tabelle di costruttori (Talide, Walter, EVO: 2930 caselle, 0 errori), non con il testo di ISO 286-2. Strumento di consultazione: per il collaudo fa fede la norma. Non copre ISO 2768, quote con scostamenti numerici (±), requisito d\'inviluppo Ⓔ, pollici. App realizzata da NextCore AI Department per UTR Tiberti · utr-tiberti.github.io/tolleranze' },
-             en: { title: 'INSPECTION REPORT', pezzo: 'Part', disegno: 'Drawing', op: 'Inspector', data: 'Date', note: 'Notes', quota: 'Dimension', lim: 'Limits', mis: 'Reading', ctl: 'Check', esito: 'RESULT', ok: 'PASS', ko: 'FAIL', fitq: 'Fit', gap: 'Actual clearance', itf: 'Actual interference', teo: 'theoretical', pair: 'Pair', sign: 'Inspector signature', sign2: 'Approved', needM: 'Type the reading into the «measured» field first, then tap Report.', needF: 'Enter the hole and shaft readings in Inspection first, then tap Report.', needQ: 'Set a Ø and a tolerance class first.', badM: 'The reading entered is not valid: correct it (only the number in mm), then tap Report.', strum: 'Instrument', U: 'Expanded uncertainty U (k = 2)', temp: 'Temperature (noted)', unc: 'UNDECIDED (within the uncertainty)', local: 'from two local readings', ruleL: 'Decision rule', rule0: 'direct comparison of the reading with the limits; measurement uncertainty not considered (enter U for ISO 14253-1)', ruleU: 'ISO 14253-1 with U = {U} µm: pass if inside the limits by at least U, fail if outside by at least U, otherwise undecided', foot: 'Limits per ISO 286-1:2010 and ISO 286-2:2010, at 20 °C (ISO 1); the module is compared with manufacturers\' tables (Talide, Walter, EVO: 2930 cells, 0 errors), not with the text of ISO 286-2. Reference tool: the standard prevails for inspection. Does not cover ISO 2768, dimensions with numeric deviations (±), envelope requirement Ⓔ, inches. App built by NextCore AI Department for UTR Tiberti · utr-tiberti.github.io/tolleranze' } };
+  var rep = { pezzo: '', disegno: '', operatore: '', data: '', note: '', strumento: '', U: '', temp: '', cliente: '', ordine: '', lotto: '', qta: '', rev: '', taratura: '', open: false };
+  var REP_KEEP = ['pezzo', 'disegno', 'operatore', 'note', 'strumento', 'U', 'cliente', 'ordine', 'lotto', 'qta', 'rev', 'taratura'];   /* v5.0: tutto salvato tranne data e temperatura */
+  var RL = { it: { title: 'RAPPORTO DI CONTROLLO', pezzo: 'Pezzo', disegno: 'Disegno', op: 'Operatore', data: 'Data', note: 'Note', quota: 'Quota', lim: 'Limiti', mis: 'Misura', ctl: 'Controllo', esito: 'ESITO', ok: 'CONFORME', ko: 'NON CONFORME', fitq: 'Accoppiamento', gap: 'Gioco effettivo', itf: 'Interferenza effettiva', teo: 'teorico', pair: 'Coppia', sign: 'Firma operatore', sign2: 'Visto', needM: 'Scrivi prima la misura nel campo «misurato», poi tocca Rapporto.', needF: 'Scrivi prima le misure di foro e albero nel Collaudo, poi tocca Rapporto.', needQ: 'Prima imposta un Ø e una classe di tolleranza.', badM: 'La misura scritta non è valida: correggila (solo il numero in mm), poi tocca Rapporto.', strum: 'Strumento', U: 'Incertezza U estesa (k = 2)', temp: 'Temperatura (annotata)', cliente: 'Cliente', ordine: 'Ordine', lotto: 'Lotto / matricola', qta: 'Quantità', rev: 'rev.', cal: 'Taratura valida fino al', pcs: 'Pezzi', piece: 'Pezzo', stats: 'Statistica', lotOk: 'LOTTO CONFORME', lotKo: 'LOTTO NON CONFORME', lotUnc: 'LOTTO NON DECIDIBILE', out: 'fuori', undec: 'non decidibili', badLot: 'Nel lotto c\'è una misura non valida (in rosso): correggila o toglila, poi tocca Rapporto.', min: 'min', max: 'max', mean: 'media', range: 'campo', nomdev: 'dal nominale', unc: 'NON DECIDIBILE (entro l\'incertezza)', local: 'da due misure locali', ruleL: 'Regola decisionale', rule0: 'confronto diretto della misura con i limiti; incertezza di misura non considerata (per ISO 14253-1 scrivere U)', ruleU: 'ISO 14253-1 con U = {U} µm: conforme se dentro i limiti di almeno U, non conforme se fuori di almeno U, altrimenti non decidibile', foot: 'Limiti secondo ISO 286-1:2010 e ISO 286-2:2010, a 20 °C (ISO 1); il modulo è confrontato con tabelle di costruttori (Talide, Walter, EVO: 2930 caselle, 0 errori), non con il testo di ISO 286-2. Strumento di consultazione: per il collaudo fa fede la norma. Non copre ISO 2768, quote con scostamenti numerici (±), requisito d\'inviluppo Ⓔ, pollici. App realizzata da NextCore AI Department per UTR Tiberti · utr-tiberti.github.io/tolleranze' },
+             en: { title: 'INSPECTION REPORT', pezzo: 'Part', disegno: 'Drawing', op: 'Inspector', data: 'Date', note: 'Notes', quota: 'Dimension', lim: 'Limits', mis: 'Reading', ctl: 'Check', esito: 'RESULT', ok: 'PASS', ko: 'FAIL', fitq: 'Fit', gap: 'Actual clearance', itf: 'Actual interference', teo: 'theoretical', pair: 'Pair', sign: 'Inspector signature', sign2: 'Approved', needM: 'Type the reading into the «measured» field first, then tap Report.', needF: 'Enter the hole and shaft readings in Inspection first, then tap Report.', needQ: 'Set a Ø and a tolerance class first.', badM: 'The reading entered is not valid: correct it (only the number in mm), then tap Report.', strum: 'Instrument', U: 'Expanded uncertainty U (k = 2)', temp: 'Temperature (noted)', cliente: 'Customer', ordine: 'Order', lotto: 'Lot / serial no.', qta: 'Quantity', rev: 'rev.', cal: 'Calibration due', pcs: 'Parts', piece: 'Part', stats: 'Statistics', lotOk: 'BATCH PASS', lotKo: 'BATCH FAIL', lotUnc: 'BATCH UNDECIDED', out: 'out', undec: 'undecided', badLot: 'The batch contains an invalid reading (in red): correct or remove it, then tap Report.', min: 'min', max: 'max', mean: 'mean', range: 'range', nomdev: 'from nominal', unc: 'UNDECIDED (within the uncertainty)', local: 'from two local readings', ruleL: 'Decision rule', rule0: 'direct comparison of the reading with the limits; measurement uncertainty not considered (enter U for ISO 14253-1)', ruleU: 'ISO 14253-1 with U = {U} µm: pass if inside the limits by at least U, fail if outside by at least U, otherwise undecided', foot: 'Limits per ISO 286-1:2010 and ISO 286-2:2010, at 20 °C (ISO 1); the module is compared with manufacturers\' tables (Talide, Walter, EVO: 2930 cells, 0 errors), not with the text of ISO 286-2. Reference tool: the standard prevails for inspection. Does not cover ISO 2768, dimensions with numeric deviations (±), envelope requirement Ⓔ, inches. App built by NextCore AI Department for UTR Tiberti · utr-tiberti.github.io/tolleranze' } };
   function rl(k) { return RL[lang][k]; }
-  function loadRep() { try { var r = JSON.parse(localStorage.getItem('tolIso.rep') || 'null'); if (r) { rep.pezzo = r.pezzo || ''; rep.disegno = r.disegno || ''; rep.operatore = r.operatore || ''; rep.note = r.note || ''; rep.strumento = r.strumento || ''; rep.U = r.U || ''; } } catch (e) {} }
-  function saveRep() { try { localStorage.setItem('tolIso.rep', JSON.stringify({ pezzo: rep.pezzo, disegno: rep.disegno, operatore: rep.operatore, note: rep.note, strumento: rep.strumento, U: rep.U })); } catch (e) {} }
+  function loadRep() { try { var r = JSON.parse(localStorage.getItem('tolIso.rep') || 'null'); if (r) REP_KEEP.forEach(function (k) { rep[k] = r[k] || ''; }); } catch (e) {} }
+  function saveRep() { try { var o = {}; REP_KEEP.forEach(function (k) { o[k] = rep[k]; }); localStorage.setItem('tolIso.rep', JSON.stringify(o)); } catch (e) {} }
   function todayStr() { var d = new Date(), dd = ('0' + d.getDate()).slice(-2), mm = ('0' + (d.getMonth() + 1)).slice(-2), y = d.getFullYear(); return lang === 'en' ? (y + '-' + mm + '-' + dd) : (dd + '/' + mm + '/' + y); }   /* v4.9: IT gg/mm/aaaa, EN ISO 8601; la stampa usa la stessa data del campo */
   function fitTypeTxt(f) { return f.type === 'clearance' ? t('clearance') : (f.type === 'interference' ? t('interference') : t('transition')); }
   function fitTeoTxt(f) { return f.type === 'clearance' ? (umAbs(f.clrMin) + '…' + umAbs(f.clrMax) + ' µm ' + tu('clr')) : (f.type === 'interference' ? (umAbs(f.intMin) + '…' + umAbs(f.intMax) + ' µm ' + tu('itf')) : (tu('clr') + ' ≤ ' + umAbs(f.clrMax) + ' · ' + tu('itf') + ' ≤ ' + umAbs(f.intMax) + ' µm')); }
@@ -835,10 +836,26 @@ var TolISO = (function () {
   function reportData() {
     var st = getState(); if (!(st.D > 0 && st.D <= 500)) return { err: 'needQ' };
     var U = repU();
-    var head = [[rl('pezzo'), rep.pezzo], [rl('disegno'), rep.disegno], [rl('data'), rep.data || todayStr()], [rl('op'), rep.operatore],
-                [rl('strum'), rep.strumento], [rl('U'), U > 0 ? umAbs(U) + ' µm' : ''], [rl('temp'), rep.temp ? rep.temp + ' °C' : '']];
-    var rows = [], zone, verdict;
-    if (tab !== 'fit') {
+    var useLot = tab !== 'fit' && lot.m.length > 0 && lot.q && lot.q === lotQuota();
+    var head = [[rl('pezzo'), rep.pezzo], [rl('disegno'), rep.disegno + (rep.rev ? ' ' + rl('rev') + ' ' + rep.rev : '')]];
+    if (rep.cliente) head.push([rl('cliente'), rep.cliente]); if (rep.ordine) head.push([rl('ordine'), rep.ordine]); if (rep.lotto) head.push([rl('lotto'), rep.lotto]);
+    if (rep.qta || useLot) head.push([rl('qta'), rep.qta || String(lot.m.length)]);
+    head.push([rl('data'), rep.data || todayStr()], [rl('op'), rep.operatore], [rl('strum'), rep.strumento]);
+    if (rep.taratura) head.push([rl('cal'), rep.taratura]);
+    head.push([rl('U'), U > 0 ? umAbs(U) + ' µm' : ''], [rl('temp'), rep.temp ? rep.temp + ' °C' : '']);
+    var rows = [], zone, verdict, lotOut = null;
+    if (useLot) {
+      /* v5.0: rapporto di lotto: quota, limiti, una riga per pezzo, statistica, esito del lotto */
+      var ol = lotLimits(); if (!ol) return { err: 'needQ' };
+      var ls = lotStats(ol, U); if (ls.nBad) return { err: 'badLot' };
+      var pl0 = partLines(ol, ls.rows[0].v, ls.rows[0].txt), halfL = isHalf(ol);
+      rows.push(pl0.rows[0], pl0.rows[1]);
+      rows.push([rl('pcs'), ls.n + ' · ' + ls.nOk + ' ' + lt('ok') + ' · ' + ls.nKo + ' ' + lt('ko') + (ls.nUnc ? ' · ' + ls.nUnc + ' ' + lt('unc') : '')]);
+      ls.rows.forEach(function (r) { rows.push([rl('piece') + ' ' + (r.i + 1), r.txt + ' mm · ' + devPctTxt(r.c).split(' · ')[0] + ' · ' + zoneTxt(r.z)]); });
+      rows.push([rl('stats'), rl('min') + ' ' + mm(ls.st.min, halfL) + ' · ' + rl('max') + ' ' + mm(ls.st.max, halfL) + ' · ' + rl('mean') + ' ' + mm(ls.st.mean, true) + ' mm · ' + rl('range') + ' ' + umAbs(ls.st.range) + ' µm']);
+      zone = ls.zone; verdict = (zone === 'ok' ? rl('lotOk') : (zone === 'ko' ? rl('lotKo') : rl('lotUnc'))) + (zone === 'ok' ? '' : ' — ' + lotOutList(ls));
+      lotOut = { ls: ls, o: ol, half: halfL };
+    } else if (tab !== 'fit') {
       var cur = st[side]; if (!cur) return { err: 'needQ' };
       var o = limits(side, cur.letter, cur.grade, st.D); if (!o.ok) return { err: 'needQ' };
       var mq = measState(); if (mq.bad) return { err: 'badM' }; var m = mq.v === undefined ? null : mq.v; if (m === null) return { err: 'needM' };
@@ -861,7 +878,7 @@ var TolISO = (function () {
       verdict = zoneTxt(zone) + (zone === 'ok' ? '' : ' — ' + which(zone));
     }
     rows.push([rl('ruleL'), U > 0 ? rl('ruleU').replace('{U}', umAbs(U)) : rl('rule0')]);
-    return { head: head, rows: rows, ok: zone === 'ok', cls: zone, verdict: verdict, note: rep.note };
+    return { head: head, rows: rows, ok: zone === 'ok', cls: zone, verdict: verdict, note: rep.note, lot: lotOut };
   }
   function reportText(d) {
     var L = [rl('title') + ' — UTR Tiberti · Tolleranze ISO 286 v' + API.version];
@@ -880,7 +897,13 @@ var TolISO = (function () {
     h += '<div class="esito ' + d.cls + '">' + rl('esito') + ': ' + esc(d.verdict) + '</div>';
     $('tol-rep-prev').innerHTML = h;
     var ph = '<h2>' + rl('title') + '</h2><table>' + d.head.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1] || '') + '</td></tr>'; }).join('') + '</table>';
-    ph += '<table>' + d.rows.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</table>';
+    var pieceLbl = rl('piece') + ' ';
+    ph += '<table>' + d.rows.filter(function (r) { return !(d.lot && r[0].indexOf(pieceLbl) === 0); }).map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</table>';
+    if (d.lot) {   /* v5.0: una riga per pezzo, in tabella */
+      ph += '<table class="lot"><tr><th>' + (lang === 'en' ? 'No.' : 'N.') + '</th><th>' + rl('mis') + ' (mm)</th><th>' + rl('nomdev') + '</th><th>' + tu('mFromMin') + ' / ' + tu('mFromMax') + '</th><th>' + rl('esito') + '</th></tr>';
+      d.lot.ls.rows.forEach(function (r) { ph += '<tr><td>' + (r.i + 1) + '</td><td>' + esc(r.txt) + '</td><td>' + esc(devPctTxt(r.c).split(' · ')[0].replace(' ' + tu('mDev'), '')) + '</td><td>' + sgn(r.c.toMin) + ' / ' + sgn(r.c.toMax) + ' µm</td><td>' + zoneTxt(r.z) + '</td></tr>'; });
+      ph += '</table>';
+    }
     ph += '<div class="esito ' + d.cls + '">' + rl('esito') + ': ' + esc(d.verdict) + '</div>';
     if (d.note) ph += '<p><b>' + rl('note') + ':</b> ' + esc(d.note) + '</p>';
     ph += '<div class="sign"><div>' + rl('sign') + '</div><div>' + rl('sign2') + '</div></div><div class="foot">' + rl('foot') + '</div>';
@@ -894,6 +917,75 @@ var TolISO = (function () {
     Array.prototype.forEach.call($('tol-rep').querySelectorAll('[data-rep]'), function (i) { i.value = rep[i.getAttribute('data-rep')] || ''; });
     rep.open = true; renderRep();
     try { $('tol-rep').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+    return true;
+  }
+
+  /* ── LOTTO (v5.0): più pezzi della stessa quota (FORO/ALBERO). Le misure restano scritte come battute (tolIso.lot) e sono legate alla
+        quota (lot.q = «20 H7»): su un'altra quota il riquadro lo dice e offre «Nuovo lotto». Statistica su quelle valide; una misura non valida
+        blocca il Rapporto finché non è corretta. ── */
+  var lot = { q: '', m: [], open: false };
+  var LT = { it: { title: 'LOTTO', lbl: 'Misure dei pezzi <span>una per riga o separate da spazio, in mm</span>', empty: 'Nessuna misura ancora: scrivile qui sopra e tocca «Aggiungi al lotto», oppure dopo ogni pezzo scrivi la misura in alto e tocca «+ Lotto».', other: 'Lotto aperto per {q}; la quota attuale è {c}.', newFor: 'Nuovo lotto per {c}', report: 'Il Rapporto ora stampa tutto il lotto.', inval: 'non valida', nPcs: 'pezzi', ok: 'conformi', ko: 'non conformi', unc: 'non decidibili' },
+             en: { title: 'BATCH', lbl: 'Readings of the parts <span>one per line or space-separated, in mm</span>', empty: 'No readings yet: type them above and tap «Add to batch», or after each part type the reading at the top and tap «+ Batch».', other: 'Batch open for {q}; the current dimension is {c}.', newFor: 'New batch for {c}', report: 'The Report now prints the whole batch.', inval: 'invalid', nPcs: 'parts', ok: 'pass', ko: 'fail', unc: 'undecided' } };
+  function lt(k) { return LT[lang][k]; }
+  function loadLot() { try { var r = JSON.parse(localStorage.getItem('tolIso.lot') || 'null'); if (r && Array.isArray(r.m)) { lot.q = String(r.q || ''); lot.m = r.m.map(String).slice(0, 500); } } catch (e) {} }
+  function saveLot() { try { localStorage.setItem('tolIso.lot', JSON.stringify({ q: lot.q, m: lot.m })); } catch (e) {} }
+  function lotQuota() { return tab === 'fit' ? null : currentQuota(); }
+  function lotLimits() { var pq = lot.q ? parse(lot.q) : null; if (!pq) return null; var c = pq.hole || pq.shaft; if (!c) return null; var o = limits(c.kind, c.letter, c.grade, pq.D); return o.ok ? o : null; }
+  /* aggiunge una o più misure (testo libero: «20,006 20,012» o righe). Ritorna quante ne ha aggiunte; 0 se la quota non è valida o non coincide. */
+  function lotAdd(raw, q) {
+    q = q || lotQuota(); if (!q) return 0;
+    if (lot.q && lot.q !== q && lot.m.length) return 0;
+    var toks = String(raw || '').split(/[\s;]+/).filter(function (x) { return x !== ''; }); if (!toks.length) return 0;
+    lot.q = q; lot.m = lot.m.concat(toks).slice(0, 500); saveLot(); return toks.length;
+  }
+  function lotDel(i) { lot.m.splice(i, 1); if (!lot.m.length) lot.q = ''; saveLot(); }
+  function lotClear() { lot.m = []; lot.q = ''; saveLot(); }
+  /* righe e statistica del lotto rispetto ai limiti o (di solito lotLimits()) e all'incertezza U del rapporto */
+  function lotStats(o, U) {
+    var rows = [], vals = [], nOk = 0, nKo = 0, nUnc = 0, nBad = 0;
+    lot.m.forEach(function (raw, i) {
+      var q = measParse(raw, o.D);
+      if (q.bad || q.v === undefined) { nBad++; rows.push({ i: i, raw: raw, bad: true }); return; }
+      var c = checkMeasure(o, q.v), z = decide(c, U || 0); vals.push(q.v);
+      if (z === 'ok') nOk++; else if (z === 'ko') nKo++; else nUnc++;
+      rows.push({ i: i, raw: raw, v: q.v, txt: q.txt || num(q.v, 3), c: c, z: z });
+    });
+    var st = null;
+    if (vals.length) { var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals), mean = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      st = { min: mn, max: mx, mean: Math.round(mean * 1e5) / 1e5, range: r1((mx - mn) * 1000) }; }
+    return { rows: rows, n: lot.m.length, nVal: vals.length, nOk: nOk, nKo: nKo, nUnc: nUnc, nBad: nBad, st: st, zone: nKo > 0 ? 'ko' : (nUnc > 0 ? 'unc' : 'ok') };
+  }
+  function sgn(v) { return (v < 0 ? '−' : '') + umAbs(Math.abs(v)); }   /* segno meno tipografico anche nella tabella del lotto */
+  function lotOutList(ls) { return ls.rows.filter(function (r) { return !r.bad && r.z !== 'ok'; }).map(function (r) { return 'n. ' + (r.i + 1) + ' (' + r.txt + ')'; }).join(', '); }
+  function renderLot() {
+    var box = $('tol-lot'); if (!box) return;
+    if (!lot.open) { box.hidden = true; return; }
+    var cq = lotQuota(), o = lotLimits(), h = '';
+    $('tol-lot-ttl').textContent = lt('title') + (lot.q ? ' · ' + lot.q : (cq ? ' · ' + cq : ''));
+    $('tol-lot-lbl').innerHTML = lt('lbl');
+    if (lot.q && cq && lot.q !== cq) h += '<div class="esito unc">' + esc(lt('other').replace('{q}', lot.q).replace('{c}', cq)) + ' <button type="button" class="tol-chip" id="tol-lot-new">' + esc(lt('newFor').replace('{c}', cq)) + '</button></div>';
+    if (!lot.m.length || !o) { $('tol-lot-prev').innerHTML = h + '<div class="tol-hint">' + lt('empty') + '</div>'; box.hidden = false; return; }
+    var ls = lotStats(o, repU()), half = isHalf(o);
+    h += '<table>';
+    ls.rows.forEach(function (r) {
+      if (r.bad) { h += '<tr><td class="n">' + (r.i + 1) + '</td><td class="bad">' + esc(r.raw) + ' — ' + lt('inval') + '</td><td></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>'; return; }
+      h += '<tr><td class="n">' + (r.i + 1) + '</td><td><b>' + esc(r.txt) + '</b> mm</td><td class="' + r.z + '">' + zoneTxt(r.z) + ' <small style="font-weight:400;color:var(--text-faint)">' + esc(devPctTxt(r.c).split(' · ')[0]) + '</small></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>';
+    });
+    h += '</table>';
+    if (ls.st) h += '<div class="stats"><b>' + ls.n + '</b> ' + lt('nPcs') + ' · <b>' + ls.nOk + '</b> ' + lt('ok') + ' · <b>' + ls.nKo + '</b> ' + lt('ko') + (ls.nUnc ? ' · <b>' + ls.nUnc + '</b> ' + lt('unc') : '') + (ls.nBad ? ' · <b>' + ls.nBad + '</b> ' + lt('inval') : '') + '<br>' +
+                     rl('min') + ' <b>' + mm(ls.st.min, half) + '</b> · ' + rl('max') + ' <b>' + mm(ls.st.max, half) + '</b> · ' + rl('mean') + ' <b>' + mm(ls.st.mean, true) + '</b> mm · ' + rl('range') + ' <b>' + umAbs(ls.st.range) + ' µm</b> · ' + rl('lim') + ' ' + mm(o.min, half) + ' / ' + mm(o.max, half) + ' mm</div>';
+    h += '<div class="esito ' + ls.zone + '">' + (ls.zone === 'ok' ? rl('lotOk') : (ls.zone === 'ko' ? rl('lotKo') : rl('lotUnc'))) + (ls.zone === 'ok' ? '' : ' — ' + lotOutList(ls)) + '</div>';
+    h += '<div class="tol-hint" style="margin-top:6px">' + lt('report') + '</div>';
+    $('tol-lot-prev').innerHTML = h; box.hidden = false;
+  }
+  function openLot(addCurrent) {
+    var cq = lotQuota(); if (!cq) { showAlert(rl('needQ')); return false; }
+    if (addCurrent) {
+      var mq = measState();
+      if (mq.v !== undefined && !mq.bad) { if (lot.q && lot.q !== cq && lot.m.length) { /* quota diversa: il riquadro lo spiega */ } else { lotAdd(String($('tol-m').value).trim(), cq); $('tol-m').value = ''; } }
+    }
+    lot.open = true; renderLot(); render();
+    try { $('tol-lot').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
     return true;
   }
 
@@ -1398,7 +1490,7 @@ var TolISO = (function () {
       var cur = st[k] ? st[k].letter + st[k].grade : '';
       Array.prototype.forEach.call($('tol-' + (k === 'hole' ? 'h' : 's') + '-chips').children, function (b) { b.classList.toggle('on', b.getAttribute('data-cls') === cur); });
     });
-    renderBand(st); markTable(st); renderSummary(st); buildFits(); if (tab === 'fit') buildFinder(); renderRep(); renderGlossAns();
+    renderBand(st); markTable(st); renderSummary(st); buildFits(); if (tab === 'fit') buildFinder(); renderLot(); renderRep(); renderGlossAns();
     saveState();
   }
 
@@ -1476,7 +1568,7 @@ var TolISO = (function () {
       else { $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     } catch (e) { $('tol-h-let').value = 'H'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     Array.prototype.forEach.call($('tol-filter').children, function (b) { b.classList.toggle('on', b.getAttribute('data-filter') === filter); });
-    loadRecent(); renderRecent(); loadFav(); renderFav(); loadRep(); preloadPhoto();
+    loadRecent(); renderRecent(); loadFav(); renderFav(); loadRep(); loadLot(); preloadPhoto();
     try { if (window.matchMedia && window.matchMedia('(min-width: 900px)').matches) $('tol-fits-det').open = true; } catch (e) {}
     setTab(tab); buildItTable(); renderProv(); buildFinder(); buildGloss();
     $('tol-gloss-q').addEventListener('input', renderGlossAns);
@@ -1512,7 +1604,7 @@ var TolISO = (function () {
     $('tol-d').addEventListener('keydown', function (e) { if (e.key === 'Enter') applyD(); });
     $('tol-d').addEventListener('change', applyD);
     ['input', 'change'].forEach(function (ev) { $('tol-m').addEventListener(ev, render); });
-    $('tol-m').addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
+    $('tol-m').addEventListener('keydown', function (e) { if (e.key === 'Enter') { if (lot.open && lotQuota()) { openLot(true); } this.blur(); } });   /* v5.0: con il lotto aperto, Invio = «+ Lotto» */
     /* v4.8: schermo basso (telefono in orizzontale o tastiera aperta): mentre si scrive nei due campi in alto la barra in basso
        non li copre; torna con Invio o uscendo dal campo */
     ['tol-d', 'tol-m'].forEach(function (id) {
@@ -1553,13 +1645,19 @@ var TolISO = (function () {
     $('tol-find-sort').addEventListener('change', function () { finder.sort = this.value; finder.all = false; buildFinder(); });
     root.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'tol-find-det') buildFinder(); if (e.target && e.target.id === 'tol-press-det') press.open = e.target.open; if (e.target && e.target.id === 'tol-insp-det') insp.open = e.target.open; }, true);
     root.addEventListener('click', function (e) {
-      var el = e.target.closest ? e.target.closest('[data-cls],[data-tab],[data-filter],[data-band],[data-copy],[data-share],[data-quick],[data-fit],[data-favdel],[data-recdel],[data-ft],[data-findmore],#tol-sum-gloss,#tol-fav-btn,#tol-sheet-btn,#tol-rep-btn,#tol-sum-rep,#tol-rep-close,#tol-rep-print,#tol-rep-share,#tol-rep-copy') : null;
+      var el = e.target.closest ? e.target.closest('[data-cls],[data-tab],[data-filter],[data-band],[data-copy],[data-share],[data-quick],[data-fit],[data-favdel],[data-recdel],[data-ft],[data-findmore],[data-lotdel],#tol-sum-lot,#tol-lot-add,#tol-lot-clear,#tol-lot-close,#tol-lot-new,#tol-sum-gloss,#tol-fav-btn,#tol-sheet-btn,#tol-rep-btn,#tol-sum-rep,#tol-rep-close,#tol-rep-print,#tol-rep-share,#tol-rep-copy') : null;
       if (!el || !root.contains(el)) return;
       if (el.id === 'tol-fav-btn') { var q = currentQuota(); if (!q) { TolISO.showAlert(lang === 'it' ? 'Prima imposta un Ø e almeno una classe.' : 'Set a Ø and at least one class first.'); return; } var nm = window.prompt(lang === 'it' ? 'Nome del preferito (es. Perno pinza):' : 'Favourite name (e.g. Gripper pin):', q); if (nm !== null) addFav(nm, q); return; }
       if (el.hasAttribute('data-favdel')) { var fi0 = parseInt(el.getAttribute('data-favdel'), 10), f0 = fav[fi0]; if (f0 && window.confirm((lang === 'it' ? 'Eliminare il preferito «' : 'Delete favourite “') + f0.n + (lang === 'it' ? '»?' : '”?'))) delFav(fi0); return; }
       if (el.hasAttribute('data-recdel')) { delRecent(parseInt(el.getAttribute('data-recdel'), 10)); return; }
       if (el.hasAttribute('data-ft')) { finder.type = el.getAttribute('data-ft'); finder.all = false; buildFinder(); return; }
       if (el.hasAttribute('data-findmore')) { finder.all = !finder.all; buildFinder(); return; }
+      if (el.id === 'tol-sum-lot') { openLot(true); return; }
+      if (el.id === 'tol-lot-add') { var ta = $('tol-lot-in'), n0 = lotAdd(ta.value); if (n0) ta.value = ''; else if (!lotQuota()) showAlert(rl('needQ')); renderLot(); render(); return; }
+      if (el.hasAttribute('data-lotdel')) { lotDel(parseInt(el.getAttribute('data-lotdel'), 10)); renderLot(); render(); return; }
+      if (el.id === 'tol-lot-clear') { lotClear(); renderLot(); render(); return; }
+      if (el.id === 'tol-lot-new') { lotClear(); lot.q = lotQuota() || ''; renderLot(); render(); return; }
+      if (el.id === 'tol-lot-close') { lot.open = false; renderLot(); return; }
       if (el.id === 'tol-rep-btn' || el.id === 'tol-sum-rep') { openRep(); return; }
       if (el.id === 'tol-sum-gloss') { var stg = getState(), cg = stg[side]; openGloss(cg ? cg.letter + cg.grade : ''); return; }
       if (el.id === 'tol-rep-close') { rep.open = false; renderRep(); return; }
@@ -1595,7 +1693,7 @@ var TolISO = (function () {
     fillSelects(); rebuildTables(); buildItTable(); renderProv(); buildGloss(); render(); renderRecent(); renderFav();
     var mi = $('tol-m'); if (mi) mi.placeholder = mi.getAttribute('data-ph-' + lang) || mi.placeholder;
     Array.prototype.forEach.call(document.querySelectorAll('#tol-rep input[data-ph-it]'), function (i) { i.placeholder = i.getAttribute('data-ph-' + lang); });
-    renderRep();
+    renderLot(); renderRep();
   }
   function printLabel() { return side === 'hole' ? tu('printHole') : tu('printShaft'); }
   function getUI() { return { tab: tab, side: side, filter: filter, viewFi: viewFi, cols: colsFor(side) }; }
@@ -1809,7 +1907,7 @@ var TolISO = (function () {
     (function () {
       ck('glossario: scheda chiusa all\'avvio, tabelle e termini generati', !$('tol-acc-gloss').open && $('tol-gloss-body').querySelectorAll('table').length === 2 && $('tol-gloss-body').querySelectorAll('dt').length === GLOSS.terms.it.length && $('tol-gloss-body').querySelectorAll('table tr').length === GLOSS.letters.length + GLOSS.grades.length + 2);
       setTab('hole'); $('tol-d').value = '25'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; rebuildTables(); render();
-      ck('glossario: tasto del riepilogo dice «Cos\'è H7?»', $('tol-sum-gloss').textContent === 'Cos\'è H7?');
+      ck('glossario: tasto del riepilogo dice «Cos\'è H7?» (sul telefono «H7 ?»)', /^(Cos'è H7\?|H7 \?)$/.test($('tol-sum-gloss').textContent.trim()));
       $('tol-sum-gloss').click();
       ck('glossario: il tasto apre la scheda con H7 già scritto e spiegato coi numeri di Ø25', $('tol-acc-gloss').open && $('tol-gloss-q').value === 'H7' && /FORO BASE/.test($('tol-gloss-ans').textContent) && /25,021 mm/.test($('tol-gloss-ans').textContent));
       $('tol-gloss-q').value = 'k6'; $('tol-gloss-q').dispatchEvent(new Event('input'));
@@ -1819,6 +1917,45 @@ var TolISO = (function () {
       $('tol-gloss-q').value = 'xyz'; $('tol-gloss-q').dispatchEvent(new Event('input'));
       ck('glossario: classe sbagliata → messaggio', /Scrivi una classe|non riconosciuta/.test($('tol-gloss-ans').textContent));
       $('tol-gloss-q').value = ''; $('tol-gloss-q').dispatchEvent(new Event('input')); $('tol-acc-gloss').open = false; $('tol-d').value = '25'; render();
+    })();
+    /* 28. v5.0: lotto + campi del rapporto per il dossier */
+    (function () {
+      var keepLot = { q: lot.q, m: lot.m.slice() }, keepR = {}; REP_KEEP.forEach(function (k) { keepR[k] = rep[k]; });
+      lotClear(); setTab('hole'); $('tol-d').value = '20'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-m').value = ''; rebuildTables(); render();
+      ck('lotto: tasto «+ Lotto» nella barra', !!$('tol-sum-lot') && /Lotto/.test($('tol-sum-lot').textContent));
+      ck('lotto: aggiunta in blocco delle 10 misure di Andrei (spazi e a capo)', lotAdd('20,006 20,012 20,009\n20,021 20,019 20,003 20,015 20,010 20,008 20,022') === 10 && lot.q === '20 H7' && lot.m.length === 10);
+      var ls = lotStats(lotLimits(), 0);
+      ck('lotto: 9 conformi, 1 non conforme (n. 10 = 20,022), min 20,003, max 20,022, media 20,0125, campo 19 µm', ls.nOk === 9 && ls.nKo === 1 && ls.rows[9].z === 'ko' && ls.st.min === 20.003 && ls.st.max === 20.022 && Math.abs(ls.st.mean - 20.0125) < 1e-9 && ls.st.range === 19 && ls.zone === 'ko');
+      lot.open = true; renderLot();
+      ck('lotto: riquadro con 10 righe, statistica e «LOTTO NON CONFORME — n. 10 (20,022)»', !$('tol-lot').hidden && $('tol-lot-prev').querySelectorAll('table tr').length === 10 && /20,0125/.test($('tol-lot-prev').textContent) && /LOTTO NON CONFORME — n\. 10 \(20,022\)/.test($('tol-lot-prev').textContent));
+      ck('lotto: salvato in localStorage', /"q":"20 H7"/.test(localStorage.getItem('tolIso.lot') || '') && /20,022/.test(localStorage.getItem('tolIso.lot') || ''));
+      /* «+ Lotto» dalla barra con una misura nel campo */
+      $('tol-m').value = '20,011'; render(); $('tol-sum-lot').click();
+      ck('lotto: «+ Lotto» aggiunge la misura del campo e lo svuota (11 pezzi)', lot.m.length === 11 && $('tol-m').value === '' && lot.m[10] === '20,011');
+      /* rapporto di lotto */
+      rep.cliente = 'Rossi Srl'; rep.ordine = 'PO 4471'; rep.lotto = 'L-2026-10'; rep.rev = 'B'; rep.taratura = '31/12/2026'; rep.qta = ''; rep.disegno = 'DIS-9';
+      var d = reportData();
+      ck('rapporto lotto: intestazione con cliente, ordine, lotto, quantità automatica 11, rev. nel disegno, taratura', !d.err && (function () { var m = {}; d.head.forEach(function (h) { m[h[0]] = h[1]; }); return m['Cliente'] === 'Rossi Srl' && m['Ordine'] === 'PO 4471' && m['Lotto / matricola'] === 'L-2026-10' && m['Quantità'] === '11' && m['Disegno'] === 'DIS-9 rev. B' && m['Taratura valida fino al'] === '31/12/2026'; })());
+      ck('rapporto lotto: righe Pezzo 1…11, statistica, esito LOTTO NON CONFORME', !d.err && d.rows.filter(function (r) { return /^Pezzo \d+$/.test(r[0]); }).length === 11 && d.rows.some(function (r) { return r[0] === 'Statistica' && /media 20,0124 mm · campo 19 µm/.test(r[1]); }) && /^LOTTO NON CONFORME — n\. 10/.test(d.verdict) && d.lot && d.lot.ls.n === 11);
+      rep.open = true; renderRep();
+      ck('rapporto lotto: stampa con tabella del lotto (11 righe + intestazione) e senza le righe «Pezzo n» doppie', $('tol-rep-print-box').querySelectorAll('table.lot tr').length === 12 && !/Pezzo 3/.test($('tol-rep-print-box').textContent));
+      var txt = reportText(d);
+      ck('rapporto lotto: testo da condividere con i pezzi e l\'esito', /Pezzo 10: 20,022 mm/.test(txt) && /ESITO: LOTTO NON CONFORME/.test(txt) && /Quantità: 11/.test(txt));
+      /* U: con U = 3 µm il pezzo 20,019 (2 µm dal max) diventa non decidibile */
+      rep.U = '3'; var d2 = reportData();
+      ck('rapporto lotto con U = 3 (ISO 14253-1): pezzo 5 (20,019, 2 µm dal max) e pezzo 10 (1 µm oltre) NON DECIDIBILI → LOTTO NON DECIDIBILE', !d2.err && /NON DECIDIBILE/.test(d2.rows.filter(function (r) { return r[0] === 'Pezzo 5'; })[0][1]) && /NON DECIDIBILE/.test(d2.rows.filter(function (r) { return r[0] === 'Pezzo 10'; })[0][1]) && /^LOTTO NON DECIDIBILE — n\. 4 \(20,021\), n\. 5 \(20,019\), n\. 10 \(20,022\)/.test(d2.verdict)); rep.U = '';
+      /* togliere il pezzo 10 → lotto conforme */
+      lotDel(9); var d3 = reportData();
+      ck('lotto: tolto il n. 10 → LOTTO CONFORME, 10 pezzi', !d3.err && d3.verdict === 'LOTTO CONFORME' && d3.lot.ls.n === 10);
+      /* misura non valida nel lotto → il rapporto si ferma */
+      lotAdd('20,0,1'); renderLot(); ck('lotto: misura non valida → riga in rosso «non valida» e rapporto bloccato (badLot)', reportData().err === 'badLot' && /non valida/.test($('tol-lot-prev').textContent)); lotDel(lot.m.length - 1);
+      /* quota diversa: niente aggiunta, avviso con «Nuovo lotto» */
+      $('tol-d').value = '25'; render(); $('tol-m').value = '25,010'; render(); var nBefore = lot.m.length; $('tol-sum-lot').click();
+      ck('lotto: su un\'altra quota «+ Lotto» non aggiunge e il riquadro propone «Nuovo lotto per 25 H7»', lot.m.length === nBefore && lot.q === '20 H7' && /Lotto aperto per 20 H7; la quota attuale è 25 H7/.test($('tol-lot-prev').textContent) && !!$('tol-lot-new'));
+      ck('lotto: su un\'altra quota il Rapporto torna al pezzo singolo', (function () { var d4 = reportData(); return !d4.err && !d4.lot && d4.rows.some(function (r) { return r[0] === 'Misura' && /25,010/.test(r[1]); }); })());
+      $('tol-lot-new').click(); ck('lotto: «Nuovo lotto» svuota e passa alla quota attuale', lot.m.length === 0 && lot.q === '25 H7');
+      lotClear(); lot.open = false; renderLot(); rep.open = false; renderRep(); $('tol-m').value = '';
+      REP_KEEP.forEach(function (k) { rep[k] = keepR[k]; }); saveRep(); lot.q = keepLot.q; lot.m = keepLot.m; saveLot();
     })();
     /* 27. v4.9: correzioni del collaudo con 4 operatori */
     (function () {
@@ -1911,7 +2048,7 @@ var TolISO = (function () {
       ck('rapporto: tasti presenti (ACCOPPIAMENTO e riepilogo)', !!$('tol-rep-btn') && !!$('tol-sum-rep'));
       ck('rapporto: in ACCOPPIAMENTO senza collaudo → avviso e riquadro chiuso', openRep() === false && /misure di foro e albero/.test($('tol-alert').textContent) && $('tol-rep').hidden);
       $('tol-s-let').value = 'g'; insp.mh = '25,010'; insp.ms = '24,985'; insp.open = true; render();
-      rep.pezzo = 'Flangia'; rep.disegno = 'DIS-123'; rep.operatore = 'M.G.'; rep.data = '27/09/2026'; rep.note = 'prova';
+      rep.pezzo = 'Flangia'; rep.disegno = 'DIS-123'; rep.operatore = 'M.G.'; rep.data = '27/09/2026'; rep.note = 'prova'; rep.cliente = ''; rep.ordine = ''; rep.lotto = ''; rep.qta = ''; rep.rev = ''; rep.taratura = '';   /* v5.0: senza i campi del dossier l'intestazione resta quella di sempre */
       ck('rapporto accoppiamento: si apre, foro e albero CONFORMI, gioco effettivo 25 µm', openRep() === true && !$('tol-rep').hidden && (function () { var tx = $('tol-rep-prev').textContent; return /Ø25 H7\/g6 — CON GIOCO/.test(tx) && /Gioco effettivo\s*25 µm/.test(tx) && /ESITO: CONFORME/.test(tx) && (tx.match(/CONFORME/g) || []).length === 3; })());
       ck('rapporto: campi del riquadro riempiti dai dati salvati', $('tol-rep').querySelector('[data-rep="pezzo"]').value === 'Flangia' && $('tol-rep').querySelector('[data-rep="data"]').value === '27/09/2026');
       var txt = reportText(reportData());
@@ -2246,7 +2383,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '4.9', reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.0', lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
