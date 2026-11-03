@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_5.7.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_5.8.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -411,7 +411,7 @@ var TolISO = (function () {
            ['Sede di cuscinetto', 'Albero o alloggiamento per un cuscinetto (es. k6, m6 sull\'albero; H7, K7, M7 nell\'alloggiamento): gli anelli del cuscinetto hanno tolleranze proprie del costruttore, non ISO 286.'],
            ['Linguetta (cava)', 'DIN 6885: linguetta h9; cava sull\'albero N9 e nel mozzo JS9 per l\'accoppiamento normale, P9 e P9 per quello stretto.'],
            ['Cpk', 'Indice di capacità del processo: distanza della media dal limite più vicino divisa per 3 deviazioni standard. Sopra 1,33 il processo è considerato capace; con pochi pezzi è solo indicativo.'],
-           ['Si possono ancora togliere', 'Quanto materiale si può ancora asportare prima del limite di scarto: per il foro fino al massimo, per l\'albero fino al minimo. Sul limite = 0 µm.']],
+           ['Si possono ancora togliere', 'Quanto materiale si può ancora asportare prima del limite di scarto: per il foro fino al massimo, per l\'albero fino al minimo. Sul limite = 0 µm. Con una quota numerica (±, ISO 2768) non si sa se è foro o albero: si dicono tutti e due.']],
       en: [['Nominal size', 'The size written on the drawing (e.g. Ø25): deviations are measured from it.'],
            ['Zero line', 'The nominal seen as a reference line: above = positive deviations, below = negative.'],
            ['Upper / lower deviation', 'How far the maximum limit (ES, es) and the minimum limit (EI, ei) are from nominal, in µm. Capitals for the hole, lower case for the shaft.'],
@@ -440,7 +440,7 @@ var TolISO = (function () {
            ['Bearing seat', 'Shaft or housing for a rolling bearing (e.g. k6, m6 on the shaft; H7, K7, M7 in the housing): bearing rings have the maker\'s own tolerances, not ISO 286.'],
            ['Keyway', 'DIN 6885: key h9; shaft keyway N9 and hub keyway JS9 for the normal fit, P9 and P9 for the tight fit.'],
            ['Cpk', 'Process capability index: distance from the mean to the nearest limit divided by 3 standard deviations. Above 1.33 the process is usually considered capable; with few parts it is only indicative.'],
-           ['Stock left to remove', 'How much material can still be removed before the scrap limit: up to the maximum for the hole, down to the minimum for the shaft. At the limit = 0 µm.']]
+           ['Stock left to remove', 'How much material can still be removed before the scrap limit: up to the maximum for the hole, down to the minimum for the shaft. At the limit = 0 µm. A numeric dimension (±, ISO 2768) does not say hole or shaft: both are given.']]
     }
   };
   var HOLE_USE = {
@@ -765,7 +765,7 @@ var TolISO = (function () {
   }
   function pressBlock(f, D) {
     if (!(f.intMax > 0)) return '';
-    var q = { Rzh: press.Rzh || 0, Rza: press.Rza || 0, De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: press.mu,
+    var q = { Rzh: press.Rzh || 0, Rza: press.Rza || 0, De: press.De || Math.round(2 * D * 100) / 100, di: press.di || 0, L: press.L || Math.round(D * 100) / 100, mu: (press.mu !== null && press.mu !== undefined) ? press.mu : 0.15,   /* v5.8: μ vuoto o scritto male dava null → errore di pagina e forzato fermo sul pezzo di prima (Diego) */
               Eh: press.Eh || MAT[press.mh].E, nuh: (press.nuh !== null ? press.nuh : MAT[press.mh].nu), Es: press.Es || MAT[press.ms].E, nus: (press.nus !== null ? press.nus : MAT[press.ms].nu), Re: press.Re || MAT[press.mh].Re };
     var L2 = lang === 'it' ? { title: 'Forzato: pressione e forza di montaggio', De: 'Ø esterno mozzo', di: 'Ø interno albero o boccola (0 = pieno)', L: 'Lunghezza accoppiamento', mu: 'Attrito μ', close: 'Boccola o albero cavo: il foro interno si chiude di {a}…{b} µm per effetto della pressatura (a interferenza minima…massima). Per avere il Ø finito dopo il montaggio, lavorarlo di quel tanto più grande, oppure alesarlo dopo la pressatura. Calcolo elastico a pressione uniforme; boccola con spallamento o flangia: la chiusura è un po\' minore.', Rzh: 'Rugosità Rz foro (mozzo)', Rza: 'Rugosità Rz albero', eff: 'Interferenza efficace (meno 0,8·ΣRz)', flat: 'Con questa rugosità l\'interferenza minima è tutta schiacciata: nel caso peggiore l\'accoppiamento non tiene. Ridurre la rugosità (rettifica, lappatura) o scegliere una classe più forzata.', mh: 'Materiale mozzo', ms: 'Materiale albero', Re: 'Snervamento mozzo Re',
                              col: ['', 'interf. min', 'interf. max'], rows: ['Interferenza', 'Pressione di contatto', 'Forza di montaggio (pressa)', 'Coppia trasmissibile', 'Tensione tangenziale mozzo (bordo foro)', 'Tensione equivalente mozzo (von Mises)'], hyp: 'Ipotesi di calcolo', dT: 'Calettamento a caldo: il mozzo va scaldato di circa', dTto: 'sopra la temperatura dell\'albero (da 20 °C a circa {T} °C)', cool: 'In alternativa si raffredda l\'albero o la boccola: con la stessa formula serve un ΔT di {T} °C.', coolIce: 'Basta il ghiaccio secco (−79 °C).', coolN2: 'Il ghiaccio secco non basta: serve l\'azoto liquido (−196 °C).', coolNo: 'Nemmeno l\'azoto liquido basta (a freddo anche α cala): combinare riscaldo del mozzo e raffreddamento dell\'albero, o ridurre l\'interferenza.', near: 'Attenzione: la tensione equivalente del mozzo arriva al {p} % dello snervamento Re: margine piccolo, verificare materiale e trattamento.', warn: 'La tensione equivalente nel mozzo (von Mises) supera lo snervamento: il mozzo si deforma in modo permanente. Ridurre l\'interferenza o aumentare lo spessore del mozzo.', brittle: 'Mozzo in ghisa: materiale fragile, il confronto con Re non basta; verificare con la resistenza a trazione e un coefficiente di sicurezza.', hot: 'Oltre circa {T} °C il materiale del mozzo si rovina (acciaio: rinvenimento; alluminio: perde resistenza): valutare il raffreddamento dell\'albero (ghiaccio secco, azoto liquido) o un\'interferenza minore.', alpha: 'con α del mozzo = {a}·10⁻⁶/K e 1 µm/mm di gioco di infilaggio',
@@ -1168,8 +1168,8 @@ var TolISO = (function () {
   var lot = { q: '', m: [], open: false };
   var lotF = { q: '', m: [] };   /* v5.5: lotto di ACCOPPIAMENTI (scheda ACCOPPIAMENTO): una coppia «foro albero» per riga, legata alla quota «25 H7/g6» */
   function LS() { return tab === 'fit' ? lotF : lot; }   /* il lotto attivo dipende dalla scheda */
-  var LT = { it: { title: 'LOTTO', lbl: 'Misure dei pezzi <span>una per riga o separate da spazio, in mm</span>', empty: 'Nessuna misura ancora: scrivile qui sopra e tocca «Aggiungi al lotto», oppure dopo ogni pezzo scrivi la misura in alto e tocca «+ Lotto».', other: 'Lotto aperto per {q}; la quota attuale è {c}.', newFor: 'Nuovo lotto per {c}', report: 'Il Rapporto ora stampa tutto il lotto.', inval: 'non valida', nPcs: 'pezzi', nPairs: 'coppie', nPc: 'pezzo', nPair: 'coppia', lblF: 'Coppie misurate <span>una coppia per riga: foro e albero, in mm (es. 25,012 24,990)</span>', emptyF: 'Nessuna coppia ancora: scrivile qui sopra (una per riga) e tocca «Aggiungi al lotto», oppure dopo ogni coppia scrivi le due misure nel Collaudo e tocca «+ Lotto».', ok: 'conformi', ko: 'non conformi', unc: 'non decidibili', okS: 'conforme', koS: 'non conforme', uncS: 'non decidibile', lim: 'al limite', invalS: 'non valida', invalP: 'non valide', far: 'troppo lontana dal Ø: è in mm?', nonum: 'non è un numero', badEs: 'LOTTO NON VALUTABILE: ci sono righe non valide (in rosso). Correggile o toglile con ✕.', noneEs: 'Nessuna misura valida nel lotto.', swap: 'foro e albero scambiati?', sd: 's', cpk: 'Cpk', ind: 'indicativo', typo: 'molto lontana: battuta bene?', last: 'Ultimo', no1: 'n.', dup: 'Il pezzo 2 è uguale al pezzo 1 messo con «+ Lotto»: se è lo stesso pezzo, toglilo con ✕.' },
-             en: { title: 'BATCH', lbl: 'Readings of the parts <span>one per line or space-separated, in mm</span>', empty: 'No readings yet: type them above and tap «Add to batch», or after each part type the reading at the top and tap «+ Batch».', other: 'Batch open for {q}; the current dimension is {c}.', newFor: 'New batch for {c}', report: 'The Report now prints the whole batch.', inval: 'invalid', nPcs: 'parts', nPairs: 'pairs', nPc: 'part', nPair: 'pair', lblF: 'Measured pairs <span>one pair per line: hole and shaft, in mm (e.g. 25.012 24.990)</span>', emptyF: 'No pairs yet: type them above (one per line) and tap «Add to batch», or after each pair type the two readings in Inspection and tap «+ Batch».', ok: 'pass', ko: 'fail', unc: 'inconclusive', okS: 'pass', koS: 'fail', uncS: 'inconclusive', lim: 'borderline', invalS: 'invalid', invalP: 'invalid', far: 'too far from the Ø: is it in mm?', nonum: 'not a number', badEs: 'BATCH CANNOT BE ASSESSED: there are invalid lines (in red). Fix them or remove them with ✕.', noneEs: 'No valid reading in the batch.', swap: 'hole and shaft swapped?', sd: 's', cpk: 'Cpk', ind: 'indicative', typo: 'very far off: typed correctly?', last: 'Last', no1: 'No.', dup: 'Part 2 equals part 1 added with «+ Batch»: if it is the same part, remove it with ✕.' } };
+  var LT = { it: { title: 'LOTTO', lbl: 'Misure dei pezzi <span>una per riga o separate da spazio, in mm</span>', empty: 'Nessuna misura ancora: scrivile qui sopra e tocca «Aggiungi al lotto», oppure dopo ogni pezzo scrivi la misura in alto e tocca «+ Lotto».', other: 'Lotto aperto per {q}; la quota attuale è {c}.', newFor: 'Nuovo lotto per {c}', report: 'Il Rapporto ora stampa tutto il lotto.', inval: 'non valida', nPcs: 'pezzi', nPairs: 'coppie', nPc: 'pezzo', nPair: 'coppia', lblF: 'Coppie misurate <span>una coppia per riga: foro e albero, in mm (es. 25,012 24,990)</span>', emptyF: 'Nessuna coppia ancora: scrivile qui sopra (una per riga) e tocca «Aggiungi al lotto», oppure dopo ogni coppia scrivi le due misure nel Collaudo e tocca «+ Lotto».', ok: 'conformi', ko: 'non conformi', unc: 'non decidibili', okS: 'conforme', koS: 'non conforme', uncS: 'non decidibile', lim: 'al limite', invalS: 'non valida', invalP: 'non valide', far: 'troppo lontana dal Ø: è in mm?', nonum: 'non è un numero', badEs: 'LOTTO NON VALUTABILE: ci sono righe non valide (in rosso). Correggile o toglile con ✕.', noneEs: 'Nessuna misura valida nel lotto.', swap: 'foro e albero scambiati?', sd: 's', cpk: 'Cpk', ind: 'indicativo', typo: 'molto lontana: battuta bene?', last: 'Ultimo', no1: 'n.', dup: 'Il pezzo 2 è uguale al pezzo 1 messo con «+ Lotto»: se è lo stesso pezzo, toglilo con ✕.', idx: 'Colonna del numero pezzo ({x}) tolta: non sono misure.' },
+             en: { title: 'BATCH', lbl: 'Readings of the parts <span>one per line or space-separated, in mm</span>', empty: 'No readings yet: type them above and tap «Add to batch», or after each part type the reading at the top and tap «+ Batch».', other: 'Batch open for {q}; the current dimension is {c}.', newFor: 'New batch for {c}', report: 'The Report now prints the whole batch.', inval: 'invalid', nPcs: 'parts', nPairs: 'pairs', nPc: 'part', nPair: 'pair', lblF: 'Measured pairs <span>one pair per line: hole and shaft, in mm (e.g. 25.012 24.990)</span>', emptyF: 'No pairs yet: type them above (one per line) and tap «Add to batch», or after each pair type the two readings in Inspection and tap «+ Batch».', ok: 'pass', ko: 'fail', unc: 'inconclusive', okS: 'pass', koS: 'fail', uncS: 'inconclusive', lim: 'borderline', invalS: 'invalid', invalP: 'invalid', far: 'too far from the Ø: is it in mm?', nonum: 'not a number', badEs: 'BATCH CANNOT BE ASSESSED: there are invalid lines (in red). Fix them or remove them with ✕.', noneEs: 'No valid reading in the batch.', swap: 'hole and shaft swapped?', sd: 's', cpk: 'Cpk', ind: 'indicative', typo: 'very far off: typed correctly?', last: 'Last', no1: 'No.', dup: 'Part 2 equals part 1 added with «+ Batch»: if it is the same part, remove it with ✕.', idx: 'Part-number column ({x}) removed: those are not readings.' } };
   function lt(k) { return LT[lang][k]; }
   function loadLot() { try { var r = JSON.parse(localStorage.getItem('tolIso.lot') || 'null'); if (r && Array.isArray(r.m)) { lot.q = String(r.q || ''); lot.m = r.m.map(String).slice(0, 500); } } catch (e) {}
     try { var rf = JSON.parse(localStorage.getItem('tolIso.lotF') || 'null'); if (rf && Array.isArray(rf.m)) { lotF.q = String(rf.q || ''); lotF.m = rf.m.map(String).slice(0, 500); } } catch (e) {} }
@@ -1180,9 +1180,27 @@ var TolISO = (function () {
   /* v5.6: misure incollate: separatori misti. «20,006, 20,012» (virgola + spazio = separatore), «20.006,20.012» (punto decimale e virgola fra
      le misure), «20 ,011» (spazio battuto prima della virgola = un numero solo, prima diventava due pezzi, uno inventato da 20,000),
      intestazione di colonna incollata da Excel (prima riga con lettere e senza cifre) tolta */
+  /* v5.8: colonna del numero pezzo davanti alle misure («1<tab>25,008», come la esportano la CMM e Excel): i numeri 1, 2, 3… non sono misure
+     (Rosa: su Ø25 i pezzi 24, 25, 26 passavano per misure vere e le altre righe diventavano «non valide»). Si toglie solo se TUTTE le righe
+     cominciano con un intero crescente seguito da tab, «;» o spazio, almeno 3 righe con la misura; le righe di sole lettere (intestazione) si saltano */
+  var lotIdxLast = '';
+  function lotDropIndex(lines) {
+    var re = /^\s*(\d{1,4})([\t; ]+)(.*)$/, idx = [], withVal = 0, ok = true;
+    lines.forEach(function (l) {
+      if (!/\S/.test(l) || (/[A-Za-z\u00C0-\u00FF]/.test(l) && !/\d/.test(l))) return;
+      var m = re.exec(l);
+      if (!m || /^[.,]\d/.test(m[3].trim()) || (idx.length && +m[1] <= idx[idx.length - 1])) { ok = false; return; }   /* «20 ,011» = un numero solo */
+      idx.push(+m[1]); if (/\S/.test(m[3])) withVal++;
+    });
+    lotIdxLast = '';
+    if (!ok || idx.length < 3 || withVal < 3) return lines;
+    lotIdxLast = idx[0] + '…' + idx[idx.length - 1];
+    return lines.map(function (l) { var m = re.exec(l); return m ? m[3] : l; });
+  }
   function lotSplit(raw) {
     var lines = String(raw || '').replace(/mm/ig, ' ').split(/\r?\n/);
     if (lines.length > 1 && /[A-Za-z\u00C0-\u00FF]/.test(lines[0]) && !/\d/.test(lines[0])) lines.shift();
+    lines = lotDropIndex(lines);
     var s = lines.join('\n').replace(/(\d)[ \t]+([.,]\d)/g, '$1$2').replace(/,\s+/g, ' ').replace(/(\d+\.\d+),(?=\d+\.\d)/g, '$1 ');
     return s.split(/[\s;]+/).filter(function (x) { return x !== ''; });
   }
@@ -1194,18 +1212,19 @@ var TolISO = (function () {
     /* v5.7: niente più pezzo tolto in silenzio (Luigi, Samir: in serie due letture uguali di fila sono normali): si avvisa e decide l'operatore */
     S.dup = !!(paste && S.auto && S.m.length === 1 && numIn(String(toks[0]).split(' ')[0]) === numIn(String(S.m[0]).split(' ')[0]) && (tab !== 'fit' || numIn(String(toks[0]).split(' ')[1]) === numIn(String(S.m[0]).split(' ')[1])));
     S.auto = !paste && !S.m.length;
+    if (paste) S.idx = lotIdxLast;   /* v5.8: avviso «colonna del numero pezzo tolta» */
     S.q = q; S.m = S.m.concat(toks).slice(0, 500); saveLot(); return toks.length;
   }
   /* v5.5: «foro albero» per riga; su una riga sola le misure si accoppiano a due a due. Voci con ≠ 2 numeri restano e vengono segnalate come non valide */
   function lotPairs(raw) {
-    var lines = String(raw || '').replace(/mm/ig, ' ').split(/\n/).map(function (l) { return l.trim(); }).filter(Boolean), out = [];
+    var lines = lotDropIndex(String(raw || '').replace(/mm/ig, ' ').split(/\r?\n/)).map(function (l) { return l.trim(); }).filter(Boolean), out = [];
     function toks(l) { return l.replace(/(\d)[ \t]+([.,]\d)/g, '$1$2').replace(/,\s+/g, ' ').split(/[\s;\/]+/).filter(Boolean); }   /* v5.6: come lotSplit */
     if (lines.length > 1) lines.forEach(function (l) { out.push(toks(l).join(' ')); });
     else if (lines.length === 1) { var t2 = toks(lines[0]); for (var i = 0; i < t2.length; i += 2) out.push(t2.slice(i, i + 2).join(' ')); }
     return out;
   }
   function lotDel(i) { var S = LS(); S.m.splice(i, 1); if (!S.m.length) S.q = ''; saveLot(); }
-  function lotClear() { var S = LS(); S.m = []; S.q = ''; S.dup = false; saveLot(); }
+  function lotClear() { var S = LS(); S.m = []; S.q = ''; S.dup = false; S.idx = ''; saveLot(); }
   function lotFitLimits() {
     var pq = lotF.q ? parse(lotF.q) : null; if (!pq || !pq.hole || !pq.shaft) return null;
     var H = limits('hole', pq.hole.letter, pq.hole.grade, pq.D), S = limits('shaft', pq.shaft.letter, pq.shaft.grade, pq.D);
@@ -1307,6 +1326,7 @@ var TolISO = (function () {
     if (lastR) h += '<div class="last">' + lt('last') + ': ' + lt('no1') + ' ' + (lastR.i + 1) + ' · <b>' + esc(lastR.bad ? lastR.raw : lastR.txt) + '</b> mm · <span class="' + (lastR.bad ? 'ko' : zCls(lastR.z)) + '">' + (lastR.bad ? lt('invalS') : zoneTxt(lastR.z, true)) + '</span></div>';
     h += lotEsitoHtml(ls, false);
     if (lot.dup) h += '<div class="esito unc">' + esc(lt('dup')) + '</div>';
+    if (lot.idx) h += '<div class="esito unc">' + esc(lt('idx').replace('{x}', lot.idx)) + '</div>';
     h += '<div class="stats"><b>' + ls.n + '</b> ' + lt(ls.n === 1 ? 'nPc' : 'nPcs') + ' · ' + lotCounts(ls, true) + (ls.st ? '<br>' + esc(stTxt(ls.st, o)) + ' · ' + rl('lim') + ' ' + mmQ(o.min, o) + ' / ' + mmQ(o.max, o) + ' mm' : '') + '</div>';
     h += tb;
     h += '<div class="tol-hint" style="margin-top:6px">' + lt('report') + '</div>';
@@ -1319,6 +1339,7 @@ var TolISO = (function () {
     if (lotF.q && cq && lotF.q !== cq) h += '<div class="esito unc">' + esc(lt('other').replace('{q}', lotF.q).replace('{c}', cq)) + ' <button type="button" class="tol-chip" id="tol-lot-new">' + esc(lt('newFor').replace('{c}', cq)) + '</button></div>';
     if (!lotF.m.length || !L) { $('tol-lot-prev').innerHTML = h + '<div class="tol-hint">' + lt('emptyF') + '</div>'; box.hidden = false; return; }
     var ls = lotStatsF(L, repU()), hh = isHalf(L.H), hs = isHalf(L.S);
+    if (lotF.idx) h += '<div class="esito unc">' + esc(lt('idx').replace('{x}', lotF.idx)) + '</div>';
     h += '<table>';
     ls.rows.forEach(function (r) {
       if (r.bad) { h += '<tr><td class="n">' + (r.i + 1) + '</td><td class="bad">' + esc(r.raw) + ' — ' + lt('invalS') + (r.why ? ': ' + esc(r.why) : '') + '</td><td></td><td><button type="button" class="del" data-lotdel="' + r.i + '">✕</button></td></tr>'; return; }
@@ -1541,8 +1562,8 @@ var TolISO = (function () {
                    band: 'fascia', bandNo: 'Ø da 0 a 500 mm', bandOf: 'fascia del Ø', bandOther: 'altra fascia', na: 'non prevista', pick: 'tocca una casella per il riepilogo', printHole: 'FORI', printShaft: 'ALBERI' },
              en: { titleHole: 'HOLE tolerances — upper and lower deviations in µm (1/1000 mm)', titleShaft: 'SHAFT tolerances — upper and lower deviations in µm (1/1000 mm)',
                    band: 'range', bandNo: 'Ø from 0 to 500 mm', bandOf: 'range of Ø', bandOther: 'other range', na: 'not provided', pick: 'tap a cell for the summary', printHole: 'HOLES', printShaft: 'SHAFTS' } };
-  TU.it.mIn = 'DENTRO'; TU.it.mOut = 'FUORI'; TU.it.mOver = 'oltre il massimo'; TU.it.mUnder = 'sotto il minimo'; TU.it.mFromMax = 'dal max'; TU.it.mFromMin = 'dal min'; TU.it.mAlso = 'rientra anche in'; TU.it.recent = 'Recenti'; TU.it.share = 'Condividi'; TU.it.shared = 'inviato'; TU.it.clr = 'gioco'; TU.it.trn = 'incerto'; TU.it.itf = 'forzato'; TU.it.mNone = 'nessuna classe della tabella'; TU.it.mRem = 'si possono ancora togliere {x} µm'; TU.it.defCls = 'Classe {c} di partenza, non scelta da te: scrivi quella del disegno (es. {q}).'; TU.it.subBand = 'per le lettere a, b, c e r…zc la fascia è'; TU.it.mLim = 'AL LIMITE'; TU.it.mUnc = 'NON DECIDIBILE'; TU.it.mLimHint = 'letta al {r}: a meno di mezza divisione ({h} µm) dal limite non si decide. Rimisura con uno strumento più fine'; TU.it.mDev = 'dal nominale'; TU.it.mPct = 'della tolleranza usata'; TU.it.delRec = 'Togli dai recenti';
-  TU.en.mIn = 'IN'; TU.en.mOut = 'OUT'; TU.en.mOver = 'above max'; TU.en.mUnder = 'below min'; TU.en.mFromMax = 'from max'; TU.en.mFromMin = 'from min'; TU.en.mAlso = 'also within'; TU.en.recent = 'Recent'; TU.en.share = 'Share'; TU.en.shared = 'sent'; TU.en.clr = 'clearance'; TU.en.trn = 'transition'; TU.en.itf = 'interference'; TU.en.mNone = 'no chart class'; TU.en.mRem = '{x} µm of stock left to remove'; TU.en.defCls = 'Class {c} is the starting one, not chosen by you: type the one on the drawing (e.g. {q}).'; TU.en.subBand = 'for letters a, b, c and r…zc the range is'; TU.en.mLim = 'BORDERLINE'; TU.en.mUnc = 'INCONCLUSIVE'; TU.en.mLimHint = 'read to {r}: within half a division ({h} µm) of the limit it cannot be decided. Re-measure with a finer instrument'; TU.en.mDev = 'from nominal'; TU.en.mPct = 'of tolerance used'; TU.en.delRec = 'Remove from recent';
+  TU.it.mIn = 'DENTRO'; TU.it.mOut = 'FUORI'; TU.it.mOver = 'oltre il massimo'; TU.it.mUnder = 'sotto il minimo'; TU.it.mFromMax = 'dal max'; TU.it.mFromMin = 'dal min'; TU.it.mAlso = 'rientra anche in'; TU.it.recent = 'Recenti'; TU.it.share = 'Condividi'; TU.it.shared = 'inviato'; TU.it.clr = 'gioco'; TU.it.trn = 'incerto'; TU.it.itf = 'forzato'; TU.it.mNone = 'nessuna classe della tabella'; TU.it.mRem = 'si possono ancora togliere {x} µm'; TU.it.mRemDim = 'ancora da togliere: albero {s} µm, foro {h} µm'; TU.it.defCls = 'Classe {c} di partenza, non scelta da te: scrivi quella del disegno (es. {q}).'; TU.it.subBand = 'per le lettere a, b, c e r…zc la fascia è'; TU.it.mLim = 'AL LIMITE'; TU.it.mUnc = 'NON DECIDIBILE'; TU.it.mLimHint = 'letta al {r}: a meno di mezza divisione ({h} µm) dal limite non si decide. Rimisura con uno strumento più fine'; TU.it.mDev = 'dal nominale'; TU.it.mPct = 'della tolleranza usata'; TU.it.delRec = 'Togli dai recenti';
+  TU.en.mIn = 'IN'; TU.en.mOut = 'OUT'; TU.en.mOver = 'above max'; TU.en.mUnder = 'below min'; TU.en.mFromMax = 'from max'; TU.en.mFromMin = 'from min'; TU.en.mAlso = 'also within'; TU.en.recent = 'Recent'; TU.en.share = 'Share'; TU.en.shared = 'sent'; TU.en.clr = 'clearance'; TU.en.trn = 'transition'; TU.en.itf = 'interference'; TU.en.mNone = 'no chart class'; TU.en.mRem = '{x} µm of stock left to remove'; TU.en.mRemDim = 'stock left to remove: shaft {s} µm, hole {h} µm'; TU.en.defCls = 'Class {c} is the starting one, not chosen by you: type the one on the drawing (e.g. {q}).'; TU.en.subBand = 'for letters a, b, c and r…zc the range is'; TU.en.mLim = 'BORDERLINE'; TU.en.mUnc = 'INCONCLUSIVE'; TU.en.mLimHint = 'read to {r}: within half a division ({h} µm) of the limit it cannot be decided. Re-measure with a finer instrument'; TU.en.mDev = 'from nominal'; TU.en.mPct = 'of tolerance used'; TU.en.delRec = 'Remove from recent';
   function tu(k) { return TU[lang][k]; }
   /* Accoppiamenti consigliati: coppie preferite di ISO 286-1:2010 Appendice A (sistema foro base e albero base).
      Il TIPO (gioco/incerto/forzato) lo calcola il modulo per il Ø corrente; l'uso è indicativo, da pratica d'officina. */
@@ -1659,8 +1680,11 @@ var TolISO = (function () {
   }
   /* v5.7: invece della «% della tolleranza usata» (5 collaudatori su 16 la leggevano al contrario sull'albero, e cambiava fra «12 g6» e «12 −0,006/−0,017»)
      si dice quanto materiale si può ancora togliere prima del limite di scarto: foro → fino al massimo, albero → fino al minimo */
-  function devPctTxt(c) { var k = c.kind || side, rem = k === 'shaft' ? c.toMin : c.toMax;
-    return (c.dev > 0 ? '+' : (c.dev < 0 ? '−' : '')) + umAbs(Math.abs(c.dev)) + ' µm ' + tu('mDev') + (c.ok ? ' · ' + tu('mRem').replace('{x}', umAbs(rem)) : ''); }
+  /* v5.8: una quota numerica («38 −0,025/−0,041», ISO 2768) non dice se è foro o albero (kind 'dim'): prima contava sempre verso il massimo, da foro,
+     e su un fuso a 1 µm dal minimo diceva «si possono ancora togliere 15 µm» (Ettore, Matteo). Ora si dicono tutti e due i margini */
+  function devPctTxt(c) {
+    var k = c.kind || side, rem = c.ok ? (k === 'dim' ? tu('mRemDim').replace('{s}', umAbs(c.toMin)).replace('{h}', umAbs(c.toMax)) : tu('mRem').replace('{x}', umAbs(k === 'shaft' ? c.toMin : c.toMax))) : '';
+    return (c.dev > 0 ? '+' : (c.dev < 0 ? '−' : '')) + umAbs(Math.abs(c.dev)) + ' µm ' + tu('mDev') + (rem ? ' · ' + rem : ''); }
   /* barra MIN ─ MISURA ─ MAX: il segno sta esattamente a pos% della pista (fuori campo si ferma al bordo, in rosso) */
   function measureBar(o, c, half) {
     var left = Math.max(0, Math.min(100, c.pos));
@@ -2292,7 +2316,16 @@ var TolISO = (function () {
     pressPreset({ di: 0 }); render();
     var deIn = $('tol-press-det').querySelector('[data-press="De"]'); deIn.value = '100'; deIn.dispatchEvent(new Event('change', { bubbles: true }));
     ck('forzato: cambio Ø esterno mozzo → pressione più alta e scheda aperta', press.De === 100 && $('tol-press-det').open && !/83,0/.test($('tol-press-det').textContent));
-    pressPreset({ De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null, open: false });
+    /* v5.8: attrito μ vuoto o con una lettera → niente errore di pagina, si usa 0,15 e si avvisa (Diego) */
+    var muIn = $('tol-press-det').querySelector('[data-press="mu"]'), muOk = true;
+    try { muIn.value = ''; muIn.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) { muOk = false; }
+    ck('v5.8 forzato con μ vuoto: nessun errore, il campo torna a 0,15', muOk && press.mu === null && $('tol-press-det').querySelector('[data-press="mu"]').value === '0,15' && /MPa/.test($('tol-press-det').textContent));
+    muIn = $('tol-press-det').querySelector('[data-press="mu"]'); muOk = true;
+    try { muIn.value = 'O,12'; muIn.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) { muOk = false; }
+    ck('v5.8 forzato con μ «O,12»: nessun errore e avviso «Valore non valido in «Attrito μ»»', muOk && /Valore non valido in «Attrito μ»: «O,12»/.test($('tol-press-det').textContent) && /MPa/.test($('tol-press-det').textContent));
+    $('tol-d').value = '30'; $('tol-s-let').value = 'p'; render();
+    ck('v5.8 forzato: dopo un μ non valido il cambio di classe aggiorna ancora la tabella', !!$('tol-press-det') && /Ø30 H7\/p6/.test($('tol-sum-txt').textContent));
+    pressPreset({ De: null, di: 0, L: null, mu: 0.15, mh: 'steel', ms: 'steel', Eh: null, nuh: null, Es: null, nus: null, Re: null, open: false, bad: {} });
     /* 18. preferiti: salva con nome, richiama, elimina, massimo 24 */
     var keepFav = fav.slice(); fav = []; renderFav();
     setTab('fit'); $('tol-d').value = '12'; $('tol-h-let').value = 'H'; $('tol-h-gr').value = '7'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; render();
@@ -2408,7 +2441,7 @@ var TolISO = (function () {
       setTab('hole'); $('tol-d').value = '40 +0,02/-0,01'; $('tol-d').dispatchEvent(new Event('change'));
       ck('v5.1 UI «40 +0,02/-0,01»: scheda FORO, riepilogo «Ø40 +0,02/−0,01», limiti 40,020 / 39,990, nessuna classe evidenziata', tab === 'hole' && /Ø40 \+0,02\/−0,01/.test($('tol-sum-txt').textContent) && /40,020 \/ 39,990/.test($('tol-sum-txt').textContent) && $('tol-h-let').value === '' && !$('tol-table').querySelector('td.tol-sel'));
       $('tol-m').value = '40,015'; render();
-      ck('v5.1 UI misura 40,015 su +0,02/−0,01: DENTRO · 5 µm dal max · 25 dal min · 83%', /DENTRO 40,015 · 5 µm dal max · 25 µm dal min/.test($('tol-sum-txt').textContent) && /si possono ancora togliere 5 µm/.test($('tol-sum-txt').textContent));
+      ck('v5.1 UI misura 40,015 su +0,02/−0,01: DENTRO · 5 µm dal max · 25 dal min · 83%', /DENTRO 40,015 · 5 µm dal max · 25 µm dal min/.test($('tol-sum-txt').textContent) && /ancora da togliere: albero 25 µm, foro 5 µm/.test($('tol-sum-txt').textContent));   /* v5.8: quota numerica = non si sa se foro o albero */
       ck('v5.1 UI tasto glossario «Cos\'è +0,02/−0,01?» e recenti con la quota numerica', /\+0,02\/−0,01/.test($('tol-sum-gloss').getAttribute('aria-label')) && recent[0] === '40 +0,02/−0,01');
       var dR = reportData(); ck('v5.1 UI rapporto su quota numerica: Quota «Ø40 +0,02/−0,01 (quota con scostamenti numerici)», limiti in mm, CONFORME', !dR.err && /Ø40 \+0,02\/−0,01 \(quota con scostamenti numerici\)/.test(dR.rows[0][1]) && /\+0,02 \/ −0,01 mm/.test(dR.rows[1][1]) && dR.verdict === 'CONFORME');
       $('tol-m').value = '';
@@ -2649,7 +2682,28 @@ var TolISO = (function () {
       ck('v5.7 lotto: in cima «Ultimo: n. 3 · 20,012 mm · CONFORME»', /Ultimo: n\. 3 · 20,012 mm · CONFORME/.test($('tol-lot-prev').textContent));
       lotClear(); lotAdd('20,006 20,0004 21,5'); var lsX = lotStats(lotLimits(), 0);
       ck('v5.6 lotto: statistica con i decimali delle letture (min 20,0004, non 20,000)', /min 20,0004/.test(stTxt(lsX.st, lotLimits())) && lsX.rows[2].why === lt('far'));
+      /* v5.8: colonna del numero pezzo davanti alle misure (Rosa) */
+      lotClear(); lotAdd('1\t25,008\n2\t25,011\n3\t25,006\n4\t25,014\n5\t25,009', '25 H7', true); lot.open = true; renderLot();
+      ck('v5.8 lotto «1<tab>25,008» … «5<tab>25,009»: numeri del pezzo tolti, 5 misure valide, avviso della colonna', lot.m.length === 5 && lot.idx === '1…5' && lotStats(lotLimits(), 0).nBad === 0 && lot.m[0] === '25,008' && /Colonna del numero pezzo \(1…5\) tolta/.test($('tol-lot-prev').textContent));
+      lotClear(); lotAdd('Pezzo\tDiametro (mm)\n24\t25,008\n25\t25,011\n26\t25,006', '25 H7', true);
+      ck('v5.8 lotto con intestazione e pezzi 24, 25, 26 su Ø25: 3 misure, nessuna presa per il numero del pezzo', lot.m.length === 3 && lot.idx === '24…26' && lotStats(lotLimits(), 0).nBad === 0);
+      lotClear(); lotAdd('1;25,008\n2;25,011\n3;25,006 mm\n4;', '25 H7', true);
+      ck('v5.8 lotto con «;» e cella vuota «4;»: colonna tolta, 3 misure', lot.m.length === 3 && lot.idx === '1…4');
+      lotClear(); lotAdd('25,008\n25,011\n25,006', '25 H7', true);
+      ck('v5.8 lotto di sole misure: niente colonna tolta', lot.m.length === 3 && lot.idx === '');
+      lotClear(); lotAdd('25\n25\n25', '25 H7', true);
+      ck('v5.8 lotto «25», «25», «25» (interi uguali): niente colonna tolta', lot.m.length === 3 && lot.idx === '');
+      var spl = lotSplit('20 ,011\n21 ,012\n22 ,013');
+      ck('v5.8 lotto «20 ,011»: lo spazio prima della virgola resta un numero solo, niente colonna tolta', spl.length === 3 && spl[0] === '20,011' && lotIdxLast === '');
+      var prs = lotPairs('1\t25,012\t24,990\n2\t25,010\t24,985\n3\t25,015\t24,992');
+      ck('v5.8 lotto di coppie con colonna del pezzo: 3 coppie «foro albero»', prs.length === 3 && prs[0] === '25,012 24,990' && lotIdxLast === '1…3');
       lotClear(); lot.q = keepLot.q; lot.m = keepLot.m; lot.open = keepOpen; saveLot();
+      /* v5.8: quota numerica = foro o albero? non si sa → si dicono tutti e due i margini (Ettore, Matteo) */
+      setTab('shaft'); $('tol-d').value = '38 −0,025/−0,041'; $('tol-d').dispatchEvent(new Event('change')); $('tol-m').value = '37,960'; render();
+      ck('v5.8 «38 −0,025/−0,041» misura 37,960 (scheda ALBERO): 15 dal max · 1 dal min · «albero 1 µm, foro 15 µm», non «togliere 15»', /15 µm dal max · 1 µm dal min/.test($('tol-sum-txt').textContent) && /ancora da togliere: albero 1 µm, foro 15 µm/.test($('tol-sum-txt').textContent) && !/si possono ancora togliere/.test($('tol-sum-txt').textContent));
+      $('tol-d').value = '38 g6'; $('tol-d').dispatchEvent(new Event('change')); $('tol-m').value = '37,980'; render();
+      ck('v5.8 «38 g6» (classe ISO, albero): resta «si possono ancora togliere X µm» verso il minimo', /si possono ancora togliere \d/.test($('tol-sum-txt').textContent) && !/albero \d/.test($('tol-sum-txt').textContent));
+      $('tol-m').value = ''; render();
       /* nota maiuscola e campo Ø */
       setTab('hole'); $('tol-d').value = '40 H7'; $('tol-d').dispatchEvent(new Event('change'));
       ck('v5.6 «40 H7» scritto in FORO: nessuna nota arancione', tab === 'hole' && $('tol-note').textContent === '');
@@ -3031,7 +3085,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.7', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '5.8', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
