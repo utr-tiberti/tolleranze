@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_6.2.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_6.3.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -1902,6 +1902,7 @@ var TolISO = (function () {
     Array.prototype.forEach.call($('tol-ittable').querySelectorAll('tbody tr'), function (tr) {
       tr.classList.toggle('tol-cur', fi >= 0 && parseInt(tr.getAttribute('data-m'), 10) === F2M[fi]);
     });
+    var mk = fi + '|' + side + '|' + cls + '|' + (document.body.classList.contains('tol-big') ? 'big' : '') + '|' + (document.body.classList.contains('tol-sum-min') ? 'min' : ''); if (mk !== lastMarkKey && fi >= 0) { var had = lastMarkKey !== ''; lastMarkKey = mk; scrollToCurRow(had); } else tableShadow();
   }
   /* ── Riga di riepilogo fissa in fondo (schede FORO/ALBERO) ── */
   function summaryOf(st) {
@@ -1961,6 +1962,24 @@ var TolISO = (function () {
     box.hidden = false; document.body.classList.add('tol-has-summary');
     /* v3.9: il riepilogo con la misura è più alto (barra): lo spazio libero in fondo alla pagina segue la sua altezza reale */
     document.body.style.paddingBottom = (box.offsetHeight + 14) + 'px';
+    document.documentElement.style.setProperty('--tol-bar', box.offsetHeight + 'px');
+    tableShadow();
+  }
+  /* v6.3: la tabella intera sta in un riquadro che scorre. Ombra a destra se c'è altro da scorrere; quando cambia la riga (Ø) o la classe, la tabella scorre da sola fino alla tua riga e alla tua colonna (iPad: la riga restava sotto la barra) */
+  function tableShadow() {
+    var t = $('tol-table'), w = t && t.parentNode, o = w && w.parentNode; if (!o || !o.classList) return;
+    o.classList.toggle('more', w.scrollWidth - w.clientWidth - w.scrollLeft > 4);
+  }
+  var lastMarkKey = '';
+  function scrollToCurRow(moved) {
+    var t = $('tol-table'), w = t.parentNode, tr = t.querySelector('tbody tr.tol-cur'); if (!tr || !w.clientHeight) return;
+    var hd = t.querySelector('thead'), hh = hd ? hd.offsetHeight : 0;
+    w.scrollTop = Math.max(0, tr.offsetTop - hh - Math.max(0, (w.clientHeight - hh - tr.offsetHeight) / 2));
+    var sel = tr.querySelector('td.tol-sel');
+    if (sel && (sel.offsetLeft < w.scrollLeft + 160 || sel.offsetLeft + sel.offsetWidth > w.scrollLeft + w.clientWidth)) w.scrollLeft = Math.max(0, sel.offsetLeft - w.clientWidth / 2);
+    tableShadow();
+    /* dopo un cambio fatto dall'utente (Ø, classe, Officina, barra ridotta) se il riquadro finisce sotto la barra si fa scorrere un po' la pagina, senza far sparire l'inizio del riquadro */
+    var bx = $('tol-summary'); if (moved && bx && !bx.hidden) { var wr = w.getBoundingClientRect(), over = wr.bottom - (bx.getBoundingClientRect().top - 8); if (over > 0 && wr.top > 60) window.scrollBy(0, Math.min(over, wr.top - 60)); }
   }
   function renderBand(st) {
     var el = $('tol-band'), ok = st.D > 0 && st.D <= 500;
@@ -2113,7 +2132,7 @@ var TolISO = (function () {
     } catch (e) { $('tol-h-let').value = 'H'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     Array.prototype.forEach.call($('tol-filter').children, function (b) { b.classList.toggle('on', b.getAttribute('data-filter') === filter); });
     loadRecent(); renderRecent(); loadFav(); renderFav(); loadRep(); loadLot(); preloadPhoto();
-    try { if (window.matchMedia && window.matchMedia('(min-width: 900px)').matches) $('tol-fits-det').open = true; } catch (e) {}
+    try { if (window.matchMedia && window.matchMedia('(min-width: 900px), (min-width: 800px) and (min-height: 600px)').matches) $('tol-fits-det').open = true; } catch (e) {}
     setTab(tab); buildItTable(); renderProv(); buildFinder(); buildGloss();
     $('tol-gloss-q').addEventListener('input', renderGlossAns);
     if (tab === 'fit') rebuildTables();
@@ -2155,6 +2174,7 @@ var TolISO = (function () {
       if (p.num && p.num.src === '2768' && /[fmcv][KHL]\s*$/.test(v)) notes.push(it ? 'La lettera ' + v.trim().slice(-1) + ' (ISO 2768-2, tolleranze geometriche) è letta ma non applicata: l\'app usa solo la parte 1, quote lineari.' : 'The letter ' + v.trim().slice(-1) + ' (ISO 2768-2, geometrical tolerances) is read but not applied: the app uses part 1 only, linear dimensions.');
       $('tol-note').innerHTML = notes.join('<br>');
     }
+    (function () { var w = $('tol-table') && $('tol-table').parentNode; if (w) w.addEventListener('scroll', tableShadow); window.addEventListener('resize', tableShadow); window.addEventListener('orientationchange', function () { setTimeout(function () { lastMarkKey = ''; render(); }, 350); }); })();   /* v6.3: girando l'iPad la tabella torna alla tua riga */
     (function () {   /* v6.1: «Collaudo» nella barra: apre il riquadro delle misure di foro e albero e ci porta lì */
       var b = $('tol-sum-insp'); if (!b) return;
       b.addEventListener('click', function () {
@@ -2918,6 +2938,10 @@ var TolISO = (function () {
       var bmin = $('tol-sum-min'); bmin.click();
       ck('v6.0 barra in basso: il tasto «−» nasconde Copia/Condividi/Rapporto/Lotto e diventa «+»', document.body.classList.contains('tol-sum-min') && getComputedStyle($('tol-sum-copy')).display === 'none' && bmin.textContent === '+');
       bmin.click(); ck('v6.0 secondo tocco: la barra torna intera', !document.body.classList.contains('tol-sum-min') && getComputedStyle($('tol-sum-copy')).display !== 'none' && bmin.textContent === '−');
+      /* v6.3 — iPad */
+      ck('v6.3 tabella intera in un riquadro con l\'ombra del bordo destro (.tol-twx > .tol-tablewrap > #tol-table)', !!$('tol-table').parentNode.classList.contains('tol-tablewrap') && $('tol-table').parentNode.parentNode.classList.contains('tol-twx'));
+      ck('v6.3 l\'altezza della barra in basso è nella variabile --tol-bar (serve a non far finire la tabella sotto la barra)', /^\d+px$/.test(document.documentElement.style.getPropertyValue('--tol-bar')));
+      ck('v6.3 tasto Officina nell\'elenco dei tasti da 40 px al tocco (era 24 px)', /#tol-big-btn, \.tol-tabs button \{ min-height: 40px/.test(document.getElementsByTagName('style')[0].textContent));
       /* v6.1 — il pezzo FUORI dice cosa si può fare; Collaudo nella barra; la frase «buono da … a …» in cima */
       function sumT() { return $('tol-sum-txt').textContent; }
       typeD('25 g6'); $('tol-m').value = '24,998'; render();
@@ -3316,7 +3340,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.2', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.3', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */

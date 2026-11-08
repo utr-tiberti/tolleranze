@@ -70,7 +70,7 @@ button, input, select, a, summary { touch-action: manipulation; }
 
 /* ══════════ TOL-ISO:CSS START — da copiare nel calcolatore ══════════ */
 .tol-grid { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 22px; margin-top: 12px; align-items: start; }
-@media (max-width: 899px) { .tol-grid { grid-template-columns: 1fr; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-grid { grid-template-columns: 1fr; } }
 .tol-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 .tol-lbl { font-size: 11.5px; color: var(--text-muted); }
 .tol-lbl span { color: var(--text-faint); font: 10.5px var(--mono, monospace); margin-left: 6px; }
@@ -115,6 +115,10 @@ button, input, select, a, summary { touch-action: manipulation; }
 .tol-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
 .tol-seg button { border: 0; background: transparent; font: 600 11.5px var(--mono, monospace); padding: 6px 14px; color: var(--text-muted); cursor: pointer; }
 .tol-seg button.on { background: var(--text); color: var(--surface); }
+/* v6.3: ombra sul bordo destro quando la tabella è più larga dello schermo (iPad in orizzontale): si capisce che c'è altro */
+.tol-twx { position: relative; }
+.tol-twx::after { content: ''; position: absolute; top: 1px; right: 1px; bottom: 1px; width: 38px; pointer-events: none; border-radius: 0 6px 6px 0; background: linear-gradient(to left, rgba(0,0,0,.30), rgba(0,0,0,0)); opacity: 0; transition: opacity .15s; }
+.tol-twx.more::after { opacity: 1; }
 .tol-tablewrap { overflow: auto; max-height: 640px; border: 1px solid var(--border); border-radius: var(--r, 6px); }
 .tol-table { border-collapse: separate; border-spacing: 0; font: 11px/1.25 var(--mono, monospace); white-space: nowrap; }
 .tol-table th, .tol-table td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 3px 7px; text-align: right; }
@@ -159,8 +163,8 @@ details.tol-det > .tol-fits, details.tol-det > .tol-find { border: 1px solid var
 .tol-card.tol-mok { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
 .tol-sum-txt .ok { color: #82e6b3; color: oklch(85% .12 160); font-weight: 700; } .tol-sum-txt .ko { color: #ff948c; color: oklch(80% .15 25); font-weight: 700; }
 .tol-summary { flex-wrap: wrap; } .tol-sum-txt { flex: 1 1 220px; } .tol-summary .tol-chip { flex: none; }
-@media (max-width: 899px) { body.tol-has-summary { padding-bottom: 150px; } .tol-sum-txt { font-size: 12px; } }
-@media (max-width: 899px) { .tol-mbox .tol-inp { width: 150px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { body.tol-has-summary { padding-bottom: 150px; } .tol-sum-txt { font-size: 12px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-mbox .tol-inp { width: 150px; } }
 @media print { .tol-recent, details.tol-det { display: none !important; } }   /* «µm» in maiuscolo diventerebbe «MM» */
 .tol-grid > div { min-width: 0; }   /* le pillole scorrevoli non devono allargare la colonna della griglia */
 .tol-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -203,7 +207,7 @@ details.tol-det > .tol-fits, details.tol-det > .tol-find { border: 1px solid var
 .tol-sum-txt .m .ok { background: var(--green); color: #fff; } .tol-sum-txt .m .ko { background: var(--red); color: #fff; }
 .tol-summary { border-top: 4px solid var(--blue); }
 .tol-summary.shaft { border-top-color: var(--amber); }
-@media (max-width: 899px) { .tol-sum-txt { flex: 1 1 100%; } .tol-sum-txt .lim { font-size: 21px; } .tol-sum-txt .cls { font-size: 16px; } .tol-summary { padding-top: 8px; gap: 6px 8px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-sum-txt { flex: 1 1 100%; } .tol-sum-txt .lim { font-size: 21px; } .tol-sum-txt .cls { font-size: 16px; } .tol-summary { padding-top: 8px; gap: 6px 8px; } }
 .tol-sum-copy { border-color: #a29e98; border-color: oklch(70% .01 78); color: var(--surface); background: transparent; white-space: nowrap; }
 .tol-sum-copy.on { background: var(--surface); color: var(--text); }
 .tol-scrollx { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 3px; }
@@ -226,7 +230,7 @@ body.tol-has-summary { padding-bottom: 78px; }
 .tol-check { font: 10.5px var(--mono); } .tol-check.ok { color: var(--green-dark); } .tol-check.ko { color: var(--red-dark); font-weight: 700; }
 .tol-net { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); vertical-align: 0; margin-right: 4px; } .tol-net.off { background: var(--amber); }
 .tol-fitrow .pict { width: 26px; height: 18px; vertical-align: -4px; margin-right: 2px; }
-@media (max-width: 899px) { .tol-dbox .tol-inp { width: 100%; } .tol-dbox { width: 100%; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-dbox .tol-inp { width: 100%; } .tol-dbox { width: 100%; } }
 /* v3.6: schede a scomparsa (Provenienza, Gradi IT, Cuscinetti): chiuse, un tocco le apre */
 details.tol-acc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg, 10px); box-shadow: var(--sh); padding: 0; margin-bottom: 12px; }
 details.tol-acc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--text-faint); font-weight: 700; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -243,7 +247,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 .tol-fitrow span { grid-column: 2 / -1; }
 .tol-res-h.tol-fit { align-items: center; }
 .tol-res-h.tol-fit .tol-fitimg { width: 110px; height: 90px; margin-left: auto; }
-@media (max-width: 899px) { .tol-fitrow { grid-template-columns: 52px 98px 1fr; } .tol-fitrow span { grid-column: 2 / -1; } .tol-res-h.tol-fit .tol-fitimg { width: 72px; height: 50px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-fitrow { grid-template-columns: 52px 98px 1fr; } .tol-fitrow span { grid-column: 2 / -1; } .tol-res-h.tol-fit .tol-fitimg { width: 72px; height: 50px; } }
 .tol-press { margin: 4px 0 14px; }
 .tol-press .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 10px; margin: 8px 0 10px; }
 .tol-press .tol-lbl { margin-bottom: 3px; }
@@ -273,7 +277,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
 .tol-zoom { display: none; position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 40; background: var(--blue-dark); color: #fff; font: 600 12.5px/1.4 var(--mono, monospace); padding: 10px 14px; border-radius: var(--r-lg, 10px); box-shadow: 0 6px 20px rgba(15,23,31,0.35); box-shadow: 0 6px 20px oklch(20% .02 250/.35); }
 .tol-zoom.on { display: block; }
 .tol-vp { font: 10px var(--mono, monospace); color: var(--text-faint); }
-@media (max-width: 899px) {
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) {
   .tol-desk { display: none !important; }
   .tol-mob { display: block; }
   .tol-tabs button { font-size: 12px; padding: 10px 4px; }
@@ -286,7 +290,7 @@ details.tol-acc > .body { padding: 0 18px 16px; animation: tolAccIn .22s ease; }
   .tol-tiles { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 359px) { .tol-cards { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 900px) { .tol-tablewrap#tol-table-wrap, .tol-desk.tol-tablewrap { max-height: calc(100vh - 270px); min-height: 320px; } }
+@media (min-width: 900px), (min-width: 800px) and (min-height: 600px) { .tol-twx .tol-tablewrap { max-height: calc(100vh - 300px - var(--tol-bar, 0px)); min-height: 220px; } }   /* v6.3: l'altezza tiene conto della barra in basso */
 @media print {
   .tol-tabs, .tol-filter, .tol-summary, .tol-update, .tol-mob, .tol-noprint { display: none !important; }
   .tol-desk { display: block !important; }
@@ -366,7 +370,7 @@ body.tol-big .tol-tile .v { font-size: 24px; } body.tol-big .tol-tile .s, body.t
 body.tol-big .tol-chip { font-size: 13px; padding: 6px 12px; }
 body.tol-big .tol-res-h b { font-size: 21px; }
 body.tol-big .tol-lot .prev table, body.tol-big .tol-rep .prev table { font-size: 15px; }
-@media (max-width: 899px) { body.tol-big .tol-sum-txt .lim { font-size: 30px; } body.tol-big .tol-sum-txt .cls { font-size: 21px; } body.tol-big .tol-sum-copy { font-size: 13px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { body.tol-big .tol-sum-txt .lim { font-size: 30px; } body.tol-big .tol-sum-txt .cls { font-size: 21px; } body.tol-big .tol-sum-copy { font-size: 13px; } }
 /* v5.2: esito AL LIMITE (ambra) quando la misura sta a meno di mezza divisione dello strumento dal limite */
 .tol-sum-txt .m .unc { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12.5px; margin-right: 4px; background: var(--amber-dark); color: #fff; font-weight: 700; }
 .tol-sum-txt .m .lim { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12.5px; margin-left: 6px; background: var(--amber-dark); color: #fff; font-weight: 700; }
@@ -377,7 +381,7 @@ body.tol-big .tol-lot .prev table, body.tol-big .tol-rep .prev table { font-size
 .tol-gen select.on { border-color: var(--amber-dark); background: var(--amber-dim); color: var(--amber-dark); }
 .tol-summary.num { border-top-color: var(--purple-dark, #6b4fa3); }
 /* v5.0: lotto (più pezzi della stessa quota) */
-@media (max-width: 899px) { .tol-summary .tol-sum-copy { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; font-size: 11.5px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { .tol-summary .tol-sum-copy { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; font-size: 11.5px; } }
 .tol-lot { border-color: var(--amber-dark); }
 .tol-lot .ttl { color: var(--amber-dark); }
 .tol-inp.tol-ta textarea { flex: 1; border: 0; outline: 0; background: transparent; font: 600 14px/1.4 var(--mono, monospace); color: var(--text); padding: 8px 10px; resize: vertical; min-height: 44px; }
@@ -458,7 +462,7 @@ body.tol-big .tol-lot .prev table, body.tol-big .tol-rep .prev table { font-size
 .tol-insp .verdict { font: 700 14px var(--mono, monospace); padding: 8px 10px; border-radius: var(--r, 6px); margin-top: 8px; }
 .tol-insp .verdict.unc { background: var(--amber-dim); color: var(--amber-dark); } .tol-insp .verdict.ok { background: var(--green-dim); color: var(--green-dark); } .tol-insp .verdict.ko { background: var(--red-dim); color: var(--red-dark); }
 .tol-sec-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-@media (max-width: 899px) { body { padding: 10px 10px 40px; } .hd { padding: 12px 14px 10px; margin-bottom: 10px; } .block { padding: 12px 12px; margin-bottom: 10px; } .hd-title { font-size: 19px; } }
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px) { body { padding: 10px 10px 40px; } .hd { padding: 12px 14px 10px; margin-bottom: 10px; } .block { padding: 12px 12px; margin-bottom: 10px; } .hd-title { font-size: 19px; } }
 .tol-print-title { display: none; font: 700 14px var(--mono); margin-bottom: 6px; }
 @media print { .tol-print-title { display: block; } }
 /* v5.0: con 5 tasti nella barra, sotto i 420 px vanno su due righe (3 + 2): larghi da premere col pollice. In coda per vincere sulle regole della 4.8. */
@@ -487,7 +491,7 @@ body.tol-big .tol-lot .prev table, body.tol-big .tol-rep .prev table { font-size
 .tol-summary .tol-sum-txt { padding-right: 44px; }
 body.tol-sum-min .tol-summary .tol-sum-copy { display: none !important; }
 /* telefono e tablet (dito, guanti): tasti di almeno 40 px e testi di almeno 12,5 px */
-@media (max-width: 899px), (pointer: coarse) {
+@media (max-width: 799px), (max-width: 899px) and (max-height: 599px), (pointer: coarse) {
   .tol-chip, .tol-summary .tol-chip { min-height: 40px; padding: 8px 13px; font-size: 13px; border-radius: 20px; }
   .tol-seg button { min-height: 40px; padding: 9px 14px; font-size: 13px; }
   .lang-chip { min-height: 40px; padding: 9px 14px; font-size: 13px; }
@@ -501,7 +505,8 @@ body.tol-sum-min .tol-summary .tol-sum-copy { display: none !important; }
   .tol-sum-txt, .tol-sum-txt .dev, .tol-sum-txt .m2 { font-size: 13px; }
   .tol-summary .tol-chip { padding: 8px 10px; font-size: 12.5px; flex: 1 1 auto; text-align: center; }   /* i 4 tasti su una riga sola */
   .tol-summary { flex-wrap: wrap; gap: 6px; }
-  .btn-help, #tol-print-btn, .tol-tabs button { min-height: 40px; }
+  .btn-help, #tol-print-btn, #tol-big-btn, .tol-tabs button { min-height: 40px; }   /* v6.3: Officina era 24 px */
+  #tol-big-btn { padding: 8px 16px; font-size: 12.5px; }
   .tol-inp input, .tol-inp select { min-height: 38px; }
 }
 @media (hover: none) { .tol-chip:hover { border-color: var(--border); color: var(--text-muted); } .tol-chip.on:hover { color: var(--surface); } }
@@ -633,7 +638,7 @@ body.tol-typing .tol-summary { display: none; }
           <div class="section-lbl" id="tol-table-title"></div>
           <div class="tol-hint tol-desk" data-tx-it="La riga evidenziata &egrave; la fascia del &Oslash; inserito. Clic su una casella per portarla nel calcolo." data-tx-en="The highlighted row is the range of the &Oslash; entered. Click a cell to load it into the calculation.">La riga evidenziata &egrave; la fascia del &Oslash; inserito. Clic su una casella per portarla nel calcolo.</div>
         </div>
-        <div class="tol-tablewrap tol-desk"><table class="tol-table" id="tol-table"></table></div>
+        <div class="tol-twx tol-desk"><div class="tol-tablewrap"><table class="tol-table" id="tol-table"></table></div></div>
         <div class="tol-mob tol-noprint">
           <div class="tol-bandnav">
             <button type="button" data-band="-1" aria-label="Fascia precedente" data-aria-it="Fascia precedente" data-aria-en="Previous range">&lsaquo;</button>
@@ -748,7 +753,7 @@ body.tol-typing .tol-summary { display: none; }
     <span data-tx-it="Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma." data-tx-en="Inspired by the Talide Utensili cardboard &laquo;ISO Tolerances&raquo; slide chart. Reference tool: the standard prevails for inspection.">Ispirato al regolo in cartoncino &laquo;Tolleranze ISO&raquo; Talide Utensili. Strumento di consultazione: per il collaudo fa fede la norma.</span><br>
 <span id="tol-net-ind"><span class="tol-net" id="tol-net"></span><span id="tol-net-txt">online</span></span> &middot; <span class="tol-check" id="tol-check"></span> &middot; <span class="tol-vp" id="tol-vp"></span><br>
     <span data-tx-it="App realizzata da <b>NextCore AI Department</b> per UTR Tiberti." data-tx-en="App built by <b>NextCore AI Department</b> for UTR Tiberti.">App realizzata da <b>NextCore AI Department</b> per UTR Tiberti.</span><br>
-    Tolleranze ISO UTR v6.2 &middot; <a href="?selftest" style="color:inherit;" data-tx-it="autotest" data-tx-en="self-test">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;" data-tx-it="verifica esterna" data-tx-en="external check">verifica esterna</a> <span id="tol-selftest-out"></span>
+    Tolleranze ISO UTR v6.3 &middot; <a href="?selftest" style="color:inherit;" data-tx-it="autotest" data-tx-en="self-test">autotest</a> &middot; <a href="verifica/verifica.html" style="color:inherit;" data-tx-it="verifica esterna" data-tx-en="external check">verifica esterna</a> <span id="tol-selftest-out"></span>
   </div>
 </div>
 
@@ -2656,6 +2661,7 @@ var TolISO = (function () {
     Array.prototype.forEach.call($('tol-ittable').querySelectorAll('tbody tr'), function (tr) {
       tr.classList.toggle('tol-cur', fi >= 0 && parseInt(tr.getAttribute('data-m'), 10) === F2M[fi]);
     });
+    var mk = fi + '|' + side + '|' + cls + '|' + (document.body.classList.contains('tol-big') ? 'big' : '') + '|' + (document.body.classList.contains('tol-sum-min') ? 'min' : ''); if (mk !== lastMarkKey && fi >= 0) { var had = lastMarkKey !== ''; lastMarkKey = mk; scrollToCurRow(had); } else tableShadow();
   }
   /* ── Riga di riepilogo fissa in fondo (schede FORO/ALBERO) ── */
   function summaryOf(st) {
@@ -2715,6 +2721,24 @@ var TolISO = (function () {
     box.hidden = false; document.body.classList.add('tol-has-summary');
     /* v3.9: il riepilogo con la misura è più alto (barra): lo spazio libero in fondo alla pagina segue la sua altezza reale */
     document.body.style.paddingBottom = (box.offsetHeight + 14) + 'px';
+    document.documentElement.style.setProperty('--tol-bar', box.offsetHeight + 'px');
+    tableShadow();
+  }
+  /* v6.3: la tabella intera sta in un riquadro che scorre. Ombra a destra se c'è altro da scorrere; quando cambia la riga (Ø) o la classe, la tabella scorre da sola fino alla tua riga e alla tua colonna (iPad: la riga restava sotto la barra) */
+  function tableShadow() {
+    var t = $('tol-table'), w = t && t.parentNode, o = w && w.parentNode; if (!o || !o.classList) return;
+    o.classList.toggle('more', w.scrollWidth - w.clientWidth - w.scrollLeft > 4);
+  }
+  var lastMarkKey = '';
+  function scrollToCurRow(moved) {
+    var t = $('tol-table'), w = t.parentNode, tr = t.querySelector('tbody tr.tol-cur'); if (!tr || !w.clientHeight) return;
+    var hd = t.querySelector('thead'), hh = hd ? hd.offsetHeight : 0;
+    w.scrollTop = Math.max(0, tr.offsetTop - hh - Math.max(0, (w.clientHeight - hh - tr.offsetHeight) / 2));
+    var sel = tr.querySelector('td.tol-sel');
+    if (sel && (sel.offsetLeft < w.scrollLeft + 160 || sel.offsetLeft + sel.offsetWidth > w.scrollLeft + w.clientWidth)) w.scrollLeft = Math.max(0, sel.offsetLeft - w.clientWidth / 2);
+    tableShadow();
+    /* dopo un cambio fatto dall'utente (Ø, classe, Officina, barra ridotta) se il riquadro finisce sotto la barra si fa scorrere un po' la pagina, senza far sparire l'inizio del riquadro */
+    var bx = $('tol-summary'); if (moved && bx && !bx.hidden) { var wr = w.getBoundingClientRect(), over = wr.bottom - (bx.getBoundingClientRect().top - 8); if (over > 0 && wr.top > 60) window.scrollBy(0, Math.min(over, wr.top - 60)); }
   }
   function renderBand(st) {
     var el = $('tol-band'), ok = st.D > 0 && st.D <= 500;
@@ -2867,7 +2891,7 @@ var TolISO = (function () {
     } catch (e) { $('tol-h-let').value = 'H'; $('tol-s-let').value = 'g'; $('tol-s-gr').value = '6'; }
     Array.prototype.forEach.call($('tol-filter').children, function (b) { b.classList.toggle('on', b.getAttribute('data-filter') === filter); });
     loadRecent(); renderRecent(); loadFav(); renderFav(); loadRep(); loadLot(); preloadPhoto();
-    try { if (window.matchMedia && window.matchMedia('(min-width: 900px)').matches) $('tol-fits-det').open = true; } catch (e) {}
+    try { if (window.matchMedia && window.matchMedia('(min-width: 900px), (min-width: 800px) and (min-height: 600px)').matches) $('tol-fits-det').open = true; } catch (e) {}
     setTab(tab); buildItTable(); renderProv(); buildFinder(); buildGloss();
     $('tol-gloss-q').addEventListener('input', renderGlossAns);
     if (tab === 'fit') rebuildTables();
@@ -2909,6 +2933,7 @@ var TolISO = (function () {
       if (p.num && p.num.src === '2768' && /[fmcv][KHL]\s*$/.test(v)) notes.push(it ? 'La lettera ' + v.trim().slice(-1) + ' (ISO 2768-2, tolleranze geometriche) è letta ma non applicata: l\'app usa solo la parte 1, quote lineari.' : 'The letter ' + v.trim().slice(-1) + ' (ISO 2768-2, geometrical tolerances) is read but not applied: the app uses part 1 only, linear dimensions.');
       $('tol-note').innerHTML = notes.join('<br>');
     }
+    (function () { var w = $('tol-table') && $('tol-table').parentNode; if (w) w.addEventListener('scroll', tableShadow); window.addEventListener('resize', tableShadow); window.addEventListener('orientationchange', function () { setTimeout(function () { lastMarkKey = ''; render(); }, 350); }); })();   /* v6.3: girando l'iPad la tabella torna alla tua riga */
     (function () {   /* v6.1: «Collaudo» nella barra: apre il riquadro delle misure di foro e albero e ci porta lì */
       var b = $('tol-sum-insp'); if (!b) return;
       b.addEventListener('click', function () {
@@ -3672,6 +3697,10 @@ var TolISO = (function () {
       var bmin = $('tol-sum-min'); bmin.click();
       ck('v6.0 barra in basso: il tasto «−» nasconde Copia/Condividi/Rapporto/Lotto e diventa «+»', document.body.classList.contains('tol-sum-min') && getComputedStyle($('tol-sum-copy')).display === 'none' && bmin.textContent === '+');
       bmin.click(); ck('v6.0 secondo tocco: la barra torna intera', !document.body.classList.contains('tol-sum-min') && getComputedStyle($('tol-sum-copy')).display !== 'none' && bmin.textContent === '−');
+      /* v6.3 — iPad */
+      ck('v6.3 tabella intera in un riquadro con l\'ombra del bordo destro (.tol-twx > .tol-tablewrap > #tol-table)', !!$('tol-table').parentNode.classList.contains('tol-tablewrap') && $('tol-table').parentNode.parentNode.classList.contains('tol-twx'));
+      ck('v6.3 l\'altezza della barra in basso è nella variabile --tol-bar (serve a non far finire la tabella sotto la barra)', /^\d+px$/.test(document.documentElement.style.getPropertyValue('--tol-bar')));
+      ck('v6.3 tasto Officina nell\'elenco dei tasti da 40 px al tocco (era 24 px)', /#tol-big-btn, \.tol-tabs button \{ min-height: 40px/.test(document.getElementsByTagName('style')[0].textContent));
       /* v6.1 — il pezzo FUORI dice cosa si può fare; Collaudo nella barra; la frase «buono da … a …» in cima */
       function sumT() { return $('tol-sum-txt').textContent; }
       typeD('25 g6'); $('tol-m').value = '24,998'; render();
@@ -4070,7 +4099,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.2', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.3', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* ══════════ TOL-ISO:JS END ══════════ */
