@@ -1,4 +1,4 @@
-/* Generato da Tolleranze_ISO_UTR_6.1.html con estrai_core.py — NON modificare a mano */
+/* Generato da Tolleranze_ISO_UTR_6.2.html con estrai_core.py — NON modificare a mano */
 /* ══════════ TOL-ISO:JS START — da copiare nel calcolatore ══════════
    Modulo autonomo: unica variabile globale = TolISO. Nessuna dipendenza.
    API:  TolISO.limits(kind, letter, grade, D)  → scostamenti/limiti di una classe
@@ -921,6 +921,24 @@ var TolISO = (function () {
       var mi = /^IT\s?(\d{1,2})$/i.exec(v), en = lang === 'en';
       if (mi && +mi[1] >= 1 && +mi[1] <= 18) { var gg = glossGrade(+mi[1]), w = (st.D > 0 && st.D <= 500) ? limits('hole', 'H', +mi[1], st.D) : null;
         a.innerHTML = '<dl><dt>IT' + mi[1] + ' · ' + esc(gg[en ? 3 : 2]) + '</dt><dd>' + (w && w.ok ? (en ? 'At Ø' : 'A Ø') + fmtD(st.D) + (en ? ': total tolerance ' : ': tolleranza totale ') + umAbs(w.it) + ' µm. ' : '') + (en ? 'Typical use: ' : 'Uso tipico: ') + esc(gg[en ? 5 : 4]) + '</dd></dl>'; return; }
+      /* v6.2 «Grado inverso»: una tolleranza in µm (o mm, anche ±) → il grado IT che ci sta dentro, al Ø corrente (lo ha Xometry, noi no) */
+      var mu = /^\s*(±)?\s*([0-9]+(?:[.,][0-9]+)?|[.,][0-9]+)\s*(µm|μm|um|micron|mm)?\s*$/i.exec(v);
+      if (mu && !(!mu[1] && !mu[3] && mu[2] === '2768')) {   /* «2768» da solo è la norma delle tolleranze generali, non 2768 µm */
+        var uTxt = (mu[3] || '').toLowerCase(), val = parseFloat(mu[2].replace(',', '.')), tot = (uTxt === 'mm' ? val * 1000 : val) * (mu[1] ? 2 : 1), box = '<span class="bad">';
+        if (!mu[3] && val < 1) { a.innerHTML = box + esc(en ? 'Add the unit: «20 µm» or «0.02 mm».' : 'Scrivi l\'unità: «20 µm» oppure «0,02 mm».') + '</span>'; return; }
+        if (!(st.D > 0 && st.D <= 500)) { a.innerHTML = box + esc(en ? 'The IT grade depends on the diameter: write the Ø first (at the top, 0 to 500 mm).' : 'Il grado IT dipende dal diametro: scrivi prima il Ø (in alto, da 0 a 500 mm).') + '</span>'; return; }
+        var its = []; for (var gi = 1; gi <= 18; gi++) its[gi] = limits('hole', 'H', gi, st.D).it;
+        var dtT = (mu[1] ? '±' + mu[2] + (uTxt === 'mm' ? ' mm' : ' µm') + ' = ' + (en ? 'total ' : 'totale ') : '') + umAbs(Math.round(tot * 10) / 10) + ' µm' + (en ? ' at Ø' : ' a Ø') + fmtD(st.D), ddT;
+        if (tot < its[1] - 1e-9) ddT = en ? 'Tighter than IT1 (' + umAbs(its[1]) + ' µm at this Ø): no ISO grade is that narrow.' : 'Più stretta di IT1 (' + umAbs(its[1]) + ' µm a questo Ø): nessun grado ISO è così stretto.';
+        else {
+          var fitG = 1; for (var gj = 1; gj <= 18; gj++) if (its[gj] <= tot + 1e-9) fitG = gj;
+          var gr = glossGrade(fitG), nx = fitG < 18 ? fitG + 1 : 0;
+          ddT = (Math.abs(its[fitG] - tot) < 0.05 ? (en ? 'It is exactly IT' + fitG : 'È esattamente IT' + fitG) : (en ? 'IT' + fitG + ' fits inside it' : 'Ci sta dentro IT' + fitG)) + ' (' + umAbs(its[fitG]) + ' µm). '
+               + (nx ? (en ? 'IT' + nx + ' (' + umAbs(its[nx]) + ' µm) would already be ' + umAbs(Math.round((its[nx] - tot) * 10) / 10) + ' µm too wide. ' : 'IT' + nx + ' (' + umAbs(its[nx]) + ' µm) sarebbe già largo di ' + umAbs(Math.round((its[nx] - tot) * 10) / 10) + ' µm. ') : '')
+               + (gr ? (en ? 'IT' + fitG + ': ' + gr[3].toLowerCase() + ' (' + gr[5] + ').' : 'IT' + fitG + ': ' + gr[2].toLowerCase() + ' (' + gr[4] + ').') : '');
+        }
+        a.innerHTML = '<dl><dt>' + esc(dtT) + '</dt><dd>' + esc(ddT) + '</dd></dl>'; return;
+      }
       var gl = /^[A-Za-z]{1,2}$/.test(v) ? glossLetter(v) : null;
       if (gl) { a.innerHTML = '<dl><dt>' + esc(v) + ' · ' + esc(gl[en ? 3 : 2]) + '</dt><dd>' + (en ? 'Typical use: ' : 'Uso tipico: ') + esc(gl[en ? 5 : 4]) + (v === v.toUpperCase() ? (en ? ' (described for the shaft; for the hole it mirrors)' : ' (descritta per l\'albero; per il foro è speculare)') : '') + '</dd></dl>'; return; }
       var wv = /^(iso\s*)?2768(-1)?$/i.test(v) ? (en ? 'general tolerances' : 'tolleranze generali') : v;
@@ -2890,6 +2908,12 @@ var TolISO = (function () {
       ck('v6.0 glossario «rz», «rugosità», «ovalizzazione», «azoto», «2768»: rispondono con la voce giusta', /Rugosità Rz/.test(gq('rz')) && /Rugosità Rz/.test(gq('rugosità')) && /Ovalità e conicità/.test(gq('ovalizzazione')) && /Interferenza/.test(gq('azoto')) && /Tolleranze generali/.test(gq('2768')));
       ck('v6.0 glossario «IT5» a Ø25: «tolleranza totale 9 µm»; «js» → la sua riga', /IT5 · Precisione molto alta/.test(gq('IT5')) && /tolleranza totale 9 µm/.test($('tol-gloss-ans').textContent) && /^js · Simmetrica/.test(gq('js')));
       ck('v6.0 glossario parola sconosciuta («alesatura») → «Parola non trovata», non «Scrivi una classe»', /Parola non trovata/.test(gq('alesatura')) && !/Scrivi una classe/.test($('tol-gloss-ans').textContent));
+      /* v6.2: «Grado inverso» — dai µm al grado IT (come Xometry) */
+      ck('v6.2 glossario «30 µm» a Ø25: ci sta dentro IT7 (21 µm), IT8 (33 µm) sarebbe largo di 3 µm', /30 µm a Ø25/.test(gq('30 µm')) && /Ci sta dentro IT7 \(21 µm\)/.test($('tol-gloss-ans').textContent) && /IT8 \(33 µm\) sarebbe già largo di 3 µm/.test($('tol-gloss-ans').textContent));
+      ck('v6.2 glossario «21 µm» = esattamente IT7; «0,021 mm» e «21» (senza unità, ≥ 1) uguali', /È esattamente IT7/.test(gq('21 µm')) && /21 µm a Ø25[^]*È esattamente IT7/.test(gq('0,021 mm')) && /È esattamente IT7/.test(gq('21')));
+      ck('v6.2 glossario «1 µm» (più stretta di IT1) e «0,02» (senza unità: chiede l\'unità)', /Più stretta di IT1/.test(gq('1 µm')) && /Scrivi l'unità/.test(gq('0,02')));
+      ck('v6.2 glossario «2000 µm» a Ø25: IT16 (1300 µm)', /Ci sta dentro IT16 \(1300 µm\)/.test(gq('2000 µm')));
+      $('tol-d').value = 'abc'; $('tol-d').dispatchEvent(new Event('change')); ck('v6.2 glossario «30 µm» senza un Ø valido: dice di scrivere prima il Ø', /dipende dal diametro/.test(gq('30 µm'))); typeD('25 H7');
       gq('');
       var bmin = $('tol-sum-min'); bmin.click();
       ck('v6.0 barra in basso: il tasto «−» nasconde Copia/Condividi/Rapporto/Lotto e diventa «+»', document.body.classList.contains('tol-sum-min') && getComputedStyle($('tol-sum-copy')).display === 'none' && bmin.textContent === '+');
@@ -3292,7 +3316,7 @@ var TolISO = (function () {
   }
 
   var API = { limits: limits, fit: fit, dim: dim, formats: formats, parts: parts, devStr: devStr, provenienza: provenienza, NORME: NORME, parse: parse, parseClass: parseClass, mount: mount, setLang: setLang, selfTest: selfTest, uiTest: uiTest, getUI: getUI, printLabel: printLabel, showAlert: showAlert, _fitDrawGeom: fitDrawGeom, _photoLayout: photoLayout, _fav: function () { return { list: fav, add: addFav, del: delFav }; }, _insp: insp, _pressCalc: pressCalc, _pressPreset: pressPreset,
-           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.1', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
+           _diagramGeom: diagramGeom, measure: checkMeasure, openReport: openRep, reportData: reportData, findFits: findFits, explain: explain, GLOSS: GLOSS, repPrint: false, version: '6.2', refreshSummary: function () { if (root) render(); }, limitNear: limitNear, measRes: measRes, gen2768: gen2768, limitsOf: limitsOf, lotAdd: lotAdd, lotStats: lotStats, reportDate: function () { return rep.data || todayStr(); } };
   return API;
 })();
 /* TOL-ISO:JS END */
